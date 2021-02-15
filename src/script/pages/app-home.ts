@@ -117,6 +117,15 @@ export class AppHome extends LitElement {
         #filters {
           gap: 10px;
         }
+
+        #getting-started {
+          text-align: center;
+          font-size: 10px;
+        }
+
+        #getting-started img {
+          width: 60vw;
+        }
       }
 
       @keyframes slideup {
