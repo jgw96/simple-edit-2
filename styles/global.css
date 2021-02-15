@@ -15,6 +15,10 @@ html, body {
   overflow: hidden;
 }
 
+fast-design-system-provider {
+  --accent-fill-rest: #6c63ff;
+}
+
 @media (prefers-color-scheme: light) {
   html,
   body {
@@ -32,6 +36,8 @@ html, body {
     --neutral-fill-rest: #5d5d5d;
 
     --neutral-fill-input-active: #e5e5e5;
+
+    --accent-fill-rest: #6c63ff;
   }
 
 }

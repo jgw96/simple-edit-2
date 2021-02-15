@@ -1,6 +1,8 @@
 import { fileSave } from 'browser-fs-access';
 import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
 
+import { classMap } from 'lit-html/directives/class-map';
+
 const typeMap = [
   { name: "grayscale", filter: new (window as any).fabric.Image.filters.Grayscale() },
   { name: "sepia", filter: new (window as any).fabric.Image.filters.Sepia() },
@@ -28,7 +30,8 @@ export class AppCanvas extends LitElement {
         justify-content: center;
         align-items: center;
         height: 100%;
-        border-radius: 8px 0 0 0;
+
+        background: #1e1e1e;
 
         height: 100%;
         width: 100%;

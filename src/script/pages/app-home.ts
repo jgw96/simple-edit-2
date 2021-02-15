@@ -64,6 +64,22 @@ export class AppHome extends LitElement {
         right: 16px;
       }
 
+      #getting-started {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 86vh;
+      }
+
+      #getting-started img {
+        width: 28em;
+        margin-top: 4em;
+      }
+
+      #getting-started h2 {
+        font-size: 2em;
+      }
+
       @keyframes slideup {
         from {
           transform: translateY(30px);
@@ -89,6 +105,8 @@ export class AppHome extends LitElement {
 
     if (blob) {
       this.org = blob;
+
+      await this.updateComplete;
 
       this.canvas = this.shadowRoot?.querySelector("app-canvas");
 
@@ -140,7 +158,7 @@ export class AppHome extends LitElement {
           </aside>
 
           <main>
-            <app-canvas></app-canvas>
+            ${this.org ? html`<app-canvas></app-canvas>` : html`<div id="getting-started"><img src="/assets/started.svg"> <h2>Choose an image to get started!</h2></div>`}
           </main>
         </div>
 
