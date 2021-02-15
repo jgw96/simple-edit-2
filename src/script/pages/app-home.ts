@@ -47,7 +47,7 @@ export class AppHome extends LitElement {
       #controls, #filters {
         display: flex;
         justify-content: space-between;
-        min-width: 38em;
+        min-width: 31em;
       }
 
       #filters {
@@ -103,6 +103,10 @@ export class AppHome extends LitElement {
 
       #advanced {
         margin-left: 1em;
+
+        position: fixed;
+        top: 10px;
+        right: 16px;
       }
 
       #settings-pane {
@@ -307,7 +311,7 @@ export class AppHome extends LitElement {
               </div>`}
           </main>
 
-          <div id="mobile-toolbar">
+          ${this.org ? html` <div id="mobile-toolbar">
           <div id="controls">
               <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo</fast-button>
               <fast-button @click="${() => this.save()}">Save Copy</fast-button>
@@ -328,7 +332,7 @@ export class AppHome extends LitElement {
               </div>
               ` : null
       }
-    </div>
+    </div>` : null}
         </div>
 
         ${this.handleSettings ? html`<div id="settings-pane">

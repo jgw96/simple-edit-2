@@ -192,8 +192,22 @@ export class AppCanvas extends LitElement {
     }
   }
 
-  public shareImage() {
-    this.canvas?.toBlob(async (blob) => {
+  public async shareImage() {
+    let dataurl = null;
+
+    const active = this.canvas.getActiveObject();
+
+    if (active) {
+      dataurl = active.toDataURL();
+    }
+    else {
+      dataurl = this.imgInstance?.toDataURL();
+    }
+
+    if (dataurl) {
+      const blob = this.dataURLtoBlob(dataurl);
+      console.log(blob);
+
       if (blob) {
         const file = new File([blob], "untitled.png", {
           type: "image/png"
@@ -209,7 +223,7 @@ export class AppCanvas extends LitElement {
           console.log(`Your system doesn't support sharing files.`);
         }
       }
-    });
+    }
   }
 
   revert() {
