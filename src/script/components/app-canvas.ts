@@ -1,8 +1,6 @@
 import { fileSave } from 'browser-fs-access';
 import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
 
-import { classMap } from 'lit-html/directives/class-map';
-
 const typeMap = [
   { name: "grayscale", filter: new (window as any).fabric.Image.filters.Grayscale() },
   { name: "sepia", filter: new (window as any).fabric.Image.filters.Sepia() },
@@ -59,8 +57,8 @@ export class AppCanvas extends LitElement {
       });
 
       this.canvas.on('mouse:wheel', (opt) => {
-        var delta = opt.e.deltaY;
-        var zoom = this.canvas.getZoom();
+        const delta = opt.e.deltaY;
+        let zoom = this.canvas.getZoom();
         zoom *= 0.999 ** delta;
         if (zoom > 20) zoom = 20;
         if (zoom < 0.01) zoom = 0.01;
@@ -96,7 +94,7 @@ export class AppCanvas extends LitElement {
           this.imgInstance.bringToFront();
         }
 
-        if (e.target.result) {
+        if (e.target?.result) {
           this.image.src = (e.target.result as string);
         }
       }
@@ -117,7 +115,7 @@ export class AppCanvas extends LitElement {
           }
         });
 
-        active.filters.push(filter.filter);
+        active.filters.push(filter?.filter);
 
         // apply filters and re-render canvas when done
         active.applyFilters();
@@ -132,7 +130,7 @@ export class AppCanvas extends LitElement {
           }
         });
 
-        this.imgInstance.filters.push(filter.filter);
+        this.imgInstance.filters.push(filter?.filter);
 
         // apply filters and re-render canvas when done
         this.imgInstance.applyFilters();
@@ -173,7 +171,7 @@ export class AppCanvas extends LitElement {
   }
 
   dataURLtoBlob(dataurl) {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+    const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
       bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
     while (n--) {
       u8arr[n] = bstr.charCodeAt(n);

@@ -16,7 +16,7 @@ export class AppHome extends LitElement {
   @internalProperty() canvas: AppCanvas | undefined | null;
   @internalProperty() org: File | undefined | null;
 
-  @internalProperty() handleSettings: boolean = false;
+  @internalProperty() handleSettings = false;
 
   settingsAni: Animation | undefined;
 
@@ -212,28 +212,28 @@ export class AppHome extends LitElement {
 
       this.canvas = this.shadowRoot?.querySelector("app-canvas");
 
-      this.canvas.drawImage(blob);
+      this.canvas?.drawImage(blob);
     }
   }
 
   async filter(type: string) {
-    await this.canvas.applyWebglFilter(type);
+    await this.canvas?.applyWebglFilter(type);
   }
 
   revert() {
-    this.canvas.revert();
+    this.canvas?.revert();
   }
 
   async save() {
-    this.canvas.save();
+    this.canvas?.save();
   }
 
   async share() {
-    this.canvas.shareImage();
+    this.canvas?.shareImage();
   }
 
   async remove() {
-    this.canvas.removeObject();
+    this.canvas?.removeObject();
   }
 
   async doSettings() {
