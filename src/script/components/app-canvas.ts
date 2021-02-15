@@ -2,20 +2,19 @@ import { fileSave } from 'browser-fs-access';
 import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
 
 const typeMap = [
-  { name: "grayscale", filter: new (window as any).fabric.Image.filters.Grayscale() },
-  { name: "sepia", filter: new (window as any).fabric.Image.filters.Sepia() },
-  { name: "brightness", filter: new (window as any).fabric.Image.filters.Brightness({ brightness: 80 }) },
-  { name: "saturation", filter: new (window as any).fabric.Image.filters.Saturation({ saturation: 50 }) },
-  { name: "blur", filter: new (window as any).fabric.Image.filters.Blur({ blur: 0.5 }) },
-  { name: "invert", filter: new (window as any).fabric.Image.filters.Invert() },
-  { name: "pixelate", filter: new (window as any).fabric.Image.filters.Pixelate({ blocksize: 50 }) }
+  { name: "grayscale", filter: new window.fabric.Image.filters.Grayscale() },
+  { name: "sepia", filter: new window.fabric.Image.filters.Sepia() },
+  { name: "brightness", filter: new window.fabric.Image.filters.Brightness({ brightness: 80 }) },
+  { name: "saturation", filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }) },
+  { name: "blur", filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }) },
+  { name: "invert", filter: new window.fabric.Image.filters.Invert() },
+  { name: "pixelate", filter: new window.fabric.Image.filters.Pixelate({ blocksize: 50 }) }
 ];
 
 @customElement('app-canvas')
 export class AppCanvas extends LitElement {
 
-  @internalProperty() canvas: any;
-  @internalProperty() ctx: any;
+  @internalProperty() canvas: fabric.Canvas;
   @internalProperty() image: HTMLImageElement | undefined | null;
   @internalProperty() imgInstance: any;
 
@@ -48,8 +47,8 @@ export class AppCanvas extends LitElement {
     if (canvas) {
       console.log('setting up');
       // this.ctx = this.canvas.getContext('2d');
-      (window as any).fabric.textureSize = 8000;
-      this.canvas = new (window as any).fabric.Canvas(canvas);
+      window.fabric.textureSize = 8000;
+      this.canvas = new window.fabric.Canvas(canvas);
 
       this.canvas.setDimensions({
         width: window.innerWidth,
@@ -57,12 +56,12 @@ export class AppCanvas extends LitElement {
       });
 
       this.canvas.on('mouse:wheel', (opt) => {
-        const delta = opt.e.deltaY;
+        const delta = (opt.e as any).deltaY;
         let zoom = this.canvas.getZoom();
         zoom *= 0.999 ** delta;
         if (zoom > 20) zoom = 20;
         if (zoom < 0.01) zoom = 0.01;
-        this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+        this.canvas.zoomToPoint(({ x: (opt.e as any).offsetX, y: (opt.e as any).offsetY } as any), zoom);
         opt.e.preventDefault();
         opt.e.stopPropagation();
       });
@@ -80,23 +79,26 @@ export class AppCanvas extends LitElement {
       reader.onloadend = (e) => {
         this.image = new Image();
 
-        this.image.onload = (e) => {
-          this.imgInstance = new (window as any).fabric.Image(this.image, {
-            left: 0,
-            top: 0,
-            angle: 0
-          });
+        if (this.image) {
+          this.image.onload = () => {
+            this.imgInstance = new window.fabric.Image((this.image as HTMLImageElement), {
+              left: 0,
+              top: 0,
+              angle: 0
+            });
 
-          this.imgInstance.scaleToWidth(window.innerWidth - 100);
+            this.imgInstance.scaleToWidth(window.innerWidth - 100);
 
-          this.canvas.add(this.imgInstance);
+            this.canvas.add(this.imgInstance);
 
-          this.imgInstance.bringToFront();
+            this.imgInstance.bringToFront();
+          }
+
+          if (e.target?.result) {
+            this.image.src = (e.target.result as string);
+          }
         }
 
-        if (e.target?.result) {
-          this.image.src = (e.target.result as string);
-        }
       }
 
       reader.readAsDataURL(blob);
@@ -115,10 +117,10 @@ export class AppCanvas extends LitElement {
           }
         });
 
-        active.filters.push(filter?.filter);
+        (active as any).filters.push(filter?.filter);
 
         // apply filters and re-render canvas when done
-        active.applyFilters();
+        (active as any).applyFilters();
 
         this.canvas.add(active);
       }
@@ -146,12 +148,12 @@ export class AppCanvas extends LitElement {
   }
 
   public async save() {
-    let dataurl = null;
+    let dataurl: string | null = null;
 
     const active = this.canvas.getActiveObject();
 
     if (active) {
-      dataurl = active.toDataURL();
+      dataurl = active.toDataURL({});
     }
     else {
       dataurl = this.imgInstance?.toDataURL();
@@ -195,12 +197,12 @@ export class AppCanvas extends LitElement {
   }
 
   public async shareImage() {
-    let dataurl = null;
+    let dataurl: string | null = null;
 
     const active = this.canvas.getActiveObject();
 
     if (active) {
-      dataurl = active.toDataURL();
+      dataurl = active.toDataURL({});
     }
     else {
       dataurl = this.imgInstance?.toDataURL();
@@ -229,7 +231,7 @@ export class AppCanvas extends LitElement {
   }
 
   revert() {
-    const active = this.canvas.getActiveObject();
+    const active: any = this.canvas.getActiveObject();
     active.filters.pop();
 
     active.applyFilters();
