@@ -1,8 +1,7 @@
-import { LitElement, css, html, customElement, property } from 'lit-element';
+import { LitElement, css, html, customElement } from 'lit-element';
 
 @customElement('app-header')
 export class AppHeader extends LitElement {
-  @property({ type: String }) title = 'SimpleEdit';
 
   static get styles() {
     return css`
@@ -17,13 +16,6 @@ export class AppHeader extends LitElement {
         height: 3.6em;
       }
 
-      header h1 {
-        margin-top: 0;
-        margin-bottom: 0;
-        font-size: 18px;
-        font-weight: bold;
-      }
-
       nav {
         width: 9em;
         display: flex;
@@ -32,6 +24,17 @@ export class AppHeader extends LitElement {
 
       nav fast-anchor {
         margin-left: 10px;
+      }
+
+      #info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 8.6em;
+      }
+
+      #info img {
+        width: 2.4em;
       }
 
       @media(prefers-color-scheme: light) {
@@ -49,7 +52,9 @@ export class AppHeader extends LitElement {
   render() {
     return html`
       <header>
-        <h1>${this.title}</h1>
+        <div id ="info">
+          <img src="/assets/icons/icon_64.png" alt="Simple Edit app icon">
+        </div>
       </header>
     `;
   }

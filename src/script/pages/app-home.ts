@@ -16,6 +16,10 @@ export class AppHome extends LitElement {
   @internalProperty() canvas: AppCanvas | undefined | null;
   @internalProperty() org: File | undefined | null;
 
+  @internalProperty() handleSettings: boolean = false;
+
+  settingsAni: Animation | undefined;
+
   static get styles() {
     return css`
       #layout {
@@ -25,8 +29,13 @@ export class AppHome extends LitElement {
 
       aside {
         display: flex;
-        padding-left: 10px;
-        padding-right: 10px;
+        padding-left: 16px;
+        padding-right: 16px;
+        margin-top: 1em;
+
+        animation-name: slideup;
+        animation-duration: 280ms;
+        animation-timing-function: "ease-in-out";
 
         justify-content: space-between;
       }
@@ -38,14 +47,10 @@ export class AppHome extends LitElement {
       #controls, #filters {
         display: flex;
         justify-content: space-between;
-        min-width: 27em;
+        min-width: 38em;
       }
 
       #filters {
-        animation-name: slideup;
-        animation-duration: 280ms;
-        animation-timing-function: "ease-in-out";
-
         min-width: 25em;
       }
 
@@ -94,6 +99,51 @@ export class AppHome extends LitElement {
 
         height: 30vh;
         overflow-y: scroll;
+      }
+
+      #advanced {
+        margin-left: 1em;
+      }
+
+      #settings-pane {
+        position: fixed;
+        right: 0;
+        top: 0;
+        background: rgb(24 24 24 / 90%);
+        backdrop-filter: blur(10px);
+        bottom: 0;
+        height: 100%;
+        width: 20vw;
+        padding-left: 1em;
+
+        display: flex;
+        flex-direction: column;
+      }
+
+      #settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 10px;
+        margin-bottom: 1em;
+      }
+
+      #color-label {
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      #color {
+        width: 88%;
+        border: none;
+        background: #2b2b2b;
+        padding: 6px;
+        border-radius: 4px;
+        height: 2em;
+      }
+
+      #remove-image {
+        background: #d02929;
       }
 
       @media(max-width: 800px) {
@@ -182,21 +232,58 @@ export class AppHome extends LitElement {
     this.canvas.removeObject();
   }
 
+  async doSettings() {
+    if (this.settingsAni) {
+      this.settingsAni.reverse();
+
+      await this.settingsAni.finished;
+
+      this.settingsAni = undefined;
+
+      this.handleSettings = !this.handleSettings;
+    }
+    else {
+      this.handleSettings = !this.handleSettings;
+
+      await this.updateComplete;
+
+      this.settingsAni = this.shadowRoot?.querySelector("#settings-pane")?.animate([
+        {
+          transform: "translateX(260px)"
+        },
+        {
+          transform: "translateY(0)"
+        }
+      ], {
+        fill: "both",
+        easing: "ease-in-out",
+        duration: 280
+      })
+    }
+  }
+
+  handleColor(color: string) {
+    console.log(color);
+    this.canvas?.changeBackgroundColor(color);
+  }
+
   render() {
     return html`
       <div>
         <div id="layout">
-          <aside>
+        ${this.org ? html`<aside>
             <div id="controls">
-              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo</fast-button>
-              <fast-button @click="${() => this.save()}">Save Copy</fast-button>
-              <fast-button @click="${() => this.share()}" id="shareButton">Share</fast-button>
+              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fast-button>
+              <fast-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fast-button>
+              <fast-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fast-button>
 
-              <fast-button @click="${() => this.revert()}">undo</fast-button>
-              <fast-button @click="${() => this.remove()}">Remove Image</fast-button>
+              <fast-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fast-button>
+              <fast-button id="remove-image" @click="${() => this.remove()}">Remove Image <ion-icon name="trash-outline"></ion-icon></fast-button>
+
+              <Fast-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fast-button>
             </div>
 
-            ${this.org ? html`
+
               <div id="filters">
                 <fast-button @click="${() => this.filter("grayscale")}">desaturate</fast-button>
                 <fast-button @click="${() => this.filter("pixelate")}">pixelate</fast-button>
@@ -205,13 +292,19 @@ export class AppHome extends LitElement {
                 <fast-button @click="${() => this.filter("sepia")}">sepia</fast-button>
                 <fast-button @click="${() => this.filter("saturation")}">saturate</fast-button>
               </div>
-              ` : null
-      }
 
-          </aside>
+          </aside>` : null }
 
           <main>
-            ${this.org ? html`<app-canvas></app-canvas>` : html`<div id="getting-started"><img src="/assets/started.svg"> <h2>Choose an image to get started!</h2></div>`}
+            ${this.org ? html`<app-canvas></app-canvas>` : html`
+             <div id="getting-started">
+               <div id="getting-started-header">
+               <img src="/assets/started.svg">
+               <h2>Choose an image to get started!</h2>
+              </div>
+
+              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo <ion-icon name="add-outline"></ion-icon></fast-button>
+              </div>`}
           </main>
 
           <div id="mobile-toolbar">
@@ -237,6 +330,19 @@ export class AppHome extends LitElement {
       }
     </div>
         </div>
+
+        ${this.handleSettings ? html`<div id="settings-pane">
+          <div id="settings-header">
+            <h3>Settings</h3>
+
+            <fast-button @click="${() => this.doSettings()}">
+              Close
+            </fast-button>
+          </div>
+
+          <label id="color-label" for="color">Canvas Background Color</label>
+          <input @change="${(ev) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
+        </div>` : null}
 
         <pwa-install>Install PWA Starter</pwa-install>
       </div>

@@ -221,6 +221,15 @@ export class AppCanvas extends LitElement {
     this.canvas.renderAll();
   }
 
+  public async changeBackgroundColor(color: string) {
+    this.canvas?.setBackgroundColor(color, () => {
+      console.log('color changed');
+
+      this.canvas.renderAll();
+      return;
+    })
+  }
+
   render() {
     return html`
       <canvas></canvas>
