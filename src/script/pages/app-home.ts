@@ -1,7 +1,11 @@
-import { LitElement, css, html, customElement, property } from 'lit-element';
+import { LitElement, css, html, customElement, property, internalProperty } from 'lit-element';
+
+import '../components/app-canvas';
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import '@pwabuilder/pwainstall';
+import { fileOpen } from 'browser-fs-access';
+import { AppCanvas } from '../components/app-canvas';
 
 @customElement('app-home')
 export class AppHome extends LitElement {
@@ -9,57 +13,66 @@ export class AppHome extends LitElement {
   // check out this link https://lit-element.polymer-project.org/guide/properties#declare-with-decorators
   @property() message = 'Welcome!';
 
+  @internalProperty() canvas: AppCanvas | undefined | null;
+  @internalProperty() org: File | undefined | null;
+
   static get styles() {
     return css`
-      #welcomeBar {
+      #layout {
+        height: 92vh;
+        width: auto;
+      }
+
+      aside {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
+        padding-left: 10px;
+        padding-right: 10px;
+
+        justify-content: space-between;
       }
 
-      #welcomeBar fast-card {
-        margin-bottom: 12px;
+      aside fast-button {
+        margin-bottom: 6px;
       }
 
-      #welcomeCard,
-      #infoCard {
-        padding: 18px;
-        padding-top: 0px;
+      #controls, #filters {
+        display: flex;
+        justify-content: space-between;
+        min-width: 20em;
       }
 
-      pwa-install {
-        position: absolute;
-        bottom: 16px;
+      #filters {
+        animation-name: slideup;
+        animation-duration: 280ms;
+        animation-timing-function: "ease-in-out";
+
+        min-width: 25em;
+      }
+
+      #choosePhoto {
+        margin-bottom: 1em;
+        background: var(--accent-fill-rest);
+      }
+
+      #shareButton {
+        margin-bottom: 1em;
+      }
+
+      fast-progress-ring {
+        position: fixed;
+        bottom: -26px;
         right: 16px;
       }
 
-      button {
-        cursor: pointer;
-      }
-
-      @media (min-width: 1200px) {
-        #welcomeCard,
-        #infoCard {
-          width: 40%;
-        }
-      }
-
-      @media (screen-spanning: single-fold-vertical) {
-        #welcomeBar {
-          flex-direction: row;
-          align-items: flex-start;
-          justify-content: space-between;
+      @keyframes slideup {
+        from {
+          transform: translateY(30px);
+          opacity: 0;
         }
 
-        #welcomeCard {
-          margin-right: 64px;
-        }
-      }
-
-      @media(prefers-color-scheme: light) {
-        fast-card {
-          --background-color: white;
+        to {
+          transform: translateY(0px);
+          opacity: 1;
         }
       }
     `;
@@ -69,95 +82,66 @@ export class AppHome extends LitElement {
     super();
   }
 
-  async firstUpdated() {
-    // this method is a lifecycle even in lit-element
-    // for more info check out the lit-element docs https://lit-element.polymer-project.org/guide/lifecycle
-    console.log('This is your home page');
+  async openPhoto() {
+    const blob = await fileOpen({
+      mimeTypes: ['image/*'],
+    });
+
+    if (blob) {
+      this.org = blob;
+
+      this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+      this.canvas.drawImage(blob);
+    }
   }
 
-  share() {
-    if ((navigator as any).share) {
-      (navigator as any).share({
-        title: 'PWABuilder pwa-starter',
-        text: 'Check out the PWABuilder pwa-starter!',
-        url: 'https://github.com/pwa-builder/pwa-starter',
-      });
-    }
+  async filter(type: string) {
+    await this.canvas.applyWebglFilter(type);
+  }
+
+  revert() {
+    this.canvas.drawImage(this.org);
+  }
+
+  async save() {
+    this.canvas.save();
+  }
+
+  async share() {
+    this.canvas.shareImage();
   }
 
   render() {
     return html`
       <div>
-        <div id="welcomeBar">
-          <fast-card id="welcomeCard">
-            <h2>${this.message}</h2>
+        <div id="layout">
+          <aside>
+            <div id="controls">
+              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo</fast-button>
+              <fast-button @click="${() => this.save()}">Save Copy</fast-button>
+              <fast-button @click="${() => this.share()}" id="shareButton">Share</fast-button>
 
-            <p>
-              For more information on the PWABuilder pwa-starter, check out the
-              <fast-anchor
-                href="https://github.com/pwa-builder/pwa-starter/blob/master/README.md"
-                appearance="hypertext"
-                >README</fast-anchor
-              >.
-            </p>
+              <fast-button @click="${() => this.revert()}">undo</fast-button>
+            </div>
 
-            <p>
-              Welcome to the
-              <fast-anchor href="https://pwabuilder.com" appearance="hypertext"
-                >PWABuilder</fast-anchor
-              >
-              pwa-starter! Be sure to head back to
-              <fast-anchor href="https://pwabuilder.com" appearance="hypertext"
-                >PWABuilder</fast-anchor
-              >
-              when you are ready to ship this PWA to the Microsoft, Google Play
-              and Samsung Galaxy stores!
-            </p>
+            ${this.org ? html`
+              <div id="filters">
+                <fast-button @click="${() => this.filter("grayscale")}">desaturate</fast-button>
+                <fast-button @click="${() => this.filter("pixelate")}">pixelate</fast-button>
+                <fast-button @click="${() => this.filter("invert")}">invert</fast-button>
+                <fast-button @click="${() => this.filter("blur")}">blur</fast-button>
+                <fast-button @click="${() => this.filter("sepia")}">sepia</fast-button>
+                <fast-button @click="${() => this.filter("saturation")}">saturate</fast-button>
+              </div>
+              ` : null
+      }
 
-            ${'share' in navigator
-              ? html`<fast-button appearance="primary" @click="${this.share}"
-                  >Share this Starter!</fast-button
-                >`
-              : null}
-          </fast-card>
+          </aside>
 
-          <fast-card id="infoCard">
-            <h2>Technology Used</h2>
-
-            <ul>
-              <li>
-                <fast-anchor
-                  href="https://www.typescriptlang.org/"
-                  appearance="hypertext"
-                  >TypeScript</fast-anchor
-                >
-              </li>
-
-              <li>
-                <fast-anchor
-                  href="https://lit-element.polymer-project.org/"
-                  appearance="hypertext"
-                  >lit-element</fast-anchor
-                >
-              </li>
-
-              <li>
-                <fast-anchor
-                  href="https://www.fast.design/docs/components/getting-started"
-                  appearance="hypertext"
-                  >FAST Components</fast-anchor
-                >
-              </li>
-
-              <li>
-                <fast-anchor
-                  href="https://vaadin.github.io/vaadin-router/vaadin-router/demo/#vaadin-router-getting-started-demos"
-                  appearance="hypertext"
-                  >Vaadin Router</fast-anchor
-                >
-              </li>
-            </ul>
-          </fast-card>
+          <main>
+            <app-canvas></app-canvas>
+          </main>
         </div>
 
         <pwa-install>Install PWA Starter</pwa-install>
