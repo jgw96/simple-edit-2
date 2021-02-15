@@ -38,7 +38,7 @@ export class AppHome extends LitElement {
       #controls, #filters {
         display: flex;
         justify-content: space-between;
-        min-width: 20em;
+        min-width: 27em;
       }
 
       #filters {
@@ -80,6 +80,45 @@ export class AppHome extends LitElement {
         font-size: 2em;
       }
 
+      #mobile-toolbar {
+        display: none;
+
+        position: fixed;
+        bottom: 0;
+        background: rgb(19, 19, 19);
+        padding: 10px;
+        /* overflow-y: scroll; */
+        /* width: 100%; */
+        right: 0;
+        left: 0;
+
+        height: 30vh;
+        overflow-y: scroll;
+      }
+
+      @media(max-width: 800px) {
+        aside {
+          display: none;
+        }
+
+        #mobile-toolbar {
+          display: block;
+        }
+
+        #controls, #filters {
+          display: grid;
+          grid-template-columns: auto auto;
+          justify-content: unset;
+          min-width: unset;
+          gap: 0px 10px;
+          margin-bottom: 2em;
+        }
+
+        #filters {
+          gap: 10px;
+        }
+      }
+
       @keyframes slideup {
         from {
           transform: translateY(30px);
@@ -119,7 +158,7 @@ export class AppHome extends LitElement {
   }
 
   revert() {
-    this.canvas.drawImage(this.org);
+    this.canvas.revert();
   }
 
   async save() {
@@ -130,17 +169,22 @@ export class AppHome extends LitElement {
     this.canvas.shareImage();
   }
 
+  async remove() {
+    this.canvas.removeObject();
+  }
+
   render() {
     return html`
       <div>
         <div id="layout">
           <aside>
             <div id="controls">
-              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo</fast-button>
+              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo</fast-button>
               <fast-button @click="${() => this.save()}">Save Copy</fast-button>
               <fast-button @click="${() => this.share()}" id="shareButton">Share</fast-button>
 
               <fast-button @click="${() => this.revert()}">undo</fast-button>
+              <fast-button @click="${() => this.remove()}">Remove Image</fast-button>
             </div>
 
             ${this.org ? html`
@@ -160,6 +204,29 @@ export class AppHome extends LitElement {
           <main>
             ${this.org ? html`<app-canvas></app-canvas>` : html`<div id="getting-started"><img src="/assets/started.svg"> <h2>Choose an image to get started!</h2></div>`}
           </main>
+
+          <div id="mobile-toolbar">
+          <div id="controls">
+              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo</fast-button>
+              <fast-button @click="${() => this.save()}">Save Copy</fast-button>
+              <fast-button @click="${() => this.share()}" id="shareButton">Share</fast-button>
+
+              <fast-button @click="${() => this.revert()}">undo</fast-button>
+              <fast-button @click="${() => this.remove()}">Remove Image</fast-button>
+            </div>
+
+            ${this.org ? html`
+              <div id="filters">
+                <fast-button @click="${() => this.filter("grayscale")}">desaturate</fast-button>
+                <fast-button @click="${() => this.filter("pixelate")}">pixelate</fast-button>
+                <fast-button @click="${() => this.filter("invert")}">invert</fast-button>
+                <fast-button @click="${() => this.filter("blur")}">blur</fast-button>
+                <fast-button @click="${() => this.filter("sepia")}">sepia</fast-button>
+                <fast-button @click="${() => this.filter("saturation")}">saturate</fast-button>
+              </div>
+              ` : null
+      }
+    </div>
         </div>
 
         <pwa-install>Install PWA Starter</pwa-install>

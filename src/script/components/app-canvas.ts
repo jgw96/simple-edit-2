@@ -148,14 +148,48 @@ export class AppCanvas extends LitElement {
   }
 
   public async save() {
-    this.canvas?.toBlob(async (blob) => {
+    let dataurl = null;
+
+    const active = this.canvas.getActiveObject();
+
+    if (active) {
+      dataurl = active.toDataURL();
+    }
+    else {
+      dataurl = this.imgInstance?.toDataURL();
+    }
+
+    if (dataurl) {
+      const blob = this.dataURLtoBlob(dataurl);
+      console.log(blob);
+
       if (blob) {
         await fileSave(blob, {
-          fileName: 'Untitled.png',
-          extensions: ['.png'],
-        });
+          fileName: "untitle.png",
+          extensions: [".png"]
+        })
       }
-    });
+    }
+  }
+
+  dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  }
+
+  public removeObject() {
+    const active = this.canvas.getActiveObject();
+
+    if (active) {
+      this.canvas.remove(active);
+    }
+    else {
+      this.canvas.remove(this.imgInstance);
+    }
   }
 
   public shareImage() {
@@ -176,6 +210,15 @@ export class AppCanvas extends LitElement {
         }
       }
     });
+  }
+
+  revert() {
+    const active = this.canvas.getActiveObject();
+    active.filters.pop();
+
+    active.applyFilters();
+
+    this.canvas.renderAll();
   }
 
   render() {
