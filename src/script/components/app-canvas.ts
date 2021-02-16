@@ -14,7 +14,7 @@ const typeMap = [
 @customElement('app-canvas')
 export class AppCanvas extends LitElement {
 
-  @internalProperty() canvas: fabric.Canvas;
+  @internalProperty() canvas: fabric.Canvas | undefined;
   @internalProperty() image: HTMLImageElement | undefined | null;
   @internalProperty() imgInstance: any;
 
@@ -50,18 +50,23 @@ export class AppCanvas extends LitElement {
       window.fabric.textureSize = 8000;
       this.canvas = new window.fabric.Canvas(canvas);
 
-      this.canvas.setDimensions({
+      this.canvas?.setDimensions({
         width: window.innerWidth,
         height: window.innerHeight - 40
       });
 
       this.canvas.on('mouse:wheel', (opt) => {
         const delta = (opt.e as any).deltaY;
-        let zoom = this.canvas.getZoom();
-        zoom *= 0.999 ** delta;
-        if (zoom > 20) zoom = 20;
-        if (zoom < 0.01) zoom = 0.01;
-        this.canvas.zoomToPoint(({ x: (opt.e as any).offsetX, y: (opt.e as any).offsetY } as any), zoom);
+        let zoom = this.canvas?.getZoom();
+
+        if (zoom) {
+          zoom *= 0.999 ** delta;
+          if (zoom > 20) zoom = 20;
+          if (zoom < 0.01) zoom = 0.01;
+
+          this.canvas?.zoomToPoint(({ x: (opt.e as any).offsetX, y: (opt.e as any).offsetY } as any), zoom);
+        }
+
         opt.e.preventDefault();
         opt.e.stopPropagation();
       });
@@ -89,7 +94,7 @@ export class AppCanvas extends LitElement {
 
             this.imgInstance.scaleToWidth(window.innerWidth - 100);
 
-            this.canvas.add(this.imgInstance);
+            this.canvas?.add(this.imgInstance);
 
             this.imgInstance.bringToFront();
           }
@@ -108,7 +113,7 @@ export class AppCanvas extends LitElement {
   public async applyWebglFilter(type: string) {
 
     try {
-      const active = this.canvas.getActiveObject();
+      const active = this.canvas?.getActiveObject();
 
       if (active) {
         const filter = typeMap.find((filter) => {
@@ -122,13 +127,16 @@ export class AppCanvas extends LitElement {
         // apply filters and re-render canvas when done
         (active as any).applyFilters();
 
-        this.canvas.add(active);
+        this.canvas?.add(active);
       }
       else {
         // add filter
         const filter = typeMap.find((filter) => {
           if (filter.name === type) {
             return filter;
+          }
+          else {
+            return null;
           }
         });
 
@@ -137,7 +145,7 @@ export class AppCanvas extends LitElement {
         // apply filters and re-render canvas when done
         this.imgInstance.applyFilters();
 
-        this.canvas.add(this.imgInstance);
+        this.canvas?.add(this.imgInstance);
       }
 
       // this.applying = false;
@@ -150,7 +158,7 @@ export class AppCanvas extends LitElement {
   public async save() {
     let dataurl: string | null = null;
 
-    const active = this.canvas.getActiveObject();
+    const active = this.canvas?.getActiveObject();
 
     if (active) {
       dataurl = active.toDataURL({});
@@ -172,9 +180,12 @@ export class AppCanvas extends LitElement {
     }
   }
 
-  dataURLtoBlob(dataurl) {
+  dataURLtoBlob(dataurl: string) {
     const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1]
+
+    //@ts-expect-error weird typescript issues
+    const mime = arr[0].match(/:(.*?);/)[1];
+
     const bstr = atob(arr[1])
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
@@ -186,20 +197,20 @@ export class AppCanvas extends LitElement {
   }
 
   public removeObject() {
-    const active = this.canvas.getActiveObject();
+    const active = this.canvas?.getActiveObject();
 
     if (active) {
-      this.canvas.remove(active);
+      this.canvas?.remove(active);
     }
     else {
-      this.canvas.remove(this.imgInstance);
+      this.canvas?.remove(this.imgInstance);
     }
   }
 
   public async shareImage() {
     let dataurl: string | null = null;
 
-    const active = this.canvas.getActiveObject();
+    const active = this.canvas?.getActiveObject();
 
     if (active) {
       dataurl = active.toDataURL({});
@@ -231,19 +242,19 @@ export class AppCanvas extends LitElement {
   }
 
   revert() {
-    const active: any = this.canvas.getActiveObject();
+    const active: any = this.canvas?.getActiveObject();
     active.filters.pop();
 
     active.applyFilters();
 
-    this.canvas.renderAll();
+    this.canvas?.renderAll();
   }
 
   public async changeBackgroundColor(color: string) {
     this.canvas?.setBackgroundColor(color, () => {
       console.log('color changed');
 
-      this.canvas.renderAll();
+      this.canvas?.renderAll();
       return;
     })
   }
