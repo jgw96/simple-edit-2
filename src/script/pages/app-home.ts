@@ -78,6 +78,7 @@ export class AppHome extends LitElement {
 
       #getting-started img {
         width: 28em;
+        height: 280px;
         margin-top: 4em;
       }
 
@@ -278,23 +279,23 @@ export class AppHome extends LitElement {
         ${this.org ? html`<aside>
             <div id="controls">
               <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fast-button>
-              <fast-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fast-button>
-              <fast-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fast-button>
+              <fast-button appearance="outline" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fast-button>
+              <fast-button appearance="outline" @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fast-button>
 
-              <fast-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fast-button>
-              <fast-button id="remove-image" @click="${() => this.remove()}">Remove Image <ion-icon name="trash-outline"></ion-icon></fast-button>
+              <fast-button appearance="outline" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fast-button>
+              <fast-button id="remove-image" @click="${() => this.remove()}">Remove Photo <ion-icon name="trash-outline"></ion-icon></fast-button>
 
-              <Fast-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fast-button>
+              <fast-button appearance="outline" id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fast-button>
             </div>
 
 
               <div id="filters">
-                <fast-button @click="${() => this.filter("grayscale")}">desaturate</fast-button>
-                <fast-button @click="${() => this.filter("pixelate")}">pixelate</fast-button>
-                <fast-button @click="${() => this.filter("invert")}">invert</fast-button>
-                <fast-button @click="${() => this.filter("blur")}">blur</fast-button>
-                <fast-button @click="${() => this.filter("sepia")}">sepia</fast-button>
-                <fast-button @click="${() => this.filter("saturation")}">saturate</fast-button>
+                <fast-button appearance="outline" @click="${() => this.filter("grayscale")}">desaturate</fast-button>
+                <fast-button appearance="outline" @click="${() => this.filter("pixelate")}">pixelate</fast-button>
+                <fast-button appearance="outline" @click="${() => this.filter("invert")}">invert</fast-button>
+                <fast-button appearance="outline" @click="${() => this.filter("blur")}">blur</fast-button>
+                <fast-button appearance="outline" @click="${() => this.filter("sepia")}">sepia</fast-button>
+                <fast-button appearance="outline" @click="${() => this.filter("saturation")}">saturate</fast-button>
               </div>
 
           </aside>` : null }

@@ -18,8 +18,6 @@ export class AppCanvas extends LitElement {
   @internalProperty() image: HTMLImageElement | undefined | null;
   @internalProperty() imgInstance: any;
 
-  worker: any | undefined;
-
   static get styles() {
     return css`
       :host {
@@ -46,7 +44,7 @@ export class AppCanvas extends LitElement {
 
     if (canvas) {
       console.log('setting up');
-      // this.ctx = this.canvas.getContext('2d');
+
       window.fabric.textureSize = 8000;
       this.canvas = new window.fabric.Canvas(canvas);
 
