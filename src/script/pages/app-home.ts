@@ -22,9 +22,22 @@ export class AppHome extends LitElement {
 
   static get styles() {
     return css`
+    fast-button::part(content) {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    fast-button ion-icon {
+      margin-left: 6px;
+    }
+
       #layout {
         height: 92vh;
         width: auto;
+
+        display: grid;
+        grid-template-columns: 18% auto;
       }
 
       aside {
@@ -33,11 +46,10 @@ export class AppHome extends LitElement {
         padding-right: 16px;
         margin-top: 1em;
 
-        animation-name: slideup;
-        animation-duration: 280ms;
-        animation-timing-function: "ease-in-out";
-
         justify-content: space-between;
+
+        flex-direction: column;
+        height: 90vh;
       }
 
       aside fast-button {
@@ -47,11 +59,12 @@ export class AppHome extends LitElement {
       #controls, #filters {
         display: flex;
         justify-content: space-between;
-        min-width: 31em;
+
+        flex-direction: column;
       }
 
-      #filters {
-        min-width: 25em;
+      #controls fast-button, #filters fast-button {
+        margin-bottom: 10px;
       }
 
       #choosePhoto {
@@ -69,11 +82,42 @@ export class AppHome extends LitElement {
         right: 16px;
       }
 
+      #getting-started-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        box-shadow: #0e0e0e 0px 2px 11px 2px;
+        border-radius: 10px;
+        margin: 4em;
+        margin-left: 6em;
+        margin-right: 6em;
+        padding-bottom: 2em;
+
+        background: var(--accent-foreground-rest);
+
+        animation-name: slideup;
+        animation-duration: 280ms;
+        animation-timing-function: "ease-in-out";
+      }
+
       #getting-started {
+        scroll-snap-type: x mandatory;
+        overflow-x: scroll;
+        display: flex;
+        width: 444px;
+      }
+
+      #getting-started::-webkit-scrollbar {
+        display: none;
+      }
+
+      .getting-started-item {
+        scroll-snap-align: center;
+
         display: flex;
         flex-direction: column;
         align-items: center;
-        height: 86vh;
       }
 
       #getting-started img {
@@ -82,8 +126,13 @@ export class AppHome extends LitElement {
         margin-top: 4em;
       }
 
+      #getting-started fast-button {
+        width: 126px;
+      }
+
       #getting-started h2 {
-        font-size: 2em;
+        font-size: 1.6em;
+        text-align: center;
       }
 
       #mobile-toolbar {
@@ -93,8 +142,6 @@ export class AppHome extends LitElement {
         bottom: 0;
         background: rgb(19, 19, 19);
         padding: 10px;
-        /* overflow-y: scroll; */
-        /* width: 100%; */
         right: 0;
         left: 0;
 
@@ -133,9 +180,25 @@ export class AppHome extends LitElement {
         margin-bottom: 1em;
       }
 
+      .setting {
+        background: #2b2b2b;
+        margin-right: 1em;
+        padding: 10px;
+        border-radius: 6px;
+      }
+
+      .setting .setting-header  {
+        margin-top: 8px;
+        font-size: 12px;
+      }
+
+      .setting .setting-header p {
+        margin-top: 8px;
+      }
+
       #color-label {
         font-weight: bold;
-        margin-bottom: 8px;
+        font-size: 16px;
       }
 
       #color {
@@ -151,7 +214,27 @@ export class AppHome extends LitElement {
         background: #d02929;
       }
 
+      @media(screen-spanning: single-fold-vertical) {
+        #getting-started-wrapper {
+          width: 44vw;
+          margin: 2em;
+        }
+
+        #layout {
+          gap: 27px;
+          grid-template-columns: 49% 50%;
+        }
+      }
+
       @media(max-width: 800px) {
+        main {
+          width: 100vw;
+        }
+
+        #settings-pane {
+          width: 60vw;
+        }
+
         aside {
           display: none;
         }
@@ -173,13 +256,26 @@ export class AppHome extends LitElement {
           gap: 10px;
         }
 
+        #getting-started-wrapper {
+          margin: 4em 1em;
+        }
+
         #getting-started {
           text-align: center;
           font-size: 10px;
+          width: 246px;
         }
 
         #getting-started img {
           width: 60vw;
+        }
+      }
+
+      @media(min-width: 1200px) {
+        #getting-started-wrapper {
+          margin: 4em;
+          margin-left: 12em;
+          margin-right: 12em;
         }
       }
 
@@ -272,9 +368,45 @@ export class AppHome extends LitElement {
     this.canvas?.changeBackgroundColor(color);
   }
 
+  scrollRight() {
+    const thing = this.shadowRoot?.querySelector("#getting-started");
+    // thing?.scrollBy({top: 0, left: 400, behavior: 'smooth'});
+    if (window.matchMedia("(max-width: 800px)").matches) {
+      thing?.scrollBy({top: 0, left: 246, behavior: 'smooth'});
+    }
+    else {
+      thing?.scrollBy({top: 0, left: 400, behavior: 'smooth'});
+    }
+  }
+
   render() {
     return html`
       <div>
+      ${!this.org ? html`<div id="getting-started-wrapper">
+              <div id="getting-started">
+                <div class="getting-started-item">
+                  <img src="/assets/started.svg">
+                  <h2>Welcome to SimpleEdit!</h2>
+
+                  <fast-button @click="${() => this.scrollRight()}">Next</fast-button>
+                </div>
+
+                <div class="getting-started-item">
+                  <img src="/assets/started_two.svg">
+                  <h2>Quickly edit your photos, create collages and more</h2>
+
+                  <fast-button @click="${() => this.scrollRight()}">Next</fast-button>
+                </div>
+
+                <div class="getting-started-item">
+                  <img src="/assets/started_three.svg">
+                  <h2>Tap Choose Photo to get started!</h2>
+
+                  <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo <ion-icon name="add-outline"></ion-icon></fast-button>
+                </div>
+               </div>
+              </div>` : null}
+
         <div id="layout">
         ${this.org ? html`<aside>
             <div id="controls">
@@ -301,25 +433,19 @@ export class AppHome extends LitElement {
           </aside>` : null }
 
           <main>
-            ${this.org ? html`<app-canvas></app-canvas>` : html`
-             <div id="getting-started">
-               <div id="getting-started-header">
-               <img src="/assets/started.svg">
-               <h2>Choose an image to get started!</h2>
-              </div>
-
-              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo <ion-icon name="add-outline"></ion-icon></fast-button>
-              </div>`}
+            ${this.org ? html`<app-canvas></app-canvas>` : null}
           </main>
 
           ${this.org ? html` <div id="mobile-toolbar">
           <div id="controls">
-              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo</fast-button>
-              <fast-button @click="${() => this.save()}">Save Copy</fast-button>
-              <fast-button @click="${() => this.share()}" id="shareButton">Share</fast-button>
+              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fast-button>
+              <fast-button appearance="outline" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fast-button>
+              <fast-button appearance="outline" @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fast-button>
 
-              <fast-button @click="${() => this.revert()}">undo</fast-button>
-              <fast-button @click="${() => this.remove()}">Remove Image</fast-button>
+              <fast-button appearance="outline" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fast-button>
+              <fast-button id="remove-image" @click="${() => this.remove()}">Remove Photo <ion-icon name="trash-outline"></ion-icon></fast-button>
+
+              <fast-button appearance="outline" id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fast-button>
             </div>
 
             ${this.org ? html`
@@ -345,8 +471,13 @@ export class AppHome extends LitElement {
             </fast-button>
           </div>
 
-          <label id="color-label" for="color">Canvas Background Color</label>
-          <input @change="${(ev) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
+          <div class="setting">
+            <div class="setting-header">
+              <label id="color-label" for="color">Canvas Background Color</label>
+              <p>Change the background color of your canvas</p>
+            </div>
+            <input @change="${(ev) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
+          </div>
         </div>` : null}
 
         <pwa-install>Install PWA Starter</pwa-install>

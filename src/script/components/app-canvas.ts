@@ -18,6 +18,11 @@ export class AppCanvas extends LitElement {
   @internalProperty() image: HTMLImageElement | undefined | null;
   @internalProperty() imgInstance: any;
 
+  isDragging = false;
+  selection: any | undefined;
+  lastPosX: number | undefined;
+  lastPosY: number | undefined;
+
   static get styles() {
     return css`
       :host {
@@ -69,7 +74,52 @@ export class AppCanvas extends LitElement {
         opt.e.stopPropagation();
       });
 
+      this.drag();
+
       // init(this.canvas, this.ctx);
+    }
+  }
+
+  drag() {
+    if (this.canvas) {
+      this.canvas.on('mouse:down', (opt) => {
+        const evt: any = opt.e;
+        if (evt.altKey === true) {
+          this.isDragging = true;
+          this.selection = false;
+          this.lastPosX = evt.clientX;
+          this.lastPosY = evt.clientY;
+        }
+      });
+      this.canvas.on('mouse:move', (opt) => {
+        if (this.isDragging) {
+          const e: any = opt.e;
+          const vpt = this.canvas?.viewportTransform;
+
+          if (vpt) {
+            if (this.lastPosX && this.lastPosY) {
+              vpt[4] += e.clientX - this.lastPosX;
+              vpt[5] += e.clientY - this.lastPosY;
+            }
+
+            this.canvas?.requestRenderAll();
+            this.lastPosX = e.clientX;
+            this.lastPosY = e.clientY;
+          }
+        }
+      });
+      this.canvas.on('mouse:up', () => {
+        // on mouse up we want to recalculate new interaction
+        // for all objects, so we call setViewportTransform
+        const transform = this.canvas?.viewportTransform;
+
+        if (transform) {
+          this.canvas?.setViewportTransform(transform);
+        }
+
+        this.isDragging = false;
+        this.selection = true;
+      });
     }
   }
 
@@ -119,6 +169,7 @@ export class AppCanvas extends LitElement {
             return filter;
           }
         });
+        console.log('filter', filter);
 
         (active as any).filters.push(filter?.filter);
 

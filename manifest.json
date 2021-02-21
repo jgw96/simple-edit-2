@@ -34,13 +34,16 @@
   ],
   "screenshots": [
     {
-      "src": "assets/screenshots/screen7.png"
+      "src": "assets/screenshots/screen_1.png"
     },
     {
-      "src": "assets/screenshots/screen8.png"
+      "src": "assets/screenshots/screen_2.png"
     },
     {
-      "src": "assets/screenshots/screen2.png"
+      "src": "assets/screenshots/screen_3.png"
+    },
+    {
+      "src": "assets/screenshots/screen_4.png"
     }
   ],
   "features": [
