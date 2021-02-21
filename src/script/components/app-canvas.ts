@@ -1,16 +1,6 @@
 import { fileSave } from 'browser-fs-access';
 import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
 
-const typeMap = [
-  { name: "grayscale", filter: new window.fabric.Image.filters.Grayscale() },
-  { name: "sepia", filter: new window.fabric.Image.filters.Sepia() },
-  { name: "brightness", filter: new window.fabric.Image.filters.Brightness({ brightness: 80 }) },
-  { name: "saturation", filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }) },
-  { name: "blur", filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }) },
-  { name: "invert", filter: new window.fabric.Image.filters.Invert() },
-  { name: "pixelate", filter: new window.fabric.Image.filters.Pixelate({ blocksize: 50 }) }
-];
-
 @customElement('app-canvas')
 export class AppCanvas extends LitElement {
 
@@ -22,6 +12,8 @@ export class AppCanvas extends LitElement {
   selection: any | undefined;
   lastPosX: number | undefined;
   lastPosY: number | undefined;
+
+  typeMap: any | undefined;
 
   static get styles() {
     return css`
@@ -44,8 +36,18 @@ export class AppCanvas extends LitElement {
     super();
   }
 
-  firstUpdated() {
+  async firstUpdated() {
     const canvas = this.shadowRoot?.querySelector("canvas");
+
+    this.typeMap = [
+      { name: "grayscale", filter: new window.fabric.Image.filters.Grayscale() },
+      { name: "sepia", filter: new window.fabric.Image.filters.Sepia() },
+      { name: "brightness", filter: new window.fabric.Image.filters.Brightness({ brightness: 80 }) },
+      { name: "saturation", filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }) },
+      { name: "blur", filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }) },
+      { name: "invert", filter: new window.fabric.Image.filters.Invert() },
+      { name: "pixelate", filter: new window.fabric.Image.filters.Pixelate({ blocksize: 50 }) }
+    ];
 
     if (canvas) {
       console.log('setting up');
@@ -164,7 +166,7 @@ export class AppCanvas extends LitElement {
       const active = this.canvas?.getActiveObject();
 
       if (active) {
-        const filter = typeMap.find((filter) => {
+        const filter = this.typeMap.find((filter) => {
           if (filter.name === type) {
             return filter;
           }
@@ -180,7 +182,7 @@ export class AppCanvas extends LitElement {
       }
       else {
         // add filter
-        const filter = typeMap.find((filter) => {
+        const filter = this.typeMap.find((filter) => {
           if (filter.name === type) {
             return filter;
           }
