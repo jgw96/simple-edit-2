@@ -29,12 +29,13 @@ export class AppCanvas extends LitElement {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100%;
 
         background: #1e1e1e;
 
-        height: 100%;
         width: 100%;
+
+        margin-top: 11em;
+        height: 100vh;
       }
 
     `;
