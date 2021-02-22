@@ -34,7 +34,7 @@ export class AppCanvas extends LitElement {
 
         width: 100%;
 
-        margin-top: 11em;
+        margin-top: 1em;
         height: 100vh;
       }
 
@@ -58,6 +58,13 @@ export class AppCanvas extends LitElement {
         width: window.innerWidth,
         height: window.innerHeight - 40
       });
+
+      window.onresize = () => {
+        this.canvas?.setDimensions({
+          width: window.innerWidth,
+          height: window.innerHeight - 40
+        });
+      }
 
       this.canvas.on('mouse:wheel', (opt) => {
         const delta = (opt.e as any).deltaY;
@@ -141,7 +148,12 @@ export class AppCanvas extends LitElement {
               angle: 0
             });
 
-            this.imgInstance.scaleToWidth(window.innerWidth - 100);
+            if (window.matchMedia("(max-width: 800px)").matches) {
+              this.imgInstance.scaleToWidth(window.innerWidth - 50);
+            }
+            else {
+              this.imgInstance.scaleToWidth(window.innerWidth - 100);
+            }
 
             this.canvas?.add(this.imgInstance);
 

@@ -225,6 +225,12 @@ export class AppHome extends LitElement {
           gap: 27px;
           grid-template-columns: 49% 50%;
         }
+
+        app-canvas {
+          width: 50vw;
+          display: block;
+          margin-top: 1em;
+        }
       }
 
       @media(max-width: 800px) {

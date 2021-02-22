@@ -10,23 +10,30 @@ export class DragDrop extends LitElement {
             display: flex;
             justify-content: center;
             align-items: center;
+            width: 100%;
+            display: block;
+            height: 100%;
         }
+
         @media(max-width: 1000px) {
             #dragdrop {
                 height: 69vh;
             }
         }
+
         @media(min-width: 1000px) {
           #dragdrop {
             height: 80vh;
           }
         }
+
         @media(screen-spanning: single-fold-vertical) {
             #dragdrop {
                 width: 48.8%;
                 height: 90vh;
             }
         }
+
         @media(screen-spanning: single-fold-horizontal) {
             #dragdrop {
                 height: 50%;
