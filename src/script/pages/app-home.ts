@@ -1,6 +1,7 @@
 import { LitElement, css, html, customElement, property, internalProperty } from 'lit-element';
 
 import '../components/app-canvas';
+import '../components/drag-drop';
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import '@pwabuilder/pwainstall';
@@ -14,7 +15,7 @@ export class AppHome extends LitElement {
   @property() message = 'Welcome!';
 
   @internalProperty() canvas: AppCanvas | undefined | null;
-  @internalProperty() org: File | undefined | null;
+  @internalProperty() org: File | Blob | undefined | null;
 
   @internalProperty() handleSettings = false;
 
@@ -224,6 +225,12 @@ export class AppHome extends LitElement {
           gap: 27px;
           grid-template-columns: 49% 50%;
         }
+
+        app-canvas {
+          width: 50vw;
+          display: block;
+          margin-top: 1em;
+        }
       }
 
       @media(max-width: 800px) {
@@ -297,11 +304,35 @@ export class AppHome extends LitElement {
     super();
   }
 
+  async firstUpdated() {
+    const test = localStorage.getItem("done-with-tut");
+
+    if (test) {
+      const thing = this.shadowRoot?.querySelector("#getting-started");
+      thing?.scrollBy({ top: 0, left: 800, behavior: 'smooth' });
+
+    }
+  }
+
   async openPhoto() {
     const blob = await fileOpen({
       mimeTypes: ['image/*'],
     });
 
+    if (blob) {
+      this.org = blob;
+
+      await this.updateComplete;
+
+      this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+      this.canvas?.drawImage(blob);
+    }
+
+    localStorage.setItem("done-with-tut", "true");
+  }
+
+  async handleSharedImage(blob: Blob | File) {
     if (blob) {
       this.org = blob;
 
@@ -372,10 +403,10 @@ export class AppHome extends LitElement {
     const thing = this.shadowRoot?.querySelector("#getting-started");
     // thing?.scrollBy({top: 0, left: 400, behavior: 'smooth'});
     if (window.matchMedia("(max-width: 800px)").matches) {
-      thing?.scrollBy({top: 0, left: 246, behavior: 'smooth'});
+      thing?.scrollBy({ top: 0, left: 246, behavior: 'smooth' });
     }
     else {
-      thing?.scrollBy({top: 0, left: 400, behavior: 'smooth'});
+      thing?.scrollBy({ top: 0, left: 400, behavior: 'smooth' });
     }
   }
 
@@ -430,10 +461,10 @@ export class AppHome extends LitElement {
                 <fast-button appearance="outline" @click="${() => this.filter("saturation")}">saturate</fast-button>
               </div>
 
-          </aside>` : null }
+          </aside>` : null}
 
           <main>
-            ${this.org ? html`<app-canvas></app-canvas>` : null}
+            ${this.org ? html`<drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas></app-canvas></drag-drop>` : null}
           </main>
 
           ${this.org ? html` <div id="mobile-toolbar">
@@ -458,7 +489,7 @@ export class AppHome extends LitElement {
                 <fast-button @click="${() => this.filter("saturation")}">saturate</fast-button>
               </div>
               ` : null
-      }
+        }
     </div>` : null}
         </div>
 
