@@ -1,4 +1,5 @@
 import { LitElement, css, html, customElement, property, internalProperty } from 'lit-element';
+import { styleMap } from 'lit-html/directives/style-map';
 
 import '../components/app-canvas';
 import '../components/drag-drop';
@@ -7,6 +8,7 @@ import '../components/drag-drop';
 import '@pwabuilder/pwainstall';
 import { fileOpen } from 'browser-fs-access';
 import { AppCanvas } from '../components/app-canvas';
+
 
 @customElement('app-home')
 export class AppHome extends LitElement {
@@ -18,6 +20,8 @@ export class AppHome extends LitElement {
   @internalProperty() org: File | Blob | undefined | null;
 
   @internalProperty() handleSettings = false;
+
+  @internalProperty() pen_mode: boolean | undefined;
 
   settingsAni: Animation | undefined;
 
@@ -186,6 +190,7 @@ export class AppHome extends LitElement {
         margin-right: 1em;
         padding: 10px;
         border-radius: 6px;
+        margin-bottom: 10px;
       }
 
       .setting .setting-header  {
@@ -310,7 +315,34 @@ export class AppHome extends LitElement {
     if (test) {
       const thing = this.shadowRoot?.querySelector("#getting-started");
       thing?.scrollBy({ top: 0, left: 800, behavior: 'smooth' });
+    }
 
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      console.log('file event', event);
+      console.log('file event data', event.data);
+      const imageBlob = event.data.file;
+
+      if (imageBlob) {
+        this.handleSharedImage(imageBlob);
+      }
+    });
+
+    this.fileHandler();
+  }
+
+  async fileHandler() {
+    if ('launchQueue' in window) {
+      (window as any).launchQueue.setConsumer(async (launchParams: any) => {
+        if (!launchParams.files.length) {
+          return;
+        }
+
+
+        const fileHandle = launchParams.files[0];
+        console.log('fileHandle', fileHandle);
+
+        await this.handleSharedImage(fileHandle);
+      });
     }
   }
 
@@ -410,6 +442,14 @@ export class AppHome extends LitElement {
     }
   }
 
+  penMode(ev: boolean) {
+    console.log(ev);
+
+    this.pen_mode = ev;
+
+    this.canvas?.handlePenMode(this.pen_mode);
+  }
+
   render() {
     return html`
       <div>
@@ -493,7 +533,11 @@ export class AppHome extends LitElement {
     </div>` : null}
         </div>
 
-        ${this.handleSettings ? html`<div id="settings-pane">
+        <div
+        style=${styleMap({
+            display: this.handleSettings ? "initial" : "none"
+          })}
+          id="settings-pane">
           <div id="settings-header">
             <h3>Settings</h3>
 
@@ -509,7 +553,19 @@ export class AppHome extends LitElement {
             </div>
             <input @change="${(ev) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
           </div>
-        </div>` : null}
+
+          <div class="setting">
+            <div class="setting-header">
+              <label id="color-label" for="color">Drawing Mode</label>
+              <p>Draw on your collage with your pen, mouse or touch!</p>
+            </div>
+
+            <fast-switch value="${this.pen_mode || false}" @change="${(ev) => this.penMode(ev.target.checked)}">
+              <span slot="checked-message">on</span>
+              <span slot="unchecked-message">off</span>
+            </fast-switch>
+          </div>
+        </div>
 
         <pwa-install>Install PWA Starter</pwa-install>
       </div>

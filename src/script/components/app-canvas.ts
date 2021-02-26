@@ -7,6 +7,7 @@ export class AppCanvas extends LitElement {
   @internalProperty() canvas: fabric.Canvas | undefined;
   @internalProperty() image: HTMLImageElement | undefined | null;
   @internalProperty() imgInstance: any;
+  @internalProperty() pen: boolean;
 
   isDragging = false;
   selection: any | undefined;
@@ -25,9 +26,59 @@ export class AppCanvas extends LitElement {
         background: #1e1e1e;
 
         width: 100%;
+      }
 
-        margin-top: 1em;
-        height: 100vh;
+      #colors {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        background: #181818;
+        backdrop-filter: blur(10px);
+        border-radius: 4px;
+        padding: 8px;
+        z-index: 3;
+        animation-name: quickup;
+        animation-duration: 300ms;
+      }
+      .color {
+        border: none;
+        height: 1.6em;
+        width: 1.6em;
+        border-radius: 50%;
+        margin: 6px;
+      }
+      #red {
+        background: red;
+      }
+
+      #green {
+        background: green;
+      }
+
+      #black {
+        background: black;
+      }
+
+      #blue {
+        background: blue;
+      }
+
+      #yellow {
+        background: yellow;
+      }
+
+      @keyframes quickup {
+        from {
+          transform: translateY(30px);
+          opacity: 0;
+        }
+        75% {
+          transform: translateY(-10px);
+          opacity: 1;
+        }
+        to {
+          transform: translateY(0);
+        }
       }
 
     `;
@@ -55,6 +106,23 @@ export class AppCanvas extends LitElement {
 
       window.fabric.textureSize = 8000;
       this.canvas = new window.fabric.Canvas(canvas);
+
+      // this.canvas.isDrawingMode = true;
+
+      // try this again tomorrow, trying for low latency canvas
+      const canvasEL = this.canvas.getElement();
+      if (canvasEL) {
+        const ctx = canvasEL.getContext("2d", {
+          desynchronized: true,
+        });
+        console.log((ctx as any).getContextAttributes());
+
+        if (ctx && (ctx as any).getContextAttributes().desynchronized) {
+          console.log('Low latency canvas supported. Yay!');
+        } else {
+          console.log('Low latency canvas not supported. Boo!');
+        }
+      }
 
       this.canvas?.setDimensions({
         width: window.innerWidth,
@@ -86,7 +154,23 @@ export class AppCanvas extends LitElement {
 
       this.drag();
 
+
+
       // init(this.canvas, this.ctx);
+
+    }
+  }
+
+  handlePenMode(mode: boolean) {
+    if (this.canvas) {
+      if (mode === true) {
+        this.pen = true;
+        this.canvas.isDrawingMode = true;
+      }
+      else {
+        this.pen = false;
+        this.canvas.isDrawingMode = false;
+      }
     }
   }
 
@@ -323,9 +407,23 @@ export class AppCanvas extends LitElement {
     })
   }
 
+  changePenColor(color: string) {
+    if (this.canvas) {
+      this.canvas.freeDrawingBrush.color = color;
+    }
+  }
+
   render() {
     return html`
       <canvas></canvas>
+
+      ${this.pen ? html`<div id="colors">
+        <button @click="${() => this.changePenColor("red")}" class="color" id="red"></button>
+        <button @click="${() => this.changePenColor("green")}" class="color" id="green"></button>
+        <button @click="${() => this.changePenColor("blue")}" class="color" id="blue"></button>
+        <button @click="${() => this.changePenColor("yellow")}" class="color" id="yellow"></button>
+        <button @click="${() => this.changePenColor("black")}" class="color" id="black"></button>
+      </div>` : null}
     `;
   }
 }

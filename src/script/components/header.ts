@@ -37,6 +37,12 @@ export class AppHeader extends LitElement {
         width: 2.4em;
       }
 
+      #info h1 {
+        font-size: 18px;
+        margin-left: 8px;
+        font-weight: bold;
+      }
+
       @media(prefers-color-scheme: light) {
         header {
           color: black;
@@ -54,6 +60,8 @@ export class AppHeader extends LitElement {
       <header>
         <div id ="info">
           <img src="/assets/icons/icon_64.png" alt="Simple Edit app icon">
+
+          <h1>SimpleEdit</h1>
         </div>
       </header>
     `;
