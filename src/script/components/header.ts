@@ -41,6 +41,7 @@ export class AppHeader extends LitElement {
         font-size: 18px;
         margin-left: 8px;
         font-weight: bold;
+        color: white;
       }
 
       @media(prefers-color-scheme: light) {
