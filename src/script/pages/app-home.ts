@@ -55,6 +55,10 @@ export class AppHome extends LitElement {
 
         flex-direction: column;
         height: 90vh;
+
+        animation-name: slideup;
+        animation-duration: 280ms;
+        animation-timing-function: "ease-in-out";
       }
 
       aside fast-button {
