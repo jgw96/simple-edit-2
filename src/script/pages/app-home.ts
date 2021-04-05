@@ -78,7 +78,7 @@ export class AppHome extends LitElement {
 
       #choosePhoto {
         margin-bottom: 1em;
-        background: var(--accent-fill-rest);
+        background: var(--accent-foreground-rest);
       }
 
       #shareButton {
@@ -103,7 +103,7 @@ export class AppHome extends LitElement {
         margin-right: 6em;
         padding-bottom: 2em;
 
-        background: var(--accent-foreground-rest);
+        background: var(--accent-fill-rest);
 
         animation-name: slideup;
         animation-duration: 280ms;
@@ -114,6 +114,10 @@ export class AppHome extends LitElement {
         scroll-snap-type: x mandatory;
         overflow-x: scroll;
         display: flex;
+        width: 444px;
+      }
+
+      #getting-started img {
         width: 444px;
       }
 
@@ -130,7 +134,6 @@ export class AppHome extends LitElement {
       }
 
       #getting-started img {
-        width: 28em;
         height: 280px;
         margin-top: 4em;
       }
@@ -224,24 +227,6 @@ export class AppHome extends LitElement {
         background: #d02929;
       }
 
-      @media(screen-spanning: single-fold-vertical) {
-        #getting-started-wrapper {
-          width: 44vw;
-          margin: 2em;
-        }
-
-        #layout {
-          gap: 27px;
-          grid-template-columns: 49% 50%;
-        }
-
-        app-canvas {
-          width: 50vw;
-          display: block;
-          margin-top: 1em;
-        }
-      }
-
       @media(max-width: 800px) {
         main {
           width: 100vw;
@@ -268,10 +253,6 @@ export class AppHome extends LitElement {
           margin-bottom: 2em;
         }
 
-        #filters {
-          gap: 10px;
-        }
-
         #getting-started-wrapper {
           margin: 4em 1em;
         }
@@ -283,7 +264,7 @@ export class AppHome extends LitElement {
         }
 
         #getting-started img {
-          width: 60vw;
+          width: 246px;
         }
       }
 
@@ -292,6 +273,46 @@ export class AppHome extends LitElement {
           margin: 4em;
           margin-left: 12em;
           margin-right: 12em;
+        }
+      }
+
+      @media(screen-spanning: single-fold-vertical) {
+        #getting-started-wrapper {
+          width: 44vw;
+          margin: 2em;
+        }
+
+        #getting-started img {
+          width: 444px;
+        }
+
+        #layout {
+          gap: 27px;
+          grid-template-columns: 49% 50%;
+        }
+
+        app-canvas {
+          width: 50vw;
+          display: block;
+          margin-top: 1em;
+        }
+      }
+
+      @media(screen-spanning: single-fold-horizontal) {
+        #mobile-toolbar {
+          height: 46.8vh;
+        }
+
+        #getting-started-wrapper {
+          margin: 0em 1em;
+        }
+
+        #getting-started {
+          width: 444px;
+        }
+
+        #getting-started img {
+          width: 444px;
         }
       }
 
