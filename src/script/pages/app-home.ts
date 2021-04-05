@@ -236,7 +236,7 @@ export class AppHome extends LitElement {
         position: fixed;
         bottom: 0;
         right: 0;
-        left: 11.5em;
+        left: 18vw;
         background: #181818;
         display: flex;
         justify-content: flex-end;
