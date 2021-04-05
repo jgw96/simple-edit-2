@@ -304,7 +304,7 @@ export class AppCanvas extends LitElement {
   }
 
   public async save() {
-    let dataurl: string | null = null;
+    let dataurl: string | undefined = undefined;
 
     const active = this.canvas?.getActiveObject();
 
@@ -312,7 +312,7 @@ export class AppCanvas extends LitElement {
       dataurl = active.toDataURL({});
     }
     else {
-      dataurl = this.imgInstance?.toDataURL();
+      dataurl = this.canvas?.toDataURL();
     }
 
     if (dataurl) {
