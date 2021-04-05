@@ -23,7 +23,11 @@ export class AppHome extends LitElement {
 
   @internalProperty() pen_mode: boolean | undefined;
 
+  @internalProperty() intensity: boolean | undefined;
+
   settingsAni: Animation | undefined;
+
+  currentFilter: string | undefined;
 
   static get styles() {
     return css`
@@ -179,6 +183,7 @@ export class AppHome extends LitElement {
         height: 100%;
         width: 20vw;
         padding-left: 1em;
+        z-index: 999;
 
         display: flex;
         flex-direction: column;
@@ -227,9 +232,40 @@ export class AppHome extends LitElement {
         background: #d02929;
       }
 
+      #extra-controls {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 11.5em;
+        background: #181818;
+        display: flex;
+        justify-content: flex-end;
+        padding: 8px;
+        z-index: 99;
+
+        animation-name: slideup;
+        animation-duration: 280ms;
+        animation-timing-function: "ease-in-out";
+      }
+
+      #extra-controls div {
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+      }
+
+      #extra-controls fast-slider {
+        width: 12em;
+        margin-left: 6px;
+      }
+
       @media(max-width: 800px) {
         main {
           width: 100vw;
+        }
+
+        #extra-controls {
+          display: none;
         }
 
         #settings-pane {
@@ -295,6 +331,10 @@ export class AppHome extends LitElement {
           width: 50vw;
           display: block;
           margin-top: 1em;
+        }
+
+        #extra-controls {
+          left: 51vw;
         }
       }
 
@@ -401,8 +441,14 @@ export class AppHome extends LitElement {
     }
   }
 
-  async filter(type: string) {
-    await this.canvas?.applyWebglFilter(type);
+  async filter(type: string, value?: number) {
+    await this.canvas?.applyWebglFilter(type, value);
+
+    this.currentFilter = type;
+
+    if (type === "blur" || type === "brightness") {
+      this.intensity = true;
+    }
   }
 
   revert() {
@@ -475,6 +521,18 @@ export class AppHome extends LitElement {
     this.canvas?.handlePenMode(this.pen_mode);
   }
 
+  async handleIntensity(value: number) {
+    console.log(value);
+    if (this.currentFilter) {
+      if (this.currentFilter === "brightness") {
+        await this.filter(this.currentFilter, value * 10);
+      }
+      else {
+        await this.filter(this.currentFilter, value);
+      }
+    }
+  }
+
   render() {
     return html`
       <div>
@@ -527,6 +585,16 @@ export class AppHome extends LitElement {
               </div>
 
           </aside>` : null}
+
+          ${
+            this.intensity ? html`<div id="extra-controls">
+              <div>
+                <label for="intensity">Intensity</label>
+                <fast-slider @change="${(ev) => this.handleIntensity(ev.target.value)}" name="intensity" id="intensity" min="0" max="1" step="0.1" value="0.5">
+                </fast-slider>
+              </div>
+            </div>` : null
+          }
 
           <main>
             ${this.org ? html`<drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas></app-canvas></drag-drop>` : null}

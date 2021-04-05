@@ -94,7 +94,7 @@ export class AppCanvas extends LitElement {
     this.typeMap = [
       { name: "grayscale", filter: new window.fabric.Image.filters.Grayscale() },
       { name: "sepia", filter: new window.fabric.Image.filters.Sepia() },
-      { name: "brightness", filter: new window.fabric.Image.filters.Brightness({ brightness: 80 }) },
+      { name: "brightness", filter: new window.fabric.Image.filters.Brightness({ brightness: 10 }) },
       { name: "saturation", filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }) },
       { name: "blur", filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }) },
       { name: "invert", filter: new window.fabric.Image.filters.Invert() },
@@ -108,21 +108,6 @@ export class AppCanvas extends LitElement {
       this.canvas = new window.fabric.Canvas(canvas);
 
       // this.canvas.isDrawingMode = true;
-
-      // try this again tomorrow, trying for low latency canvas
-      const canvasEL = this.canvas.getElement();
-      if (canvasEL) {
-        const ctx = canvasEL.getContext("2d", {
-          desynchronized: true,
-        });
-        console.log((ctx as any).getContextAttributes());
-
-        if (ctx && (ctx as any).getContextAttributes().desynchronized) {
-          console.log('Low latency canvas supported. Yay!');
-        } else {
-          console.log('Low latency canvas not supported. Boo!');
-        }
-      }
 
       this.canvas?.setDimensions({
         width: window.innerWidth,
@@ -153,11 +138,6 @@ export class AppCanvas extends LitElement {
       });
 
       this.drag();
-
-
-
-      // init(this.canvas, this.ctx);
-
     }
   }
 
@@ -229,16 +209,16 @@ export class AppCanvas extends LitElement {
         if (this.image) {
           this.image.onload = () => {
             this.imgInstance = new window.fabric.Image((this.image as HTMLImageElement), {
-              left: 0,
-              top: 0,
+              left: 0 + window.innerWidth / 8,
+              top: 0 + window.innerHeight / 8,
               angle: 0
             });
 
             if (window.matchMedia("(max-width: 800px)").matches) {
-              this.imgInstance.scaleToWidth(window.innerWidth - 50);
+              this.imgInstance.scaleToWidth(400);
             }
             else {
-              this.imgInstance.scaleToWidth(window.innerWidth - 100);
+              this.imgInstance.scaleToWidth(800);
             }
 
             this.canvas?.add(this.imgInstance);
@@ -257,7 +237,7 @@ export class AppCanvas extends LitElement {
     }
   }
 
-  public async applyWebglFilter(type: string) {
+  public async applyWebglFilter(type: string, value?: number) {
 
     try {
       const active = this.canvas?.getActiveObject();
@@ -268,6 +248,20 @@ export class AppCanvas extends LitElement {
             return filter;
           }
         });
+
+        console.log('type', type);
+
+        if (value && type === "blur") {
+          filter.filter.setOptions({
+            blur: value
+          })
+        }
+        else if (value && type === "brightness") {
+          filter.filter.setOptions({
+            brightness: value
+          })
+        }
+
         console.log('filter', filter);
 
         (active as any).filters.push(filter?.filter);
