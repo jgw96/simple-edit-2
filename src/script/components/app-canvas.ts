@@ -194,6 +194,7 @@ export class AppCanvas extends LitElement {
         this.isDragging = false;
         this.selection = true;
       });
+
     }
   }
 

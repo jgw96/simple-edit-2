@@ -82,7 +82,7 @@ export class AppHome extends LitElement {
 
       #choosePhoto {
         margin-bottom: 1em;
-        background: var(--accent-foreground-rest);
+        background: var(--accent-fill-hover);
       }
 
       #shareButton {
