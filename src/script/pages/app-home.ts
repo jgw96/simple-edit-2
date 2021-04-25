@@ -8,6 +8,8 @@ import '../components/drag-drop';
 import '@pwabuilder/pwainstall';
 import { fileOpen } from 'browser-fs-access';
 import { AppCanvas } from '../components/app-canvas';
+import { Swipe } from '../utils/swipe';
+import { get } from 'idb-keyval';
 
 
 @customElement('app-home')
@@ -161,16 +163,23 @@ export class AppHome extends LitElement {
         right: 0;
         left: 0;
 
-        height: 30vh;
-        overflow-y: scroll;
+        height: 50vh;
+        transform: translateY(9em);
       }
 
-      #advanced {
+      #controls #advanced {
+        display: none;
         margin-left: 1em;
 
         position: fixed;
         top: 10px;
         right: 16px;
+      }
+
+      #mobile-toolbar #advanced {
+        display: none;
+        position: initial;
+        margin-left: 0;
       }
 
       #settings-pane {
@@ -259,6 +268,20 @@ export class AppHome extends LitElement {
         margin-left: 6px;
       }
 
+      #pill-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 14px;
+          }
+
+      #pill {
+        background: var(--neutral-outline-rest);
+        height: 12px;
+        width: 2.2em;
+        border-radius: 12px;
+      }
+
       @media(max-width: 800px) {
         main {
           width: 100vw;
@@ -278,6 +301,7 @@ export class AppHome extends LitElement {
 
         #mobile-toolbar {
           display: block;
+          border-radius: 12px 12px 0px 0px;
         }
 
         #controls, #filters {
@@ -296,11 +320,18 @@ export class AppHome extends LitElement {
         #getting-started {
           text-align: center;
           font-size: 10px;
-          width: 246px;
+          width: 280px;
         }
 
         #getting-started img {
-          width: 246px;
+          width: 280px;
+          margin-top: 0em;
+        }
+
+        #getting-started h2 {
+          font-size: 2em;
+          text-align: center;
+          margin-top: 0px;
         }
       }
 
@@ -393,6 +424,68 @@ export class AppHome extends LitElement {
     });
 
     this.fileHandler();
+
+    const search = new URLSearchParams(location.search);
+    const file_name = search.get("file");
+
+    if (file_name) {
+      const files = await get("files");
+
+      if (files) {
+        files.forEach(async (file) => {
+          if (file.name === file_name) {
+            const blob = await file.handle.getFile();
+            this.org = blob;
+
+            await this.updateComplete;
+
+            this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+            this.canvas?.drawImage(blob);
+          }
+        })
+      }
+    }
+  }
+
+  swipeHandler() {
+    const el = this.shadowRoot?.querySelector("#mobile-toolbar");
+
+    console.log('el', el);
+
+    if (el) {
+      const swiper = new Swipe(el);
+
+      swiper.onUp((ev) => {
+        //Your code goes here
+
+        console.log('here', ev);
+
+        el.animate([
+          {
+            transform: "translateY(0em)"
+          }
+        ], {
+          duration: 200,
+          easing: "ease-out",
+          fill: "forwards"
+        })
+      });
+
+      swiper.onDown((ev) => {
+        el.animate([
+          {
+            transform: "translateY(9em)"
+          }
+        ], {
+          duration: 200,
+          easing: "ease-out",
+          fill: "forwards"
+        })
+      })
+
+      swiper.run()
+    }
   }
 
   async fileHandler() {
@@ -426,6 +519,8 @@ export class AppHome extends LitElement {
       this.canvas?.drawImage(blob);
     }
 
+    this.swipeHandler();
+
     localStorage.setItem("done-with-tut", "true");
   }
 
@@ -438,6 +533,8 @@ export class AppHome extends LitElement {
       this.canvas = this.shadowRoot?.querySelector("app-canvas");
 
       this.canvas?.drawImage(blob);
+
+      this.swipeHandler();
     }
   }
 
@@ -601,6 +698,10 @@ export class AppHome extends LitElement {
           </main>
 
           ${this.org ? html` <div id="mobile-toolbar">
+          <div id="pill-box">
+            <div id="pill"></div>
+          </div>
+
           <div id="controls">
               <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fast-button>
               <fast-button appearance="outline" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fast-button>

@@ -1,3 +1,4 @@
+import { Router } from '@vaadin/router';
 import { LitElement, css, html, customElement } from 'lit-element';
 
 @customElement('app-header')
@@ -16,6 +17,10 @@ export class AppHeader extends LitElement {
         height: 3.6em;
       }
 
+      fast-anchor ion-icon {
+        margin-left: 6px;
+      }
+
       nav {
         width: 9em;
         display: flex;
@@ -31,6 +36,8 @@ export class AppHeader extends LitElement {
         align-items: center;
         justify-content: space-between;
         width: 8.6em;
+
+        cursor: pointer;
       }
 
       #info img {
@@ -56,14 +63,24 @@ export class AppHeader extends LitElement {
     super();
   }
 
+  goBack() {
+    Router.go("/")
+  }
+
   render() {
     return html`
       <header>
-        <div id ="info">
+        <div @click="${() => this.goBack()}" id ="info">
           <img src="/assets/icons/icon_64.png" alt="Simple Edit app icon">
 
           <h1>SimpleEdit</h1>
         </div>
+
+        ${"showSaveFilePicker" in window ? html`<fast-anchor href="/gallery" appearance="button" id="gallery-button">
+          Gallery
+
+          <ion-icon name="images-outline"></ion-icon>
+        </fast-anchor>` : null}
       </header>
     `;
   }

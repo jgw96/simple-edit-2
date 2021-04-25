@@ -67,7 +67,7 @@ export class AppIndex extends LitElement {
         children: [
           { path: '/', component: 'app-home' },
           {
-            path: '/about',
+            path: '/gallery',
             component: 'app-about',
             action: async () => {
               await import('./app-about.js');
