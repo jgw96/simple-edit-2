@@ -45,6 +45,17 @@ export class AppAbout extends LitElement {
         margin-right: 6px;
       }
 
+      #started {
+        background: var(--accent-fill-rest);
+      }
+
+      #no-saved-block {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
       @media(max-width: 800px) {
         ul {
           grid-template-columns: auto auto;
@@ -109,7 +120,7 @@ export class AppAbout extends LitElement {
       <div>
         <h2>Gallery</h2>
 
-        <ul>
+        ${this.saved ? html`<ul>
           ${
             this.saved.length > 0 ? html`
               ${
@@ -122,8 +133,16 @@ export class AppAbout extends LitElement {
                       </div>
 
                       <div id="actions">
-                        <fast-button @click="${() => this.continue(saved)}" id="edit-button">Edit</fast-button>
-                        <fast-button @click="${() => this.removeFile(saved)}">Remove</fast-button>
+                        <fast-button @click="${() => this.continue(saved)}" id="edit-button">
+                          Edit
+
+                          <ion-icon name="brush-outline"></ion-icon>
+                        </fast-button>
+                        <fast-button @click="${() => this.removeFile(saved)}">
+                          Remove
+
+                          <ion-icon name="trash-outline"></ion-icon>
+                        </fast-button>
                       </div>
                     </fast-card>
                   `
@@ -131,7 +150,12 @@ export class AppAbout extends LitElement {
               }
             ` : null
           }
-        </ul>
+        </ul>` : html`
+        <div id="no-saved-block">
+          <h3>No previous edits</h3>
+
+          <fast-anchor id="started" href="/">Get Started</fast-anchor>
+        </div>`}
       </div>
     `;
   }
