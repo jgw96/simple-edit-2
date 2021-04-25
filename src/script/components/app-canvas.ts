@@ -1,4 +1,5 @@
 import { fileSave } from 'browser-fs-access';
+import { get, set } from 'idb-keyval';
 import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
 
 @customElement('app-canvas')
@@ -242,6 +243,7 @@ export class AppCanvas extends LitElement {
 
     try {
       const active = this.canvas?.getActiveObject();
+      console.log('active', active);
 
       if (active) {
         const filter = this.typeMap.find((filter) => {
@@ -250,27 +252,57 @@ export class AppCanvas extends LitElement {
           }
         });
 
-        console.log('type', type);
+        if ((active as any)._objects) {
+          (active as any)._objects.forEach((object) => {
+            if (value && type === "blur") {
+              filter.filter.setOptions({
+                blur: value
+              })
+            }
+            else if (value && type === "brightness") {
+              filter.filter.setOptions({
+                brightness: value
+              })
+            }
 
-        if (value && type === "blur") {
-          filter.filter.setOptions({
-            blur: value
+            console.log('filter', filter);
+
+            (object as any).filters.push(filter?.filter);
+
+            // apply filters and re-render canvas when done
+            (object as any).applyFilters();
+
+            // this.canvas?.add(active);
+
           })
+
+          this.canvas?.renderAll();
         }
-        else if (value && type === "brightness") {
-          filter.filter.setOptions({
-            brightness: value
-          })
+        else {
+          console.log('type', type);
+
+          if (value && type === "blur") {
+            filter.filter.setOptions({
+              blur: value
+            })
+          }
+          else if (value && type === "brightness") {
+            filter.filter.setOptions({
+              brightness: value
+            })
+          }
+
+          console.log('filter', filter);
+
+          (active as any).filters.push(filter?.filter);
+
+          // apply filters and re-render canvas when done
+          (active as any).applyFilters();
+
+          this.canvas?.renderAll();
+
+          // this.canvas?.add(active);
         }
-
-        console.log('filter', filter);
-
-        (active as any).filters.push(filter?.filter);
-
-        // apply filters and re-render canvas when done
-        (active as any).applyFilters();
-
-        this.canvas?.add(active);
       }
       else {
         // add filter
@@ -288,7 +320,7 @@ export class AppCanvas extends LitElement {
         // apply filters and re-render canvas when done
         this.imgInstance.applyFilters();
 
-        this.canvas?.add(this.imgInstance);
+        this.canvas?.renderAll();
       }
 
       // this.applying = false;
@@ -315,11 +347,30 @@ export class AppCanvas extends LitElement {
       console.log(blob);
 
       if (blob) {
-        await fileSave(blob, {
+        const handle = await fileSave(blob, {
           fileName: "untitle.png",
           extensions: [".png"]
-        })
+        });
+
+        await this.saveFileHandles(handle, blob);
       }
+    }
+  }
+
+  async saveFileHandles(newHandle, previewBlob) {
+    const files = await get("files");
+
+    const newEntry = {
+      handle: newHandle,
+      name: newHandle.name,
+      preview: previewBlob
+    }
+
+    if (files) {
+      await set("files", [...files, newEntry])
+    }
+    else {
+      await set("files", [newEntry]);
     }
   }
 
@@ -343,7 +394,15 @@ export class AppCanvas extends LitElement {
     const active = this.canvas?.getActiveObject();
 
     if (active) {
-      this.canvas?.remove(active);
+
+      if ((active as any)._objects) {
+        (active as any)._objects.forEach((object) => {
+          this.canvas?.remove(object);
+        })
+      }
+      else {
+        this.canvas?.remove(active);
+      }
     }
     else {
       this.canvas?.remove(this.imgInstance);
