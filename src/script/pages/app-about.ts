@@ -56,6 +56,10 @@ export class AppAbout extends LitElement {
         align-items: center;
       }
 
+      #gallery-wrapper {
+        margin-top: 3em;
+      }
+
       @media(max-width: 800px) {
         ul {
           grid-template-columns: auto auto;
@@ -117,7 +121,7 @@ export class AppAbout extends LitElement {
 
   render() {
     return html`
-      <div>
+      <div id="gallery-wrapper">
         <h2>Gallery</h2>
 
         ${this.saved ? html`<ul>

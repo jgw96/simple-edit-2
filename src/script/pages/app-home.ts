@@ -44,7 +44,7 @@ export class AppHome extends LitElement {
     }
 
       #layout {
-        height: 92vh;
+        height: 96vh;
         width: auto;
 
         display: grid;
@@ -60,7 +60,7 @@ export class AppHome extends LitElement {
         justify-content: space-between;
 
         flex-direction: column;
-        height: 90vh;
+        height: 94vh;
 
         animation-name: slideup;
         animation-duration: 280ms;
@@ -98,19 +98,29 @@ export class AppHome extends LitElement {
       }
 
       #getting-started-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        padding-bottom: 2em;
+        background-color: #18181800;
+        backdrop-filter: blur(12px);
+        border-radius: 10px;
+      }
+
+      #getting-started-backer {
+        background: paint(static-gradient);
+        --static-gradient-color: var(--accent-fill-rest);
+        --static-gradient-size: 2;
+
         display: flex;
         align-items: center;
         justify-content: center;
-
-        box-shadow: #0e0e0e 0px 2px 11px 2px;
+        box-shadow: rgb(14 14 14) 0px 2px 11px 2px;
         border-radius: 10px;
-        margin: 4em;
-        margin-left: 6em;
-        margin-right: 6em;
-        padding-bottom: 2em;
-
-        background: var(--accent-fill-rest);
-
+        margin: 4em 6em;
+        /* background: rgba(38, 38, 38, 0); */
         animation-name: slideup;
         animation-duration: 280ms;
         animation-timing-function: "ease-in-out";
@@ -313,7 +323,7 @@ export class AppHome extends LitElement {
           margin-bottom: 2em;
         }
 
-        #getting-started-wrapper {
+        #getting-started-backer {
           margin: 4em 1em;
         }
 
@@ -336,7 +346,7 @@ export class AppHome extends LitElement {
       }
 
       @media(min-width: 1200px) {
-        #getting-started-wrapper {
+        #getting-started-backer {
           margin: 4em;
           margin-left: 12em;
           margin-right: 12em;
@@ -344,7 +354,7 @@ export class AppHome extends LitElement {
       }
 
       @media(screen-spanning: single-fold-vertical) {
-        #getting-started-wrapper {
+        #getting-started-backer {
           width: 44vw;
           margin: 2em;
         }
@@ -446,6 +456,10 @@ export class AppHome extends LitElement {
         })
       }
     }
+
+    (window as any).requestIdleCallback(() => {
+      (CSS as any).paintWorklet.addModule("https://unpkg.com/houdini-static-gradient@1.1.2/worklet.js");
+    })
   }
 
   swipeHandler() {
@@ -633,7 +647,7 @@ export class AppHome extends LitElement {
   render() {
     return html`
       <div>
-      ${!this.org ? html`<div id="getting-started-wrapper">
+      ${!this.org ? html`<div id="getting-started-backer"><div id="getting-started-wrapper">
               <div id="getting-started">
                 <div class="getting-started-item">
                   <img src="/assets/started.svg">
@@ -656,7 +670,7 @@ export class AppHome extends LitElement {
                   <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo <ion-icon name="add-outline"></ion-icon></fast-button>
                 </div>
                </div>
-              </div>` : null}
+              </div></div>` : null}
 
         <div id="layout">
         ${this.org ? html`<aside>
