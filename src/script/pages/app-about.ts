@@ -20,16 +20,23 @@ export class AppAbout extends LitElement {
         margin-left: 16px;
       }
 
-      ul fast-card {
+      fluent-button {
+        color: white;
+      }
+
+      ul fluent-card {
         width: 100%;
         height: 18em;
         padding: 12px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+
+        background-color: var(--neutral-foreground-rest);
+        color: white;
       }
 
-      ul fast-card img {
+      ul fluent-card img {
         width: 100%;
         height: 8em;
         object-fit: cover;
@@ -58,6 +65,12 @@ export class AppAbout extends LitElement {
 
       #gallery-wrapper {
         margin-top: 3em;
+        overflow-y: scroll;
+        height: 93vh;
+      }
+
+      #removeButton {
+        background: #d02929;
       }
 
       @media(max-width: 800px) {
@@ -130,25 +143,25 @@ export class AppAbout extends LitElement {
               ${
                 this.saved.map((saved) => {
                   return html`
-                    <fast-card>
+                    <fluent-card>
                       <div id="header-info">
                         <img src="${URL.createObjectURL(saved.preview)}">
                         <h3>${saved.name}</h3>
                       </div>
 
                       <div id="actions">
-                        <fast-button @click="${() => this.continue(saved)}" id="edit-button">
+                        <fluent-button @click="${() => this.continue(saved)}" id="edit-button">
                           Edit
 
                           <ion-icon name="brush-outline"></ion-icon>
-                        </fast-button>
-                        <fast-button @click="${() => this.removeFile(saved)}">
+                        </fluent-button>
+                        <fluent-button  id="removeButton" appearance="danger" @click="${() => this.removeFile(saved)}">
                           Remove
 
                           <ion-icon name="trash-outline"></ion-icon>
-                        </fast-button>
+                        </fluent-button>
                       </div>
-                    </fast-card>
+                    </fluent-card>
                   `
                 })
               }
@@ -158,7 +171,7 @@ export class AppAbout extends LitElement {
         <div id="no-saved-block">
           <h3>No previous edits</h3>
 
-          <fast-anchor id="started" href="/">Get Started</fast-anchor>
+          <fluent-anchor id="started" href="/">Get Started</fluent-anchor>
         </div>`}
       </div>
     `;

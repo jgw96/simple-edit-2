@@ -1,6 +1,7 @@
 import { fileSave } from 'browser-fs-access';
 import { get, set } from 'idb-keyval';
 import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
+import { drag, drawImageFunc, setupCanvas } from '../services/canvas';
 
 @customElement('app-canvas')
 export class AppCanvas extends LitElement {
@@ -89,7 +90,7 @@ export class AppCanvas extends LitElement {
     super();
   }
 
-  async firstUpdated() {
+  firstUpdated() {
     const canvas = this.shadowRoot?.querySelector("canvas");
 
     this.typeMap = [
@@ -103,42 +104,8 @@ export class AppCanvas extends LitElement {
     ];
 
     if (canvas) {
-      console.log('setting up');
-
-      window.fabric.textureSize = 8000;
-      this.canvas = new window.fabric.Canvas(canvas);
-
-      // this.canvas.isDrawingMode = true;
-
-      this.canvas?.setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight - 40
-      });
-
-      window.onresize = () => {
-        this.canvas?.setDimensions({
-          width: window.innerWidth,
-          height: window.innerHeight - 40
-        });
-      }
-
-      this.canvas.on('mouse:wheel', (opt) => {
-        const delta = (opt.e as any).deltaY;
-        let zoom = this.canvas?.getZoom();
-
-        if (zoom) {
-          zoom *= 0.999 ** delta;
-          if (zoom > 20) zoom = 20;
-          if (zoom < 0.01) zoom = 0.01;
-
-          this.canvas?.zoomToPoint(({ x: (opt.e as any).offsetX, y: (opt.e as any).offsetY } as any), zoom);
-        }
-
-        opt.e.preventDefault();
-        opt.e.stopPropagation();
-      });
-
-      this.drag();
+      this.canvas = setupCanvas(canvas);
+      drag(this.canvas);
     }
   }
 
@@ -155,92 +122,11 @@ export class AppCanvas extends LitElement {
     }
   }
 
-  drag() {
-    if (this.canvas) {
-      this.canvas.on('mouse:down', (opt) => {
-        const evt: any = opt.e;
-        if (evt.altKey === true) {
-          this.isDragging = true;
-          this.selection = false;
-          this.lastPosX = evt.clientX;
-          this.lastPosY = evt.clientY;
-        }
-      });
-      this.canvas.on('mouse:move', (opt) => {
-        if (this.isDragging) {
-          const e: any = opt.e;
-          const vpt = this.canvas?.viewportTransform;
-
-          if (vpt) {
-            if (this.lastPosX && this.lastPosY) {
-              vpt[4] += e.clientX - this.lastPosX;
-              vpt[5] += e.clientY - this.lastPosY;
-            }
-
-            this.canvas?.requestRenderAll();
-            this.lastPosX = e.clientX;
-            this.lastPosY = e.clientY;
-          }
-        }
-      });
-      this.canvas.on('mouse:up', () => {
-        // on mouse up we want to recalculate new interaction
-        // for all objects, so we call setViewportTransform
-        const transform = this.canvas?.viewportTransform;
-
-        if (transform) {
-          this.canvas?.setViewportTransform(transform);
-        }
-
-        this.isDragging = false;
-        this.selection = true;
-      });
-
-    }
-  }
-
   public drawImage(blob: Blob | File) {
-    if (this.canvas) {
-      console.info("Drawing image");
-
-      const reader = new FileReader();
-
-      reader.onloadend = (e) => {
-        this.image = new Image();
-
-        if (this.image) {
-          this.image.onload = () => {
-            this.imgInstance = new window.fabric.Image((this.image as HTMLImageElement), {
-              left: 0 + window.innerWidth / 8,
-              top: 0 + window.innerHeight / 8,
-              angle: 0
-            });
-
-            if (window.matchMedia("(max-width: 800px)").matches) {
-              this.imgInstance.scaleToWidth(400);
-            }
-            else {
-              this.imgInstance.scaleToWidth(800);
-            }
-
-            this.canvas?.add(this.imgInstance);
-
-            this.imgInstance.bringToFront();
-          }
-
-          if (e.target?.result) {
-            this.image.src = (e.target.result as string);
-          }
-        }
-
-      }
-
-      reader.readAsDataURL(blob);
-    }
+    drawImageFunc(blob, this.canvas, this.image, this.imgInstance);
   }
 
   public async applyWebglFilter(type: string, value?: number) {
-
     try {
       const active = this.canvas?.getActiveObject();
       console.log('active', active);

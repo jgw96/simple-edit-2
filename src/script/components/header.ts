@@ -33,11 +33,11 @@ export class AppHeader extends LitElement {
         justify-content: space-between;
       }
 
-      fast-anchor ion-icon {
+      fluent-anchor ion-icon {
         display: block;
       }
 
-      fast-anchor {
+      fluent-anchor {
         height: calc(env(titlebar-area-height, 33px) - 6px);
         background: var(--accent-fill-rest);
         border-radius: 22px;
@@ -116,10 +116,10 @@ export class AppHeader extends LitElement {
           <h1>SimpleEdit</h1>
         </div>
 
-        ${"showSaveFilePicker" in window && location.href.includes("gallery") === false ? html`<fast-anchor href="/gallery" appearance="button" id="gallery-button">
+        ${"showSaveFilePicker" in window && location.href.includes("gallery") === false ? html`<fluent-anchor href="/gallery" appearance="button" id="gallery-button">
           Gallery
           <ion-icon name="images-outline"></ion-icon>
-        </fast-anchor>` : null}
+        </fluent-anchor>` : null}
       </header>
     `;
   }

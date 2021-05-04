@@ -33,13 +33,13 @@ export class AppHome extends LitElement {
 
   static get styles() {
     return css`
-    fast-button::part(content) {
+    fluent-button::part(content) {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    fast-button ion-icon {
+    fluent-button ion-icon {
       margin-left: 6px;
     }
 
@@ -47,8 +47,8 @@ export class AppHome extends LitElement {
         height: 96vh;
         width: auto;
 
-        display: grid;
-        grid-template-columns: 18% auto;
+        display: flex;
+        flex-direction: column;
       }
 
       aside {
@@ -59,27 +59,32 @@ export class AppHome extends LitElement {
 
         justify-content: space-between;
 
-        flex-direction: column;
-        height: 94vh;
+        height: initial;
+        flex-direction: row;
 
         animation-name: slideup;
         animation-duration: 280ms;
         animation-timing-function: "ease-in-out";
       }
 
-      aside fast-button {
+      aside fluent-button {
         margin-bottom: 6px;
       }
 
       #controls, #filters {
         display: flex;
-        justify-content: space-between;
-
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: flex-start;
       }
 
-      #controls fast-button, #filters fast-button {
+      #filters {
+        flex-direction: row;
+        justify-content: flex-end;
+      }
+
+      #controls fluent-button, #filters fluent-button {
         margin-bottom: 10px;
+        margin-right: 6px;
       }
 
       #choosePhoto {
@@ -91,7 +96,7 @@ export class AppHome extends LitElement {
         margin-bottom: 1em;
       }
 
-      fast-progress-ring {
+      fluent-progress-ring {
         position: fixed;
         bottom: -26px;
         right: 16px;
@@ -155,7 +160,7 @@ export class AppHome extends LitElement {
         margin-top: 4em;
       }
 
-      #getting-started fast-button {
+      #getting-started fluent-button {
         width: 126px;
       }
 
@@ -274,7 +279,7 @@ export class AppHome extends LitElement {
         align-items: center;
       }
 
-      #extra-controls fast-slider {
+      #extra-controls fluent-slider {
         width: 12em;
         margin-left: 6px;
       }
@@ -367,22 +372,32 @@ export class AppHome extends LitElement {
         #layout {
           gap: 27px;
           grid-template-columns: 49% 50%;
+          display: grid;
         }
 
         app-canvas {
           width: 50vw;
           display: block;
-          margin-top: 1em;
         }
 
         #extra-controls {
           left: 51vw;
         }
+
+        aside {
+          flex-direction: column;
+        }
+
+        #controls, #filters {
+          flex-direction: column;
+        }
       }
 
       @media(screen-spanning: single-fold-horizontal) {
         #mobile-toolbar {
-          height: 46.8vh;
+          height: 60vh;
+          border-radius: 0;
+          margin-top: 0em;
         }
 
         #getting-started-wrapper {
@@ -395,6 +410,22 @@ export class AppHome extends LitElement {
 
         #getting-started img {
           width: 444px;
+        }
+
+        main {
+          height: 46vh;
+        }
+
+        app-canvas {
+          height: 46vh;
+        }
+
+        #pill-box {
+          display: none;
+        }
+
+        #controls {
+          margin-top: 1em;
         }
       }
 
@@ -654,21 +685,21 @@ export class AppHome extends LitElement {
                   <img src="/assets/started.svg">
                   <h2>Welcome to SimpleEdit!</h2>
 
-                  <fast-button @click="${() => this.scrollRight()}">Next</fast-button>
+                  <fluent-button @click="${() => this.scrollRight()}">Next</fluent-button>
                 </div>
 
                 <div class="getting-started-item">
                   <img src="/assets/started_two.svg">
                   <h2>Quickly edit your photos, create collages and more</h2>
 
-                  <fast-button @click="${() => this.scrollRight()}">Next</fast-button>
+                  <fluent-button @click="${() => this.scrollRight()}">Next</fluent-button>
                 </div>
 
                 <div class="getting-started-item">
                   <img src="/assets/started_three.svg">
                   <h2>Tap Choose Photo to get started!</h2>
 
-                  <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo <ion-icon name="add-outline"></ion-icon></fast-button>
+                  <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo <ion-icon name="add-outline"></ion-icon></fluent-button>
                 </div>
                </div>
               </div></div>` : null}
@@ -676,24 +707,24 @@ export class AppHome extends LitElement {
         <div id="layout">
         ${this.org ? html`<aside>
             <div id="controls">
-              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fast-button>
-              <fast-button appearance="outline" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fast-button>
-              <fast-button appearance="outline" @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fast-button>
+              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fluent-button>
+              <fluent-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fluent-button>
+              <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
 
-              <fast-button appearance="outline" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fast-button>
-              <fast-button id="remove-image" @click="${() => this.remove()}">Remove Photo <ion-icon name="trash-outline"></ion-icon></fast-button>
+              <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
+              <fluent-button id="remove-image" @click="${() => this.remove()}">Remove Photo <ion-icon name="trash-outline"></ion-icon></fluent-button>
 
-              <fast-button appearance="outline" id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fast-button>
+              <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
             </div>
 
 
               <div id="filters">
-                <fast-button appearance="outline" @click="${() => this.filter("grayscale")}">desaturate</fast-button>
-                <fast-button appearance="outline" @click="${() => this.filter("pixelate")}">pixelate</fast-button>
-                <fast-button appearance="outline" @click="${() => this.filter("invert")}">invert</fast-button>
-                <fast-button appearance="outline" @click="${() => this.filter("blur")}">blur</fast-button>
-                <fast-button appearance="outline" @click="${() => this.filter("sepia")}">sepia</fast-button>
-                <fast-button appearance="outline" @click="${() => this.filter("saturation")}">saturate</fast-button>
+                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
+                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
+                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
+                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
+                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
+                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
               </div>
 
           </aside>` : null}
@@ -702,8 +733,8 @@ export class AppHome extends LitElement {
             this.intensity ? html`<div id="extra-controls">
               <div>
                 <label for="intensity">Intensity</label>
-                <fast-slider @change="${(ev) => this.handleIntensity(ev.target.value)}" name="intensity" id="intensity" min="0" max="1" step="0.1" value="0.5">
-                </fast-slider>
+                <fluent-slider @change="${(ev) => this.handleIntensity(ev.target.value)}" name="intensity" id="intensity" min="0" max="1" step="0.1" value="0.5">
+                </fluent-slider>
               </div>
             </div>` : null
           }
@@ -718,24 +749,24 @@ export class AppHome extends LitElement {
           </div>
 
           <div id="controls">
-              <fast-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fast-button>
-              <fast-button appearance="outline" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fast-button>
-              <fast-button appearance="outline" @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fast-button>
+              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fluent-button>
+              <fluent-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fluent-button>
+              <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
 
-              <fast-button appearance="outline" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fast-button>
-              <fast-button id="remove-image" @click="${() => this.remove()}">Remove Photo <ion-icon name="trash-outline"></ion-icon></fast-button>
+              <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
+              <fluent-button id="remove-image" @click="${() => this.remove()}">Remove Photo <ion-icon name="trash-outline"></ion-icon></fluent-button>
 
-              <fast-button appearance="outline" id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fast-button>
+              <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
             </div>
 
             ${this.org ? html`
               <div id="filters">
-                <fast-button @click="${() => this.filter("grayscale")}">desaturate</fast-button>
-                <fast-button @click="${() => this.filter("pixelate")}">pixelate</fast-button>
-                <fast-button @click="${() => this.filter("invert")}">invert</fast-button>
-                <fast-button @click="${() => this.filter("blur")}">blur</fast-button>
-                <fast-button @click="${() => this.filter("sepia")}">sepia</fast-button>
-                <fast-button @click="${() => this.filter("saturation")}">saturate</fast-button>
+                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
+                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
+                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
+                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
+                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
+                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
               </div>
               ` : null
         }
@@ -750,9 +781,9 @@ export class AppHome extends LitElement {
           <div id="settings-header">
             <h3>Settings</h3>
 
-            <fast-button @click="${() => this.doSettings()}">
+            <fluent-button @click="${() => this.doSettings()}">
               Close
-            </fast-button>
+            </fluent-button>
           </div>
 
           <div class="setting">
@@ -769,10 +800,10 @@ export class AppHome extends LitElement {
               <p>Draw on your collage with your pen, mouse or touch!</p>
             </div>
 
-            <fast-switch value="${this.pen_mode || false}" @change="${(ev) => this.penMode(ev.target.checked)}">
+            <fluent-switch value="${this.pen_mode || false}" @change="${(ev) => this.penMode(ev.target.checked)}">
               <span slot="checked-message">on</span>
               <span slot="unchecked-message">off</span>
-            </fast-switch>
+            </fluent-switch>
           </div>
         </div>
 

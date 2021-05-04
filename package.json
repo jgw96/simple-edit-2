@@ -18,7 +18,8 @@
     "idb-keyval": "^5.0.5",
     "lit-element": "^2.4.0",
     "workbox-core": "^6.0.2",
-    "workbox-precaching": "^6.0.2"
+    "workbox-precaching": "^6.0.2",
+    "workbox-strategies": "^5.1.4"
   },
   "devDependencies": {
     "@open-wc/rollup-plugin-html": "^1.2.3",
