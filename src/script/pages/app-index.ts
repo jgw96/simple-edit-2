@@ -31,6 +31,12 @@ export class AppIndex extends LitElement {
         margin-top: env(titlebar-area-height, 33px);
       }
 
+      @media(max-width: 800px) {
+        main {
+          margin-top: 3.6em;
+        }
+      }
+
       @keyframes fadeOut {
         from {
           opacity: 1;

@@ -71,6 +71,26 @@ export class AppHeader extends LitElement {
         color: white;
       }
 
+      #gallery-button::part(content) {
+        display: flex;
+        align-items: center;
+      }
+
+      #gallery-button ion-icon {
+        margin-left: 6px;
+      }
+
+      @media(max-width: 800px) {
+        :host, header {
+          height: 3.6em;
+        }
+
+        #info h1 {
+          font-size: 20px;
+        }
+      }
+
+
       @media(prefers-color-scheme: light) {
         header {
           color: black;
@@ -96,7 +116,8 @@ export class AppHeader extends LitElement {
           <h1>SimpleEdit</h1>
         </div>
 
-        ${"showSaveFilePicker" in window ? html`<fast-anchor href="/gallery" appearance="button" id="gallery-button">
+        ${"showSaveFilePicker" in window && location.href.includes("gallery") === false ? html`<fast-anchor href="/gallery" appearance="button" id="gallery-button">
+          Gallery
           <ion-icon name="images-outline"></ion-icon>
         </fast-anchor>` : null}
       </header>

@@ -119,7 +119,8 @@ export class AppHome extends LitElement {
         justify-content: center;
         box-shadow: rgb(14 14 14) 0px 2px 11px 2px;
         border-radius: 10px;
-        margin: 4em 6em;
+        margin: 6em;
+        margin-top: 7em;
         /* background: rgba(38, 38, 38, 0); */
         animation-name: slideup;
         animation-duration: 280ms;
