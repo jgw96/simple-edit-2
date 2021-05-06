@@ -3,10 +3,11 @@ import { styleMap } from 'lit-html/directives/style-map';
 
 import '../components/app-canvas';
 import '../components/drag-drop';
+import '../components/save-modal';
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import '@pwabuilder/pwainstall';
-import { fileOpen } from 'browser-fs-access';
+import { directoryOpen, fileOpen } from 'browser-fs-access';
 import { AppCanvas } from '../components/app-canvas';
 import { Swipe } from '../utils/swipe';
 import { get } from 'idb-keyval';
@@ -19,13 +20,15 @@ export class AppHome extends LitElement {
   @property() message = 'Welcome!';
 
   @internalProperty() canvas: AppCanvas | undefined | null;
-  @internalProperty() org: File | Blob | undefined | null;
+  @internalProperty() org: File | Array<File> | Array<Blob> | Blob | undefined | null;
 
   @internalProperty() handleSettings = false;
 
   @internalProperty() pen_mode: boolean | undefined;
 
   @internalProperty() intensity: boolean | undefined;
+
+  @internalProperty() saving = false;
 
   settingsAni: Animation | undefined;
 
@@ -90,6 +93,10 @@ export class AppHome extends LitElement {
       #choosePhoto {
         margin-bottom: 1em;
         background: var(--accent-fill-hover);
+      }
+
+      #chooseFolder {
+        background: var(--accent-fill-rest);
       }
 
       #shareButton {
@@ -161,7 +168,7 @@ export class AppHome extends LitElement {
       }
 
       #getting-started fluent-button {
-        width: 126px;
+        width: 132px;
       }
 
       #getting-started h2 {
@@ -263,7 +270,6 @@ export class AppHome extends LitElement {
         right: 0;
         left: 18vw;
         background: #181818;
-        display: flex;
         justify-content: flex-end;
         padding: 8px;
         z-index: 99;
@@ -271,6 +277,8 @@ export class AppHome extends LitElement {
         animation-name: slideup;
         animation-duration: 280ms;
         animation-timing-function: "ease-in-out";
+
+        display: none;
       }
 
       #extra-controls div {
@@ -299,6 +307,7 @@ export class AppHome extends LitElement {
       }
 
       @media(max-width: 800px) {
+
         main {
           width: 100vw;
         }
@@ -348,6 +357,16 @@ export class AppHome extends LitElement {
           font-size: 2em;
           text-align: center;
           margin-top: 0px;
+        }
+      }
+
+      @media(max-width: 1200px) and (min-width: 800px) {
+        #remove-image {
+          position: fixed;
+          bottom: 0;
+          right: 6px;
+
+          z-index: 99999;
         }
       }
 
@@ -477,7 +496,6 @@ export class AppHome extends LitElement {
         files.forEach(async (file) => {
           if (file.name === file_name) {
             const blob = await file.handle.getFile();
-            this.org = blob;
 
             await this.updateComplete;
 
@@ -551,23 +569,58 @@ export class AppHome extends LitElement {
   }
 
   async openPhoto() {
-    const blob = await fileOpen({
+    const blobs = await fileOpen({
       mimeTypes: ['image/*'],
+      multiple: true
     });
 
-    if (blob) {
-      this.org = blob;
+    if (blobs) {
+      this.org = blobs;
 
-      await this.updateComplete;
+      blobs.forEach(async (blob) => {
+        await this.updateComplete;
 
-      this.canvas = this.shadowRoot?.querySelector("app-canvas");
+        this.canvas = this.shadowRoot?.querySelector("app-canvas");
 
-      this.canvas?.drawImage(blob);
+        this.canvas?.drawImage(blob);
+      })
     }
+
+    await this.updateComplete;
 
     this.swipeHandler();
 
     localStorage.setItem("done-with-tut", "true");
+  }
+
+  async openFolder() {
+    const options = {
+      // Set to `true` to recursively open files in all subdirectories,
+      // defaults to `false`.
+      recursive: true,
+    };
+
+    const blobs = await directoryOpen(options);
+
+    // await this.updateComplete;
+
+    if (blobs) {
+      console.log('blobs', blobs);
+      this.org = blobs;
+
+      blobs.forEach(async (blob) => {
+        this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+        this.canvas?.drawImage(blob);
+      })
+    }
+
+    await this.updateComplete;
+
+    this.swipeHandler();
+
+    localStorage.setItem("done-with-tut", "true");
+
   }
 
   async handleSharedImage(blob: Blob | File) {
@@ -579,6 +632,8 @@ export class AppHome extends LitElement {
       this.canvas = this.shadowRoot?.querySelector("app-canvas");
 
       this.canvas?.drawImage(blob);
+
+      await this.updateComplete;
 
       this.swipeHandler();
     }
@@ -599,7 +654,12 @@ export class AppHome extends LitElement {
   }
 
   async save() {
+    this.saving = !this.saving;
+  }
+
+  saveCanvas() {
     this.canvas?.save();
+    this.saving = !this.saving;
   }
 
   async share() {
@@ -678,6 +738,8 @@ export class AppHome extends LitElement {
 
   render() {
     return html`
+      <save-modal @saved="${() => this.saveCanvas()}" ?hiddenModal="${this.saving ? false : true}"></save-modal>
+
       <div>
       ${!this.org ? html`<div id="getting-started-backer"><div id="getting-started-wrapper">
               <div id="getting-started">
@@ -699,7 +761,7 @@ export class AppHome extends LitElement {
                   <img src="/assets/started_three.svg">
                   <h2>Tap Choose Photo to get started!</h2>
 
-                  <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photo <ion-icon name="add-outline"></ion-icon></fluent-button>
+                  <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
                 </div>
                </div>
               </div></div>` : null}
@@ -707,7 +769,8 @@ export class AppHome extends LitElement {
         <div id="layout">
         ${this.org ? html`<aside>
             <div id="controls">
-              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fluent-button>
+              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
+              <fluent-button id="chooseFolder" @click="${() => this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></fluent-button>
               <fluent-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fluent-button>
               <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
 
@@ -749,7 +812,7 @@ export class AppHome extends LitElement {
           </div>
 
           <div id="controls">
-              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photo <ion-icon name="add-outline"></ion-icon></fluent-button>
+              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
               <fluent-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fluent-button>
               <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
 
