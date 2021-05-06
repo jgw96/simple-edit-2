@@ -15,6 +15,11 @@ html, body {
   overflow: hidden;
 }
 
-fast-design-system-provider {
+fluent-design-system-provider {
   --accent-fill-rest: #6c63ff;
+  --background-color: #181818;
+  --accent-fill-hover: #DA1A5F;
+  --neutral-foreground-rest: white;
+  --neutral-fill-rest: #2d2d2d;
+  --neutral-fill-hover: #2d2d2dda;
 }

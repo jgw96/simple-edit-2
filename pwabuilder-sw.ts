@@ -1,5 +1,6 @@
 import { precacheAndRoute } from "workbox-precaching";
 import {registerRoute} from 'workbox-routing';
+import { CacheFirst } from "workbox-strategies";
 
 // Add custom service worker logic, such as a push notification serivce, or json request cache.
 self.addEventListener("message", (event: any) => {
@@ -28,6 +29,21 @@ registerRoute(
   '/share/image/',
   shareTargetHandler,
   'POST'
+);
+
+registerRoute(
+  ({ url }) => url.href.includes("@fluentui"),
+  new CacheFirst()
+);
+
+registerRoute(
+  ({ url }) => url.href.includes("ionic"),
+  new CacheFirst()
+);
+
+registerRoute(
+  ({ url }) => url.href.includes("@pwabuilder"),
+  new CacheFirst()
 );
 
 

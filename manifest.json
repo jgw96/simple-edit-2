@@ -1,9 +1,10 @@
 {
   "name": "SimpleEdit",
   "display": "standalone",
+  "display_override": ["window-controls-overlay"],
   "start_url": "/",
   "short_name": "SimpleEdit",
-  "theme_color": "#6c63ff",
+  "theme_color": "#181818",
   "description": "Quickly edit your photos, create collages and more",
   "orientation": "any",
   "background_color": "#6c63ff",
@@ -34,7 +35,7 @@
   ],
   "screenshots": [
     {
-      "src": "assets/screenshots/screen_1.png"
+      "src": "assets/screenshots/screen.png"
     },
     {
       "src": "assets/screenshots/screen_2.png"
@@ -43,7 +44,10 @@
       "src": "assets/screenshots/screen_3.png"
     },
     {
-      "src": "assets/screenshots/screen_4.png"
+      "src": "assets/screenshots/mobile_1.png"
+    },
+    {
+      "src": "assets/screenshots/mobile_2.png"
     }
   ],
   "features": [

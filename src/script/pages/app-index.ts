@@ -11,7 +11,7 @@ export class AppIndex extends LitElement {
   static get styles() {
     return css`
       main {
-        height: 92vh;
+        height: 96vh;
         padding: 0;
       }
 
@@ -25,6 +25,16 @@ export class AppIndex extends LitElement {
 
       #routerOutlet > .entering {
         animation: 160ms fadeIn linear;
+      }
+
+      main {
+        margin-top: env(titlebar-area-height, 33px);
+      }
+
+      @media(max-width: 800px) {
+        main {
+          margin-top: 3.6em;
+        }
       }
 
       @keyframes fadeOut {

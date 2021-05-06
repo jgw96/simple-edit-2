@@ -12,7 +12,7 @@
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
     />
     <meta name="description" content="Make quick, simple edits to any image!" />
-    <meta name="theme-color" content="#6c63ff" />
+    <meta name="theme-color" content="#181818" />
 
     <!-- These meta tags are Apple-specific, and set the web application to run in full-screen mode with a black status bar. Learn more at https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -26,23 +26,23 @@
     <link rel="manifest" href="manifest.json" />
 
     <!-- Microsoft Fast Components https://www.fast.design/docs/components/getting-started-->
-    <script
-      type="module"
-      src="https://unpkg.com/@microsoft/fast-components"
-    ></script>
+    <script type="module" src="https://unpkg.com/@fluentui/web-components"></script>
 
     <!-- A stylesheet to design the pages. -->
     <link href="styles/global.css" rel="stylesheet" />
 
     <!--<script type="module" src="/build/src/script/pages/app-index.js"></script>-->
     <script type="module" src="src/script/pages/app-index.ts"></script>
+
+    <!-- dual screen -->
+    <meta http-equiv="origin-trial" content="Alw3Y+dq11tjFTyoOLSY5/68/z2G7ZgzyGchXPpimW2llZnE/iJt+A1cajy+Jg9K9xD1YuFU7XBfk0vVCT0jyesAAACCeyJvcmlnaW4iOiJodHRwczovL2dyYXktcG9uZC0wMWNjZWM0MTAuYXp1cmVzdGF0aWNhcHBzLm5ldDo0NDMiLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiZmVhdHVyZSI6IldpbmRvd1NlZ21lbnRzIiwiZXhwaXJ5IjoxNjIzOTU4NTcxfQ==">
   </head>
 
   <body>
     <!-- Our app-index web component. This component is defined in src/pages/app-index.ts-->
-    <fast-design-system-provider use-defaults>
+    <fluent-design-system-provider use-defaults>
       <app-index></app-index>
-    </fast-design-system-provider>
+    </fluent-design-system-provider>
 
     <script type="module" src="/pwabuilder-sw.ts"></script>
 
@@ -50,8 +50,9 @@
       navigator.serviceWorker.register("/pwabuilder-sw.js");
     </script>
 
-    <script src="/assets/fabric.min.js"></script>
+    <script async defer src="/assets/fabric.min.js"></script>
 
-    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+    <script async defer type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+    <script async defer nomodule="" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
   </body>
 </html>
