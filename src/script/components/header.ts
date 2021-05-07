@@ -116,10 +116,10 @@ export class AppHeader extends LitElement {
           <h1>SimpleEdit</h1>
         </div>
 
-        ${"showSaveFilePicker" in window && location.href.includes("gallery") === false ? html`<fluent-anchor href="/gallery" appearance="button" id="gallery-button">
+        <!--${"showSaveFilePicker" in window && location.href.includes("gallery") === false ? html`<fluent-anchor href="/gallery" appearance="button" id="gallery-button">
           Gallery
           <ion-icon name="images-outline"></ion-icon>
-        </fluent-anchor>` : null}
+        </fluent-anchor>` : null}-->
       </header>
     `;
   }
