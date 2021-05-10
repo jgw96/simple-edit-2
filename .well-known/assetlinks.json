@@ -1,0 +1,5 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target" : { "namespace": "android_app", "package_name": "com.simpledit.app",
+                   "sha256_cert_fingerprints": ["03:64:78:38:A6:24:A8:59:92:E5:C5:06:62:70:57:EB:3A:4A:DB:39:AC:11:A2:A8:6C:3A:23:F7:0B:90:D1:71"] }
+    }]
