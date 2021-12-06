@@ -8,7 +8,10 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
         console.log('setting up');
 
         window.fabric.textureSize = 8000;
-        const fabricCanvas = new window.fabric.Canvas(canvas);
+        const fabricCanvas = new window.fabric.Canvas(canvas, {
+          preserveObjectStacking: true,
+          backgroundColor: "#1e1e1e"
+        });
 
         console.log('fabricCanvas', fabricCanvas);
 

@@ -27,10 +27,8 @@ export class AppAbout extends LitElement {
       ul fluent-card {
         width: 100%;
         height: 18em;
-        padding: 12px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
 
         background-color: var(--neutral-foreground-rest);
         color: white;
@@ -38,8 +36,22 @@ export class AppAbout extends LitElement {
 
       ul fluent-card img {
         width: 100%;
-        height: 8em;
+        height: 10em;
         object-fit: cover;
+      }
+
+      #content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        padding-left: 10px;
+        padding-bottom: 10px;
+        padding-right: 10px;
+      }
+
+      #content h3 {
+        margin-top: 6px;
       }
 
       #actions {
@@ -49,7 +61,7 @@ export class AppAbout extends LitElement {
 
       #edit-button {
         background: var(--accent-fill-rest);
-        margin-right: 6px;
+        margin-right: 10px;
       }
 
       #started {
@@ -75,7 +87,7 @@ export class AppAbout extends LitElement {
 
       @media(max-width: 800px) {
         ul {
-          grid-template-columns: auto auto;
+          grid-template-columns: 50% 50%;
         }
       }
     `;
@@ -110,9 +122,23 @@ export class AppAbout extends LitElement {
     if (readWrite) {
       options.mode = 'readwrite';
     }
+
+    const perm = await fileHandle.queryPermission(options);
+
+    console.log('perm', perm);
+
     // Check if permission was already granted. If so, return true.
-    if ((await fileHandle.queryPermission(options)) === 'granted') {
+    if (perm === 'granted') {
       return true;
+    }
+    else {
+      const check = await fileHandle.requestPermission(options);
+
+      console.log('check', check);
+
+      if (check === 'granted') {
+        return true;
+      }
     }
     // Request permission. If the user grants permission, return true.
     if ((await fileHandle.requestPermission(options)) === 'granted') {
@@ -146,20 +172,24 @@ export class AppAbout extends LitElement {
                     <fluent-card>
                       <div id="header-info">
                         <img src="${URL.createObjectURL(saved.preview)}">
-                        <h3>${saved.name}</h3>
                       </div>
 
-                      <div id="actions">
-                        <fluent-button @click="${() => this.continue(saved)}" id="edit-button">
-                          Edit
+                      <div id="content">
 
-                          <ion-icon name="brush-outline"></ion-icon>
-                        </fluent-button>
-                        <fluent-button  id="removeButton" appearance="danger" @click="${() => this.removeFile(saved)}">
-                          Remove
+                        <h3>${saved.name}</h3>
 
-                          <ion-icon name="trash-outline"></ion-icon>
-                        </fluent-button>
+                        <div id="actions">
+                          <fluent-button @click="${() => this.continue(saved)}" id="edit-button">
+                            Edit
+
+                            <ion-icon name="brush-outline"></ion-icon>
+                          </fluent-button>
+                          <fluent-button  id="removeButton" appearance="danger" @click="${() => this.removeFile(saved)}">
+                            Remove
+
+                            <ion-icon name="trash-outline"></ion-icon>
+                          </fluent-button>
+                        </div>
                       </div>
                     </fluent-card>
                   `
