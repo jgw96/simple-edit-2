@@ -229,8 +229,11 @@ export class AppHome extends LitElement {
       }
 
       #mobile-toolbar #otherControls fluent-button {
-        width: 100%;
         margin-bottom: 8px;
+      }
+
+      #mobile-toolbar #otherControls .menu-label {
+        display: none;
       }
 
       #settings-pane {
@@ -343,6 +346,13 @@ export class AppHome extends LitElement {
 
       @media(max-width: 800px) {
 
+        #controls fluent-button, #filters fluent-button, #otherControls fluent-button {
+          border-radius: 6px;
+          padding: 6px;
+          font-size: 1em;
+          font-weight: 500;
+        }
+
         #canvasMain {
           display: initial;
         }
@@ -421,10 +431,30 @@ export class AppHome extends LitElement {
         }
       }
 
-      @media(screen-spanning: single-fold-vertical) {
+      #filters.duoFilters {
+        display: none;
+      }
+
+      @media(horizontal-viewport-segments: 2) {
         #getting-started-backer {
           width: 44vw;
           margin: 2em;
+        }
+
+        #filters.duoFilters {
+          display: flex;
+        }
+
+        #canvasMain {
+          display: initial;
+        }
+
+        #canvasMain .tabletFilters {
+          display: none;
+        }
+
+        #getting-started-wrapper {
+          margin-top: 2em;
         }
 
         #getting-started img {
@@ -448,14 +478,32 @@ export class AppHome extends LitElement {
 
         aside {
           flex-direction: column;
+          overflow-y: scroll;
         }
 
         #controls, #filters {
           flex-direction: column;
         }
+
+        #controls fluent-button, #filters fluent-button {
+          border-radius: 6px;
+          padding: 6px;
+          font-size: 1em;
+          font-weight: 500;
+        }
+
+        .menu-label {
+          margin-bottom: 20px;
+          margin-top: 20px;
+          font-size: 20px;
+        }
+
+        #advanced {
+          display: none;
+        }
       }
 
-      @media(screen-spanning: single-fold-horizontal) {
+      @media(vertical-viewport-segments: 2) {
         #mobile-toolbar {
           height: 60vh;
           border-radius: 0;
@@ -847,6 +895,38 @@ export class AppHome extends LitElement {
 
               <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
             </div>
+
+            <div id="filters" class="duoFilters">
+                <div class="menu-label">
+                  <span id="filters-label">Filters</span>
+                </div>
+
+                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
+                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
+                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
+                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
+                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
+                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
+                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
+
+                <div id="otherControls">
+                  <div class="menu-label">
+                    <span id="order-label">Order</span>
+                  </div>
+
+                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
+                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
+                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
+                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+
+
+                    <div class="menu-label">
+                      <span>Add</span>
+                    </div>
+
+                    <fluent-button @click="${() => this.addText()}">Add Text</fluent-button>
+                </div>
+              </div>
 
 
           </aside>` : null}

@@ -40,7 +40,7 @@ export class AppCanvas extends LitElement {
         border-radius: 6px;
         padding: 8px;
         position: fixed;
-        bottom: 3.2em;
+        bottom: 16px;
         right: 16px;
         display: flex;
         flex-direction: column;
@@ -55,6 +55,10 @@ export class AppCanvas extends LitElement {
         flex-direction: column;
         align-items: flex-start;
         font-weight: normal;
+
+        margin-top: 6px;
+        margin-bottom: 10px;
+        padding: 6px;
       }
 
       #textControls label input {
@@ -464,6 +468,10 @@ export class AppCanvas extends LitElement {
 
             <label>Text Color
               <input type="color" @input=${(e: any) => this.changeTextColor(e.target.value)} />
+            </label>
+
+            <label>Font Size
+              <input type="number" @input=${(e: any) => this.currentText.set("fontSize", e.target.value)} />
             </label>
           </div>
         ` : null
