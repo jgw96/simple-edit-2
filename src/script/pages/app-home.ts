@@ -29,6 +29,7 @@ export class AppHome extends LitElement {
   @internalProperty() intensity: boolean | undefined;
 
   @internalProperty() saving = false;
+  @internalProperty() removeShow = false;
 
   settingsAni: Animation | undefined;
 
@@ -36,6 +37,34 @@ export class AppHome extends LitElement {
 
   static get styles() {
     return css`
+
+    .menu-label {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    #canvasMain {
+      display: grid;
+      grid-template-columns: 16% 84%;
+    }
+
+    #canvasMain .tabletFilters {
+      flex-direction: column;
+      justify-content: flex-start;
+      padding-left: 10px;
+      padding-right: 6px;
+      padding-top: 8px;
+    }
+
+    #otherControls {
+      margin-top: 1em;
+    }
+
+    #otherControls fluent-button {
+      width: 97%;
+    }
+
     fluent-button::part(content) {
       display: flex;
       align-items: center;
@@ -116,16 +145,11 @@ export class AppHome extends LitElement {
         align-items: center;
         height: 100%;
         padding-bottom: 2em;
-        background-color: #18181800;
-        backdrop-filter: blur(12px);
+        background-color: rgb(107 99 255);
         border-radius: 10px;
       }
 
       #getting-started-backer {
-        background: paint(static-gradient);
-        --static-gradient-color: var(--accent-fill-rest);
-        --static-gradient-size: 2;
-
         display: flex;
         align-items: center;
         justify-content: center;
@@ -186,12 +210,11 @@ export class AppHome extends LitElement {
         right: 0;
         left: 0;
 
-        height: 50vh;
-        transform: translateY(9em);
+        height: 94vh;
+        transform: translateY(30em);
       }
 
       #controls #advanced {
-        display: none;
         margin-left: 1em;
 
         position: fixed;
@@ -203,6 +226,14 @@ export class AppHome extends LitElement {
         display: none;
         position: initial;
         margin-left: 0;
+      }
+
+      #mobile-toolbar #otherControls fluent-button {
+        margin-bottom: 8px;
+      }
+
+      #mobile-toolbar #otherControls .menu-label {
+        display: none;
       }
 
       #settings-pane {
@@ -237,6 +268,10 @@ export class AppHome extends LitElement {
         margin-bottom: 10px;
       }
 
+      .colorCard {
+        display: none;
+      }
+
       .setting .setting-header  {
         margin-top: 8px;
         font-size: 12px;
@@ -262,6 +297,9 @@ export class AppHome extends LitElement {
 
       #remove-image {
         background: #d02929;
+
+        animation-name: slideup;
+        animation-duration: 300ms;
       }
 
       #extra-controls {
@@ -308,6 +346,17 @@ export class AppHome extends LitElement {
 
       @media(max-width: 800px) {
 
+        #controls fluent-button, #filters fluent-button, #otherControls fluent-button {
+          border-radius: 6px;
+          padding: 6px;
+          font-size: 1em;
+          font-weight: 500;
+        }
+
+        #canvasMain {
+          display: initial;
+        }
+
         main {
           width: 100vw;
         }
@@ -338,6 +387,10 @@ export class AppHome extends LitElement {
           margin-bottom: 2em;
         }
 
+        #canvasMain .tabletFilters {
+          display: none;
+        }
+
         #getting-started-backer {
           margin: 4em 1em;
         }
@@ -363,10 +416,10 @@ export class AppHome extends LitElement {
       @media(max-width: 1200px) and (min-width: 800px) {
         #remove-image {
           position: fixed;
-          bottom: 0;
-          right: 6px;
-
-          z-index: 99999;
+          bottom: 0px;
+          right: 10px;
+          width: 10.5em;
+          z-index: 8;
         }
       }
 
@@ -378,10 +431,30 @@ export class AppHome extends LitElement {
         }
       }
 
-      @media(screen-spanning: single-fold-vertical) {
+      #filters.duoFilters {
+        display: none;
+      }
+
+      @media(horizontal-viewport-segments: 2) {
         #getting-started-backer {
           width: 44vw;
           margin: 2em;
+        }
+
+        #filters.duoFilters {
+          display: flex;
+        }
+
+        #canvasMain {
+          display: initial;
+        }
+
+        #canvasMain .tabletFilters {
+          display: none;
+        }
+
+        #getting-started-wrapper {
+          margin-top: 2em;
         }
 
         #getting-started img {
@@ -405,14 +478,32 @@ export class AppHome extends LitElement {
 
         aside {
           flex-direction: column;
+          overflow-y: scroll;
         }
 
         #controls, #filters {
           flex-direction: column;
         }
+
+        #controls fluent-button, #filters fluent-button {
+          border-radius: 6px;
+          padding: 6px;
+          font-size: 1em;
+          font-weight: 500;
+        }
+
+        .menu-label {
+          margin-bottom: 20px;
+          margin-top: 20px;
+          font-size: 20px;
+        }
+
+        #advanced {
+          display: none;
+        }
       }
 
-      @media(screen-spanning: single-fold-horizontal) {
+      @media(vertical-viewport-segments: 2) {
         #mobile-toolbar {
           height: 60vh;
           border-radius: 0;
@@ -506,10 +597,6 @@ export class AppHome extends LitElement {
         })
       }
     }
-
-    (window as any).requestIdleCallback(() => {
-      (CSS as any).paintWorklet.addModule("https://unpkg.com/houdini-static-gradient@1.1.2/worklet.js");
-    })
   }
 
   swipeHandler() {
@@ -539,7 +626,7 @@ export class AppHome extends LitElement {
       swiper.onDown((ev) => {
         el.animate([
           {
-            transform: "translateY(9em)"
+            transform: "translateY(30em)"
           }
         ], {
           duration: 200,
@@ -649,6 +736,22 @@ export class AppHome extends LitElement {
     }
   }
 
+  async handleBringForward() {
+    await this.canvas?.bringForwardObject();
+  }
+
+  async handleBringFront() {
+    await this.canvas?.bringToFront();
+  }
+
+  async handleSendBackward() {
+    await this.canvas?.sendBackward();
+  }
+
+  async handleSendToBack() {
+    await this.canvas?.sendToBack();
+  }
+
   revert() {
     this.canvas?.revert();
   }
@@ -736,6 +839,19 @@ export class AppHome extends LitElement {
     }
   }
 
+  addText() {
+    this.canvas?.handleText()
+  }
+
+  handleObjectSelected() {
+    console.log('object selected');
+    this.removeShow = true;
+  }
+
+  handleObjectCleared() {
+    this.removeShow = false;
+  }
+
   render() {
     return html`
       <save-modal @saved="${() => this.saveCanvas()}" ?hiddenModal="${this.saving ? false : true}"></save-modal>
@@ -775,20 +891,43 @@ export class AppHome extends LitElement {
               <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
 
               <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
-              <fluent-button id="remove-image" @click="${() => this.remove()}">Remove Photo <ion-icon name="trash-outline"></ion-icon></fluent-button>
+              ${this.removeShow ? html`<fluent-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></fluent-button>` : null}
 
               <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
             </div>
 
+            <div id="filters" class="duoFilters">
+                <div class="menu-label">
+                  <span id="filters-label">Filters</span>
+                </div>
 
-              <div id="filters">
                 <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
                 <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
                 <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
                 <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
                 <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
                 <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
+                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
+
+                <div id="otherControls">
+                  <div class="menu-label">
+                    <span id="order-label">Order</span>
+                  </div>
+
+                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
+                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
+                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
+                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+
+
+                    <div class="menu-label">
+                      <span>Add</span>
+                    </div>
+
+                    <fluent-button @click="${() => this.addText()}">Add Text</fluent-button>
+                </div>
               </div>
+
 
           </aside>` : null}
 
@@ -802,8 +941,41 @@ export class AppHome extends LitElement {
             </div>` : null
           }
 
-          <main>
-            ${this.org ? html`<drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas></app-canvas></drag-drop>` : null}
+          <main id="canvasMain">
+
+          ${ this.org ? html`<div id="filters" class="tabletFilters">
+                <div class="menu-label">
+                  <span id="filters-label">Filters</span>
+                </div>
+
+                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
+                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
+                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
+                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
+                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
+                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
+                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
+
+                <div id="otherControls">
+                  <div class="menu-label">
+                    <span id="order-label">Order</span>
+                  </div>
+
+                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
+                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
+                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
+                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+
+
+                    <div class="menu-label">
+                      <span>Add</span>
+                    </div>
+
+                    <fluent-button @click="${() => this.addText()}">Add Text</fluent-button>
+                </div>
+              </div>` : null }
+
+            ${this.org ? html`<drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas @object-selected="${() => this.handleObjectSelected()}" @object-cleared="${() => this.handleObjectCleared()}"></app-canvas></drag-drop>` : null}
           </main>
 
           ${this.org ? html` <div id="mobile-toolbar">
@@ -817,7 +989,7 @@ export class AppHome extends LitElement {
               <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
 
               <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
-              <fluent-button id="remove-image" @click="${() => this.remove()}">Remove Photo <ion-icon name="trash-outline"></ion-icon></fluent-button>
+              ${this.removeShow ? html`<fluent-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></fluent-button>` : null}
 
               <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
             </div>
@@ -830,9 +1002,20 @@ export class AppHome extends LitElement {
                 <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
                 <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
                 <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
+                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
               </div>
               ` : null
         }
+                <div id="otherControls">
+                  <div class="menu-label">
+                    <span id="order-label">Order</span>
+                  </div>
+
+                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
+                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
+                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
+                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+                </div>
     </div>` : null}
         </div>
 
@@ -857,7 +1040,7 @@ export class AppHome extends LitElement {
             <input @change="${(ev) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
           </div>
 
-          <div class="setting">
+          <div class="setting colorCard">
             <div class="setting-header">
               <label id="color-label" for="color">Drawing Mode</label>
               <p>Draw on your collage with your pen, mouse or touch!</p>

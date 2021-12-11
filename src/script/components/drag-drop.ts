@@ -27,14 +27,14 @@ export class DragDrop extends LitElement {
           }
         }
 
-        @media(screen-spanning: single-fold-vertical) {
+        @media(horizontal-viewport-segments: 2) {
             #dragdrop {
                 width: 48.8%;
                 height: 90vh;
             }
         }
 
-        @media(screen-spanning: single-fold-horizontal) {
+        @media(vertical-viewport-segments: 2) {
             #dragdrop {
                 height: 50%;
             }

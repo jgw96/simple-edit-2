@@ -11,6 +11,9 @@ export class AppCanvas extends LitElement {
   @internalProperty() imgInstance: any;
   @internalProperty() pen: boolean;
 
+  @internalProperty() text = false;
+  @internalProperty() currentText;
+
   isDragging = false;
   selection: any | undefined;
   lastPosX: number | undefined;
@@ -30,6 +33,45 @@ export class AppCanvas extends LitElement {
         width: 100%;
       }
 
+      #textControls {
+        z-index: 9;
+        background: #2d2d2d;
+        width: 14em;
+        border-radius: 6px;
+        padding: 8px;
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        display: flex;
+        flex-direction: column;
+        font-weight: bold;
+
+        animation-name: quickup;
+        animation-duration: 300ms;
+      }
+
+      #textControls label {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-weight: normal;
+
+        margin-top: 6px;
+        margin-bottom: 10px;
+        padding: 6px;
+      }
+
+      #textControls label input {
+        border: none;
+        width: 100%;
+        margin-top: 4px;
+      }
+
+      #textControlsHeader {
+        display: block;
+        margin-bottom: 6px;
+      }
+
       #colors {
         position: absolute;
         bottom: 16px;
@@ -42,6 +84,7 @@ export class AppCanvas extends LitElement {
         animation-name: quickup;
         animation-duration: 300ms;
       }
+
       .color {
         border: none;
         height: 1.6em;
@@ -49,6 +92,12 @@ export class AppCanvas extends LitElement {
         border-radius: 50%;
         margin: 6px;
       }
+
+      .color:hover {
+        border: solid 1px white;
+        background: green;
+      }
+
       #red {
         background: red;
       }
@@ -96,7 +145,7 @@ export class AppCanvas extends LitElement {
     this.typeMap = [
       { name: "grayscale", filter: new window.fabric.Image.filters.Grayscale() },
       { name: "sepia", filter: new window.fabric.Image.filters.Sepia() },
-      { name: "brightness", filter: new window.fabric.Image.filters.Brightness({ brightness: 10 }) },
+      { name: "brightness", filter: new window.fabric.Image.filters.Brightness({ brightness: 0.3 }) },
       { name: "saturation", filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }) },
       { name: "blur", filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }) },
       { name: "invert", filter: new window.fabric.Image.filters.Invert() },
@@ -106,6 +155,24 @@ export class AppCanvas extends LitElement {
     if (canvas) {
       this.canvas = setupCanvas(canvas);
       drag(this.canvas);
+
+      this.canvas?.on('mouse:down', (options) => {
+        if (options.target) {
+          console.log('an object was clicked! ', options.target.type);
+
+          if (options.target.type?.includes("text")) {
+            this.text = true;
+            this.currentText = options.target;
+          }
+
+          this.dispatchEvent(new CustomEvent("object-selected", {bubbles: true, composed: true}));
+        }
+      });
+
+      this.canvas?.on('selection:cleared', () => {
+        this.text = false;
+        this.dispatchEvent(new CustomEvent("object-cleared", {bubbles: true, composed: true}));
+      })
     }
   }
 
@@ -124,6 +191,30 @@ export class AppCanvas extends LitElement {
 
   public drawImage(blob: Blob | File) {
     drawImageFunc(blob, this.canvas, this.image, this.imgInstance);
+  }
+
+  public bringForwardObject() {
+    const active = this.canvas?.getActiveObject();
+    console.log(active);
+    active?.bringForward(true);
+  }
+
+  public bringToFront() {
+    const active = this.canvas?.getActiveObject();
+    console.log(active);
+    active?.bringToFront();
+  }
+
+  sendBackward() {
+    const active = this.canvas?.getActiveObject();
+    console.log(active);
+    active?.sendBackwards();
+  }
+
+  sendToBack() {
+    const active = this.canvas?.getActiveObject();
+    console.log(active);
+    active?.sendToBack();
   }
 
   public async applyWebglFilter(type: string, value?: number) {
@@ -234,7 +325,7 @@ export class AppCanvas extends LitElement {
 
       if (blob) {
         const handle = await fileSave(blob, {
-          fileName: "untitle.png",
+          fileName: "untitled.png",
           extensions: [".png"]
         });
 
@@ -353,9 +444,38 @@ export class AppCanvas extends LitElement {
     }
   }
 
+  changeTextColor(color: string) {
+    if (this.canvas) {
+      this.currentText.set("fill", color);
+    }
+  }
+
+  handleText() {
+    this.currentText = new window.fabric.IText('New Text', { left: 100, top: 100, fill: "white", fontFamily: "sans-serif" });
+    this.canvas?.add(this.currentText);
+  }
+
   render() {
     return html`
       <canvas></canvas>
+
+      ${
+        this.text ? html`
+          <div id="textControls">
+            <div>
+              <span id="textControlsHeader">Text Settings</span>
+            </div>
+
+            <label>Text Color
+              <input type="color" @input=${(e: any) => this.changeTextColor(e.target.value)} />
+            </label>
+
+            <label>Font Size
+              <input type="number" @input=${(e: any) => this.currentText.set("fontSize", e.target.value)} />
+            </label>
+          </div>
+        ` : null
+      }
 
       ${this.pen ? html`<div id="colors">
         <button @click="${() => this.changePenColor("red")}" class="color" id="red"></button>
