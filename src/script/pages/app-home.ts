@@ -218,7 +218,7 @@ export class AppHome extends LitElement {
         margin-left: 1em;
 
         position: fixed;
-        top: 10px;
+        top: env(titlebar-area-height, 10px);
         right: 16px;
       }
 
