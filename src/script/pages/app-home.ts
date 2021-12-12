@@ -1,4 +1,4 @@
-import { LitElement, css, html, customElement, property, internalProperty } from 'lit-element';
+import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
 import { styleMap } from 'lit-html/directives/style-map';
 
 import '../components/app-canvas';
@@ -10,17 +10,16 @@ import '@pwabuilder/pwainstall';
 import { directoryOpen, fileOpen } from 'browser-fs-access';
 import { AppCanvas } from '../components/app-canvas';
 import { Swipe } from '../utils/swipe';
-import { get } from 'idb-keyval';
+import { get, set } from 'idb-keyval';
 
 
 @customElement('app-home')
 export class AppHome extends LitElement {
   // For more information on using properties in lit-element
   // check out this link https://lit-element.polymer-project.org/guide/properties#declare-with-decorators
-  @property() message = 'Welcome!';
 
   @internalProperty() canvas: AppCanvas | undefined | null;
-  @internalProperty() org: File | Array<File> | Array<Blob> | Blob | undefined | null;
+  @internalProperty() org: File | Array<File> | Array<Blob> | Blob | undefined | null = undefined;
 
   @internalProperty() handleSettings = false;
 
@@ -107,6 +106,25 @@ export class AppHome extends LitElement {
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
+      }
+
+      #controls a {
+        width: 5em;
+        text-decoration: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: var(--accent-fill-rest);
+        height: 2.5em;
+        margin-bottom: 0px;
+        margin-top: 0px;
+        border-radius: 2px;
+        font-size: 13px;
+
+        position: fixed;
+        right: 9.4em;
       }
 
       #filters {
@@ -218,7 +236,6 @@ export class AppHome extends LitElement {
         margin-left: 1em;
 
         position: fixed;
-        top: env(titlebar-area-height, 10px);
         right: 16px;
       }
 
@@ -558,6 +575,20 @@ export class AppHome extends LitElement {
   }
 
   async firstUpdated() {
+    const working = await get("current_file");
+
+    if (working) {
+      this.org = working;
+
+      await this.updateComplete;
+
+      this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+      if (working) {
+        this.canvas?.openFromJSON(working);
+      }
+    }
+
     const test = localStorage.getItem("done-with-tut");
 
     if (test) {
@@ -566,8 +597,6 @@ export class AppHome extends LitElement {
     }
 
     navigator.serviceWorker.addEventListener('message', (event) => {
-      console.log('file event', event);
-      console.log('file event data', event.data);
       const imageBlob = event.data.file;
 
       if (imageBlob) {
@@ -579,24 +608,29 @@ export class AppHome extends LitElement {
 
     const search = new URLSearchParams(location.search);
     const file_name = search.get("file");
+    console.log(file_name);
 
     if (file_name) {
-      const files = await get("files");
+      const files = await get("saved_files");
 
       if (files) {
         files.forEach(async (file) => {
           if (file.name === file_name) {
-            const blob = await file.handle.getFile();
+            const blob = file.preview;
+            this.org = blob;
 
             await this.updateComplete;
 
             this.canvas = this.shadowRoot?.querySelector("app-canvas");
+            this.canvas?.openFromJSON(file.canvas);
 
-            this.canvas?.drawImage(blob);
+            await set("current_file", file.canvas);
           }
         })
       }
     }
+
+    this.swipeHandler();
   }
 
   swipeHandler() {
@@ -670,6 +704,8 @@ export class AppHome extends LitElement {
         this.canvas = this.shadowRoot?.querySelector("app-canvas");
 
         this.canvas?.drawImage(blob);
+
+        await set("current_file", this.canvas?.writeToJSON());
       })
     }
 
@@ -699,7 +735,9 @@ export class AppHome extends LitElement {
         this.canvas = this.shadowRoot?.querySelector("app-canvas");
 
         this.canvas?.drawImage(blob);
-      })
+      });
+
+      await set("current_file", this.canvas?.writeToJSON());
     }
 
     await this.updateComplete;
@@ -722,6 +760,8 @@ export class AppHome extends LitElement {
 
       await this.updateComplete;
 
+      await set("current_file", this.canvas?.writeToJSON());
+
       this.swipeHandler();
     }
   }
@@ -734,26 +774,38 @@ export class AppHome extends LitElement {
     if (type === "blur" || type === "brightness") {
       this.intensity = true;
     }
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
   async handleBringForward() {
     await this.canvas?.bringForwardObject();
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
   async handleBringFront() {
     await this.canvas?.bringToFront();
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
   async handleSendBackward() {
     await this.canvas?.sendBackward();
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
   async handleSendToBack() {
     await this.canvas?.sendToBack();
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
-  revert() {
+  async revert() {
     this.canvas?.revert();
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
   async save() {
@@ -771,6 +823,8 @@ export class AppHome extends LitElement {
 
   async remove() {
     this.canvas?.removeObject();
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
   async doSettings() {
@@ -803,9 +857,11 @@ export class AppHome extends LitElement {
     }
   }
 
-  handleColor(color: string) {
+  async handleColor(color: string) {
     console.log(color);
-    this.canvas?.changeBackgroundColor(color);
+    await this.canvas?.changeBackgroundColor(color);
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
   scrollRight() {
@@ -839,8 +895,10 @@ export class AppHome extends LitElement {
     }
   }
 
-  addText() {
-    this.canvas?.handleText()
+  async addText() {
+    this.canvas?.handleText();
+
+    await set("current_file", this.canvas?.writeToJSON());
   }
 
   handleObjectSelected() {
@@ -880,7 +938,7 @@ export class AppHome extends LitElement {
                   <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
                 </div>
                </div>
-              </div></div>` : null}
+  </div></div>` : null}
 
         <div id="layout">
         ${this.org ? html`<aside>
@@ -892,6 +950,10 @@ export class AppHome extends LitElement {
 
               <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
               ${this.removeShow ? html`<fluent-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></fluent-button>` : null}
+
+              <a href="/gallery">
+                Gallery
+              </a>
 
               <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
             </div>
@@ -908,6 +970,7 @@ export class AppHome extends LitElement {
                 <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
                 <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
                 <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
+                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
 
                 <div id="otherControls">
                   <div class="menu-label">
@@ -955,6 +1018,7 @@ export class AppHome extends LitElement {
                 <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
                 <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
                 <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
+                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
 
                 <div id="otherControls">
                   <div class="menu-label">
@@ -1003,6 +1067,7 @@ export class AppHome extends LitElement {
                 <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
                 <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
                 <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
+                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
               </div>
               ` : null
         }

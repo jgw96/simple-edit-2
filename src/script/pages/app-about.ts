@@ -24,6 +24,24 @@ export class AppAbout extends LitElement {
         color: white;
       }
 
+      #gallery-header {
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+      }
+
+      #gallery-header a {
+        background: var(--accent-fill-rest);
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        padding: 8px;
+        width: 3em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
       ul fluent-card {
         width: 100%;
         height: 18em;
@@ -100,10 +118,12 @@ export class AppAbout extends LitElement {
   async firstUpdated() {
     const saved = await this.getSavedFiles();
     this.saved = saved;
+
+    sessionStorage.setItem("visited-gallery", "true");
   }
 
   async getSavedFiles() {
-    const files = await get("files");
+    const files = await get("saved_files");
 
     return files;
   }
@@ -124,8 +144,6 @@ export class AppAbout extends LitElement {
     }
 
     const perm = await fileHandle.queryPermission(options);
-
-    console.log('perm', perm);
 
     // Check if permission was already granted. If so, return true.
     if (perm === 'granted') {
@@ -153,7 +171,7 @@ export class AppAbout extends LitElement {
 
     const arr = savedFiles.filter(file => file.name !== saved.name);
 
-    await set("files", arr);
+    await set("saved_files", arr);
 
     this.saved = arr;
   }
@@ -161,7 +179,13 @@ export class AppAbout extends LitElement {
   render() {
     return html`
       <div id="gallery-wrapper">
-        <h2>Gallery</h2>
+        <div id="gallery-header">
+          <a href="/">
+            Back
+          </a>
+
+          <h2>Saved Projects</h2>
+        </div>
 
         ${this.saved ? html`<ul>
           ${

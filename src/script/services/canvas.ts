@@ -1,3 +1,5 @@
+import { set } from "idb-keyval";
+
 let isDragging = false;
   let selection: any | undefined;
   let lastPosX: number | undefined;
@@ -12,8 +14,6 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
           preserveObjectStacking: true,
           backgroundColor: "#1e1e1e"
         });
-
-        console.log('fabricCanvas', fabricCanvas);
 
         // fabricCanvas.isDrawingMode = true;
 
@@ -105,7 +105,7 @@ export function drag(canvas) {
         image = new Image();
 
         if (image) {
-          image.onload = () => {
+          image.onload = async () => {
             imgInstance = new window.fabric.Image((image as HTMLImageElement), {
               left: 0 + window.innerWidth / 8,
               top: 0 + window.innerHeight / 8,
@@ -122,6 +122,8 @@ export function drag(canvas) {
             canvas?.add(imgInstance);
 
             imgInstance.bringToFront();
+
+            await set("current_file", this.canvas?.writeToJSON());
           }
 
           if (e.target?.result) {
