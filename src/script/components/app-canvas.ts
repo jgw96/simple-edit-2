@@ -149,7 +149,8 @@ export class AppCanvas extends LitElement {
       { name: "saturation", filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }) },
       { name: "blur", filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }) },
       { name: "invert", filter: new window.fabric.Image.filters.Invert() },
-      { name: "pixelate", filter: new window.fabric.Image.filters.Pixelate({ blocksize: 50 }) }
+      { name: "pixelate", filter: new window.fabric.Image.filters.Pixelate({ blocksize: 50 })},
+      { name: "contrast", filter: new window.fabric.Image.filters.Contrast({ contrast: 0.25 }) },
     ];
 
     if (canvas) {
@@ -176,6 +177,16 @@ export class AppCanvas extends LitElement {
     }
   }
 
+  public writeToJSON() {
+    return this.canvas?.toJSON();
+  }
+
+  public openFromJSON(json: JSON) {
+    this.canvas?.loadFromJSON(json, () => {
+      this.canvas?.renderAll();
+    });
+  }
+
   handlePenMode(mode: boolean) {
     if (this.canvas) {
       if (mode === true) {
@@ -189,8 +200,10 @@ export class AppCanvas extends LitElement {
     }
   }
 
-  public drawImage(blob: Blob | File) {
+ public async drawImage(blob: Blob | File) {
     drawImageFunc(blob, this.canvas, this.image, this.imgInstance);
+
+    await set("current_file", this.canvas?.toJSON());
   }
 
   public bringForwardObject() {
@@ -308,7 +321,7 @@ export class AppCanvas extends LitElement {
   }
 
   public async save() {
-    let dataurl: string | undefined = undefined;
+    /*let dataurl: string | undefined = undefined;
 
     const active = this.canvas?.getActiveObject();
 
@@ -331,24 +344,46 @@ export class AppCanvas extends LitElement {
 
         await this.saveFileHandles(handle, blob);
       }
-    }
-  }
+    }*/
 
-  async saveFileHandles(newHandle, previewBlob) {
-    const files = await get("files");
+    let dataurl: string | undefined = undefined;
 
-    const newEntry = {
-      handle: newHandle,
-      name: newHandle.name,
-      preview: previewBlob
-    }
+    const active = this.canvas?.getActiveObject();
 
-    if (files) {
-      await set("files", [...files, newEntry])
+    if (active) {
+      dataurl = active.toDataURL({});
     }
     else {
-      await set("files", [newEntry]);
+      dataurl = this.canvas?.toDataURL();
     }
+
+    if (dataurl) {
+      const blob = this.dataURLtoBlob(dataurl);
+      const handle = await fileSave(blob, {
+        fileName: "untitled.png",
+        extensions: [".png"]
+      });
+
+      const savedCanvas = this.canvas?.toJSON();
+
+      if (savedCanvas) {
+        const savedCanvasData = {
+          canvas: savedCanvas,
+          name: handle.name || "untitled",
+          handle: handle,
+          preview: blob
+        }
+
+        const files = await get("saved_files");
+        if (files) {
+          await set("saved_files", [...files, savedCanvasData]);
+        }
+        else {
+          await set("saved_files", [savedCanvasData]);
+        }
+      }
+    }
+
   }
 
   dataURLtoBlob(dataurl: string) {

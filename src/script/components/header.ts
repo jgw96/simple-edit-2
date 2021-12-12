@@ -25,6 +25,7 @@ export class AppHeader extends LitElement {
         background: var(--app-color-primary);
         color: white;
         height: env(titlebar-area-height, 33px);
+        width: emv(titlebar-area-width);
       }
 
       nav {
@@ -33,19 +34,26 @@ export class AppHeader extends LitElement {
         justify-content: space-between;
       }
 
-      fluent-anchor ion-icon {
+      a ion-icon {
         display: block;
       }
 
-      fluent-anchor {
+      a {
         height: calc(env(titlebar-area-height, 33px) - 6px);
         background: var(--accent-fill-rest);
-        border-radius: 22px;
+        border-radius: 6px;
 
         -webkit-app-region: no-drag;
         app-region: no-drag;
         pointer-events: all;
         cursor: pointer;
+
+        width: 5em;
+        text-decoration: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       #info {
@@ -104,7 +112,7 @@ export class AppHeader extends LitElement {
   }
 
   goBack() {
-    Router.go("/")
+    Router.go("/");
   }
 
   render() {
