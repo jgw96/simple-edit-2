@@ -1,6 +1,6 @@
 import { LitElement, css, html, customElement } from 'lit-element';
 
-import './app-home';
+import './app-intro';
 
 import { Router } from '@vaadin/router';
 
@@ -75,7 +75,14 @@ export class AppIndex extends LitElement {
         path: '',
         animate: true,
         children: [
-          { path: '/', component: 'app-home' },
+          { path: '/', component: 'app-intro' },
+          {
+            path: '/home',
+            component: 'app-home',
+            action: async () => {
+              await import('./app-home');
+            }
+          },
           {
             path: '/about',
             component: 'app-about',

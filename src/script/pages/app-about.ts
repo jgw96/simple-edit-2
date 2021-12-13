@@ -132,7 +132,7 @@ export class AppAbout extends LitElement {
     const perm_test = await this.verifyPermission(saved.handle, true);
 
     if (perm_test === true) {
-      Router.go(`/?file=${saved.name}`);
+      Router.go(`/home?file=${saved.name}`);
     }
   }
 
@@ -180,7 +180,7 @@ export class AppAbout extends LitElement {
     return html`
       <div id="gallery-wrapper">
         <div id="gallery-header">
-          <a href="/">
+          <a href="/home">
             Back
           </a>
 

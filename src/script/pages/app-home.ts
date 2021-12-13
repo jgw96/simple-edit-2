@@ -43,6 +43,18 @@ export class AppHome extends LitElement {
       font-size: 14px;
     }
 
+    pwa-install {
+      position: fixed;
+      right: 12.2em;
+      z-index: 2;
+    }
+
+    pwa-install::part(openButton) {
+      border-radius: 2px;
+      height: 2.45em;
+      background: var(--accent-fill-hover);
+    }
+
     #canvasMain {
       display: grid;
       grid-template-columns: 16% 84%;
@@ -154,68 +166,6 @@ export class AppHome extends LitElement {
         position: fixed;
         bottom: -26px;
         right: 16px;
-      }
-
-      #getting-started-wrapper {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        padding-bottom: 2em;
-        background-color: rgb(107 99 255);
-        border-radius: 10px;
-      }
-
-      #getting-started-backer {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: rgb(14 14 14) 0px 2px 11px 2px;
-        border-radius: 10px;
-        margin: 6em;
-        margin-top: 7em;
-        /* background: rgba(38, 38, 38, 0); */
-        animation-name: slideup;
-        animation-duration: 280ms;
-        animation-timing-function: "ease-in-out";
-      }
-
-      #getting-started {
-        scroll-snap-type: x mandatory;
-        overflow-x: scroll;
-        display: flex;
-        width: 444px;
-      }
-
-      #getting-started img {
-        width: 444px;
-      }
-
-      #getting-started::-webkit-scrollbar {
-        display: none;
-      }
-
-      .getting-started-item {
-        scroll-snap-align: center;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      #getting-started img {
-        height: 280px;
-        margin-top: 4em;
-      }
-
-      #getting-started fluent-button {
-        width: 132px;
-      }
-
-      #getting-started h2 {
-        font-size: 1.6em;
-        text-align: center;
       }
 
       #mobile-toolbar {
@@ -407,27 +357,6 @@ export class AppHome extends LitElement {
         #canvasMain .tabletFilters {
           display: none;
         }
-
-        #getting-started-backer {
-          margin: 4em 1em;
-        }
-
-        #getting-started {
-          text-align: center;
-          font-size: 10px;
-          width: 280px;
-        }
-
-        #getting-started img {
-          width: 280px;
-          margin-top: 0em;
-        }
-
-        #getting-started h2 {
-          font-size: 2em;
-          text-align: center;
-          margin-top: 0px;
-        }
       }
 
       @media(max-width: 1200px) and (min-width: 800px) {
@@ -440,24 +369,11 @@ export class AppHome extends LitElement {
         }
       }
 
-      @media(min-width: 1200px) {
-        #getting-started-backer {
-          margin: 4em;
-          margin-left: 12em;
-          margin-right: 12em;
-        }
-      }
-
       #filters.duoFilters {
         display: none;
       }
 
       @media(horizontal-viewport-segments: 2) {
-        #getting-started-backer {
-          width: 44vw;
-          margin: 2em;
-        }
-
         #filters.duoFilters {
           display: flex;
         }
@@ -468,14 +384,6 @@ export class AppHome extends LitElement {
 
         #canvasMain .tabletFilters {
           display: none;
-        }
-
-        #getting-started-wrapper {
-          margin-top: 2em;
-        }
-
-        #getting-started img {
-          width: 444px;
         }
 
         #layout {
@@ -527,18 +435,6 @@ export class AppHome extends LitElement {
           margin-top: 0em;
         }
 
-        #getting-started-wrapper {
-          margin: 0em 1em;
-        }
-
-        #getting-started {
-          width: 444px;
-        }
-
-        #getting-started img {
-          width: 444px;
-        }
-
         main {
           height: 46vh;
         }
@@ -587,13 +483,6 @@ export class AppHome extends LitElement {
       if (working) {
         this.canvas?.openFromJSON(working);
       }
-    }
-
-    const test = localStorage.getItem("done-with-tut");
-
-    if (test) {
-      const thing = this.shadowRoot?.querySelector("#getting-started");
-      thing?.scrollBy({ top: 0, left: 800, behavior: 'smooth' });
     }
 
     navigator.serviceWorker.addEventListener('message', (event) => {
@@ -864,17 +753,6 @@ export class AppHome extends LitElement {
     await set("current_file", this.canvas?.writeToJSON());
   }
 
-  scrollRight() {
-    const thing = this.shadowRoot?.querySelector("#getting-started");
-    // thing?.scrollBy({top: 0, left: 400, behavior: 'smooth'});
-    if (window.matchMedia("(max-width: 800px)").matches) {
-      thing?.scrollBy({ top: 0, left: 246, behavior: 'smooth' });
-    }
-    else {
-      thing?.scrollBy({ top: 0, left: 400, behavior: 'smooth' });
-    }
-  }
-
   penMode(ev: boolean) {
     console.log(ev);
 
@@ -914,34 +792,8 @@ export class AppHome extends LitElement {
     return html`
       <save-modal @saved="${() => this.saveCanvas()}" ?hiddenModal="${this.saving ? false : true}"></save-modal>
 
-      <div>
-      ${!this.org ? html`<div id="getting-started-backer"><div id="getting-started-wrapper">
-              <div id="getting-started">
-                <div class="getting-started-item">
-                  <img src="/assets/started.svg">
-                  <h2>Welcome to SimpleEdit!</h2>
-
-                  <fluent-button @click="${() => this.scrollRight()}">Next</fluent-button>
-                </div>
-
-                <div class="getting-started-item">
-                  <img src="/assets/started_two.svg">
-                  <h2>Quickly edit your photos, create collages and more</h2>
-
-                  <fluent-button @click="${() => this.scrollRight()}">Next</fluent-button>
-                </div>
-
-                <div class="getting-started-item">
-                  <img src="/assets/started_three.svg">
-                  <h2>Tap Choose Photo to get started!</h2>
-
-                  <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Choose Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
-                </div>
-               </div>
-  </div></div>` : null}
-
         <div id="layout">
-        ${this.org ? html`<aside>
+        <aside>
             <div id="controls">
               <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
               <fluent-button id="chooseFolder" @click="${() => this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></fluent-button>
@@ -950,6 +802,8 @@ export class AppHome extends LitElement {
 
               <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
               ${this.removeShow ? html`<fluent-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></fluent-button>` : null}
+
+              <pwa-install>Install SimpleEdit</pwa-install>
 
               <a href="/gallery">
                 Gallery
@@ -992,7 +846,7 @@ export class AppHome extends LitElement {
               </div>
 
 
-          </aside>` : null}
+          </aside>
 
           ${
             this.intensity ? html`<div id="extra-controls">
@@ -1006,7 +860,7 @@ export class AppHome extends LitElement {
 
           <main id="canvasMain">
 
-          ${ this.org ? html`<div id="filters" class="tabletFilters">
+          <div id="filters" class="tabletFilters">
                 <div class="menu-label">
                   <span id="filters-label">Filters</span>
                 </div>
@@ -1037,12 +891,12 @@ export class AppHome extends LitElement {
 
                     <fluent-button @click="${() => this.addText()}">Add Text</fluent-button>
                 </div>
-              </div>` : null }
+              </div>
 
-            ${this.org ? html`<drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas @object-selected="${() => this.handleObjectSelected()}" @object-cleared="${() => this.handleObjectCleared()}"></app-canvas></drag-drop>` : null}
+            <drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas @object-selected="${() => this.handleObjectSelected()}" @object-cleared="${() => this.handleObjectCleared()}"></app-canvas></drag-drop>
           </main>
 
-          ${this.org ? html` <div id="mobile-toolbar">
+          <div id="mobile-toolbar">
           <div id="pill-box">
             <div id="pill"></div>
           </div>
@@ -1058,7 +912,7 @@ export class AppHome extends LitElement {
               <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
             </div>
 
-            ${this.org ? html`
+
               <div id="filters">
                 <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
                 <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
@@ -1069,8 +923,7 @@ export class AppHome extends LitElement {
                 <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
                 <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
               </div>
-              ` : null
-        }
+
                 <div id="otherControls">
                   <div class="menu-label">
                     <span id="order-label">Order</span>
@@ -1081,7 +934,7 @@ export class AppHome extends LitElement {
                   <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
                   <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
                 </div>
-    </div>` : null}
+    </div>
         </div>
 
         <div
@@ -1117,8 +970,6 @@ export class AppHome extends LitElement {
             </fluent-switch>
           </div>
         </div>
-
-        <pwa-install>Install PWA Starter</pwa-install>
       </div>
     `;
   }
