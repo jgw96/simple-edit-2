@@ -422,7 +422,7 @@ export class AppCanvas extends LitElement {
   }
 
   public async shareImage() {
-    let dataurl: string | null = null;
+    let dataurl: string | null | undefined = null;
 
     const active = this.canvas?.getActiveObject();
 
@@ -430,8 +430,10 @@ export class AppCanvas extends LitElement {
       dataurl = active.toDataURL({});
     }
     else {
-      dataurl = this.imgInstance?.toDataURL();
+      dataurl = this.canvas?.toDataURL();
     }
+
+    console.log(dataurl);
 
     if (dataurl) {
       const blob = this.dataURLtoBlob(dataurl);
