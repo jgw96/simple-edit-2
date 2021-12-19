@@ -1,5 +1,6 @@
 import { Router } from '@vaadin/router';
-import { LitElement, css, html, customElement } from 'lit-element';
+import { LitElement, css, html } from 'lit';
+import { customElement } from 'lit/decorators.js';
 
 @customElement('app-header')
 export class AppHeader extends LitElement {

@@ -1,4 +1,5 @@
-import { LitElement, css, html, customElement } from 'lit-element';
+import { LitElement, css, html } from 'lit';
+import { customElement } from 'lit/decorators.js';
 
 
 @customElement('drag-drop')
@@ -56,10 +57,10 @@ export class DragDrop extends LitElement {
       for (let i = 0; i < ev.dataTransfer.items.length; i++) {
         // If dropped items aren't files, reject them
         if (ev.dataTransfer.items[i].kind === 'file') {
-          let file = ev.dataTransfer.items[i].getAsFile();
+          const file = ev.dataTransfer.items[i].getAsFile();
           console.log('... file[' + i + '].name = ' + file.name);
 
-          let event = new CustomEvent('got-file', {
+          const event = new CustomEvent('got-file', {
             detail: {
               file: file
             }
@@ -72,7 +73,7 @@ export class DragDrop extends LitElement {
       for (let i = 0; i < ev.dataTransfer.files.length; i++) {
         console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
 
-        let event = new CustomEvent('got-file', {
+        const event = new CustomEvent('got-file', {
           detail: {
             file: ev.dataTransfer.files[i]
           }
