@@ -1,10 +1,12 @@
 import { Router } from '@vaadin/router';
+import { FileSystemHandle } from 'browser-fs-access';
 import { get, set } from 'idb-keyval';
-import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
+import { LitElement, css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
 
 @customElement('app-about')
 export class AppAbout extends LitElement {
-  @internalProperty() saved: Array<any> = [];
+  @state() saved: Array<any> = [];
 
   static get styles() {
     return css`
@@ -128,7 +130,7 @@ export class AppAbout extends LitElement {
     return files;
   }
 
-  async continue(saved) {
+  async continue(saved: any) {
     const perm_test = await this.verifyPermission(saved.handle, true);
 
     if (perm_test === true) {
@@ -136,7 +138,7 @@ export class AppAbout extends LitElement {
     }
   }
 
-  async verifyPermission(fileHandle, readWrite) {
+  async verifyPermission(fileHandle: FileSystemHandle, readWrite: boolean) {
     console.log('trying perm');
     const options: any = {};
     if (readWrite) {
@@ -166,7 +168,7 @@ export class AppAbout extends LitElement {
     return false;
   }
 
-  async removeFile(saved) {
+  async removeFile(saved: any) {
     const savedFiles:Array<any> = await this.getSavedFiles();
 
     const arr = savedFiles.filter(file => file.name !== saved.name);

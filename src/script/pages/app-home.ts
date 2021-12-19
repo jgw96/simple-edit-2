@@ -1,5 +1,6 @@
-import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
-import { styleMap } from 'lit-html/directives/style-map';
+import { LitElement, css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map';
 
 import '../components/app-canvas';
 import '../components/drag-drop';
@@ -18,17 +19,17 @@ export class AppHome extends LitElement {
   // For more information on using properties in lit-element
   // check out this link https://lit-element.polymer-project.org/guide/properties#declare-with-decorators
 
-  @internalProperty() canvas: AppCanvas | undefined | null;
-  @internalProperty() org: File | Array<File> | Array<Blob> | Blob | undefined | null = undefined;
+  @state() canvas: AppCanvas | undefined | null;
+  @state() org: File | Array<File> | Array<Blob> | Blob | undefined | null = undefined;
 
-  @internalProperty() handleSettings = false;
+  @state() handleSettings = false;
 
-  @internalProperty() pen_mode: boolean | undefined;
+  @state() pen_mode: boolean | undefined;
 
-  @internalProperty() intensity: boolean | undefined;
+  @state() intensity: boolean | undefined;
 
-  @internalProperty() saving = false;
-  @internalProperty() removeShow = false;
+  @state() saving = false;
+  @state() removeShow = false;
 
   settingsAni: Animation | undefined;
 
@@ -313,6 +314,11 @@ export class AppHome extends LitElement {
 
       @media(max-width: 800px) {
 
+        pwa-install {
+          left: 12px;
+          bottom: 12px;
+        }
+
         #controls fluent-button, #filters fluent-button, #otherControls fluent-button {
           border-radius: 6px;
           padding: 6px;
@@ -503,7 +509,7 @@ export class AppHome extends LitElement {
       const files = await get("saved_files");
 
       if (files) {
-        files.forEach(async (file) => {
+        files.forEach(async (file: any) => {
           if (file.name === file_name) {
             const blob = file.preview;
             this.org = blob;
@@ -528,9 +534,10 @@ export class AppHome extends LitElement {
     console.log('el', el);
 
     if (el) {
+      // @ts-ignore
       const swiper = new Swipe(el);
 
-      swiper.onUp((ev) => {
+      swiper.onUp((ev: any) => {
         //Your code goes here
 
         console.log('here', ev);
@@ -546,7 +553,7 @@ export class AppHome extends LitElement {
         })
       });
 
-      swiper.onDown((ev) => {
+      swiper.onDown((ev: any) => {
         el.animate([
           {
             transform: "translateY(30em)"
@@ -852,7 +859,7 @@ export class AppHome extends LitElement {
             this.intensity ? html`<div id="extra-controls">
               <div>
                 <label for="intensity">Intensity</label>
-                <fluent-slider @change="${(ev) => this.handleIntensity(ev.target.value)}" name="intensity" id="intensity" min="0" max="1" step="0.1" value="0.5">
+                <fluent-slider @change="${(ev: any) => this.handleIntensity(ev.target.value)}" name="intensity" id="intensity" min="0" max="1" step="0.1" value="0.5">
                 </fluent-slider>
               </div>
             </div>` : null
@@ -955,7 +962,7 @@ export class AppHome extends LitElement {
               <label id="color-label" for="color">Canvas Background Color</label>
               <p>Change the background color of your canvas</p>
             </div>
-            <input @change="${(ev) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
+            <input @change="${(ev: any) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
           </div>
 
           <div class="setting colorCard">
@@ -964,7 +971,7 @@ export class AppHome extends LitElement {
               <p>Draw on your collage with your pen, mouse or touch!</p>
             </div>
 
-            <fluent-switch value="${this.pen_mode || false}" @change="${(ev) => this.penMode(ev.target.checked)}">
+            <fluent-switch value="${this.pen_mode || false}" @change="${(ev: any) => this.penMode(ev.target.checked)}">
               <span slot="checked-message">on</span>
               <span slot="unchecked-message">off</span>
             </fluent-switch>

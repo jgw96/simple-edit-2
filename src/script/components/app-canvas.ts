@@ -1,25 +1,26 @@
 import { fileSave } from 'browser-fs-access';
 import { get, set } from 'idb-keyval';
-import { LitElement, css, html, customElement, internalProperty } from 'lit-element';
+import { LitElement, css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
 import { drag, drawImageFunc, setupCanvas } from '../services/canvas';
 
 @customElement('app-canvas')
 export class AppCanvas extends LitElement {
 
-  @internalProperty() canvas: fabric.Canvas | undefined;
-  @internalProperty() image: HTMLImageElement | undefined | null;
-  @internalProperty() imgInstance: any;
-  @internalProperty() pen: boolean;
+  @state() canvas: fabric.Canvas | undefined = undefined;
+  @state() image: HTMLImageElement | undefined | null = undefined;
+  @state() imgInstance: any | undefined = undefined;
+  @state() pen: boolean | undefined = undefined;
 
-  @internalProperty() text = false;
-  @internalProperty() currentText;
+  @state() text = false;
+  @state() currentText: any | undefined = undefined;
 
   isDragging = false;
-  selection: any | undefined;
-  lastPosX: number | undefined;
-  lastPosY: number | undefined;
+  selection: any | undefined = undefined;
+  lastPosX: number | undefined = undefined;
+  lastPosY: number | undefined = undefined;
 
-  typeMap: any | undefined;
+  typeMap: any | undefined = undefined;
 
   static get styles() {
     return css`
@@ -236,14 +237,14 @@ export class AppCanvas extends LitElement {
       console.log('active', active);
 
       if (active) {
-        const filter = this.typeMap.find((filter) => {
+        const filter = this.typeMap.find((filter: any) => {
           if (filter.name === type) {
             return filter;
           }
         });
 
         if ((active as any)._objects) {
-          (active as any)._objects.forEach((object) => {
+          (active as any)._objects.forEach((object: any) => {
             if (value && type === "blur") {
               filter.filter.setOptions({
                 blur: value
@@ -296,7 +297,7 @@ export class AppCanvas extends LitElement {
       }
       else {
         // add filter
-        const filter = this.typeMap.find((filter) => {
+        const filter = this.typeMap.find((filter: any) => {
           if (filter.name === type) {
             return filter;
           }
@@ -369,7 +370,7 @@ export class AppCanvas extends LitElement {
       if (savedCanvas) {
         const savedCanvasData = {
           canvas: savedCanvas,
-          name: handle.name || "untitled",
+          name: handle && handle.name || "untitled",
           handle: handle,
           preview: blob
         }
@@ -408,7 +409,7 @@ export class AppCanvas extends LitElement {
     if (active) {
 
       if ((active as any)._objects) {
-        (active as any)._objects.forEach((object) => {
+        (active as any)._objects.forEach((object: any) => {
           this.canvas?.remove(object);
         })
       }
