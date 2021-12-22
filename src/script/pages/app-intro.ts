@@ -104,17 +104,6 @@ export class AppIntro extends LitElement {
         `
   ];
 
-  scrollRight() {
-    const thing = this.shadowRoot?.querySelector("#getting-started");
-    // thing?.scrollBy({top: 0, left: 400, behavior: 'smooth'});
-    if (window.matchMedia("(max-width: 800px)").matches) {
-      thing?.scrollBy({ top: 0, left: 246, behavior: 'smooth' });
-    }
-    else {
-      thing?.scrollBy({ top: 0, left: 400, behavior: 'smooth' });
-    }
-  }
-
   render() {
     return html`
           <div id="getting-started-grid">
@@ -124,8 +113,6 @@ export class AppIntro extends LitElement {
                 Quickly edit your photos, create collages and more with
                 filters, text controls, and more! SimpleEdit works on any device, your phone, tablet and laptop.
               </p>
-
-              <!-- <fluent-button @click="${() => this.scrollRight()}">Next</fluent-button>-->
             </div>
 
             <div class="getting-started-item" id="lastItem">

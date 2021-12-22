@@ -11,6 +11,7 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
     window.fabric.textureSize = 8000;
     const fabricCanvas = new window.fabric.Canvas(canvas, {
       preserveObjectStacking: true,
+      allowTouchScrolling: true,
       backgroundColor: "#1e1e1e"
     });
 
