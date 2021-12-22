@@ -1,6 +1,8 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map';
+//@ts-ignore
+import fabricPureBrowser from 'https://cdn.skypack.dev/fabric-pure-browser';
 
 import '../components/app-canvas';
 import '../components/drag-drop';
@@ -30,6 +32,8 @@ export class AppHome extends LitElement {
 
   @state() saving = false;
   @state() removeShow = false;
+
+  fabric: any;
 
   settingsAni: Animation | undefined;
 
@@ -73,17 +77,17 @@ export class AppHome extends LitElement {
       margin-top: 1em;
     }
 
-    #otherControls fluent-button {
+    #otherControls sl-button {
       width: 97%;
     }
 
-    fluent-button::part(content) {
+    sl-button::part(content) {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    fluent-button ion-icon {
+    sl-button ion-icon {
       margin-left: 6px;
     }
 
@@ -111,7 +115,7 @@ export class AppHome extends LitElement {
         animation-timing-function: "ease-in-out";
       }
 
-      aside fluent-button {
+      aside sl-button {
         margin-bottom: 6px;
       }
 
@@ -145,18 +149,13 @@ export class AppHome extends LitElement {
         justify-content: flex-end;
       }
 
-      #controls fluent-button, #filters fluent-button {
+      #controls sl-button, #filters sl-button {
         margin-bottom: 10px;
         margin-right: 6px;
       }
 
       #choosePhoto {
         margin-bottom: 1em;
-        background: var(--accent-fill-hover);
-      }
-
-      #chooseFolder {
-        background: var(--accent-fill-rest);
       }
 
       #shareButton {
@@ -196,7 +195,7 @@ export class AppHome extends LitElement {
         margin-left: 0;
       }
 
-      #mobile-toolbar #otherControls fluent-button {
+      #mobile-toolbar #otherControls sl-button {
         margin-bottom: 8px;
       }
 
@@ -319,7 +318,7 @@ export class AppHome extends LitElement {
           bottom: 12px;
         }
 
-        #controls fluent-button, #filters fluent-button, #otherControls fluent-button {
+        #controls sl-button, #filters sl-button, #otherControls sl-button {
           border-radius: 6px;
           padding: 6px;
           font-size: 1em;
@@ -416,7 +415,7 @@ export class AppHome extends LitElement {
           flex-direction: column;
         }
 
-        #controls fluent-button, #filters fluent-button {
+        #controls sl-button, #filters sl-button {
           border-radius: 6px;
           padding: 6px;
           font-size: 1em;
@@ -477,6 +476,8 @@ export class AppHome extends LitElement {
   }
 
   async firstUpdated() {
+    window.fabric = fabricPureBrowser.fabric;
+
     const working = await get("current_file");
 
     if (working) {
@@ -802,13 +803,13 @@ export class AppHome extends LitElement {
         <div id="layout">
         <aside>
             <div id="controls">
-              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
-              <fluent-button id="chooseFolder" @click="${() => this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></fluent-button>
-              <fluent-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fluent-button>
-              <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
+              <sl-button type="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button id="chooseFolder" @click="${() => this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></sl-button>
+              <sl-button type="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
-              ${this.removeShow ? html`<fluent-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></fluent-button>` : null}
+              <sl-button type="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              ${this.removeShow ? html`<sl-button type="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>` : null}
 
               <pwa-install>Install SimpleEdit</pwa-install>
 
@@ -816,7 +817,7 @@ export class AppHome extends LitElement {
                 Gallery
               </a>
 
-              <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
+              <sl-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
             <div id="filters" class="duoFilters">
@@ -824,46 +825,36 @@ export class AppHome extends LitElement {
                   <span id="filters-label">Filters</span>
                 </div>
 
-                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
-                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
-                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
-                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
-                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
-                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
-                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
-                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
+                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
+                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
+                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
+                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
+                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
+                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
+                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
+                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
 
                 <div id="otherControls">
                   <div class="menu-label">
                     <span id="order-label">Order</span>
                   </div>
 
-                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
-                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
-                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
-                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
+                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
+                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
+                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
 
 
                     <div class="menu-label">
                       <span>Add</span>
                     </div>
 
-                    <fluent-button @click="${() => this.addText()}">Add Text</fluent-button>
+                    <sl-button @click="${() => this.addText()}">Add Text</sl-button>
                 </div>
               </div>
 
 
           </aside>
-
-          ${
-            this.intensity ? html`<div id="extra-controls">
-              <div>
-                <label for="intensity">Intensity</label>
-                <fluent-slider @change="${(ev: any) => this.handleIntensity(ev.target.value)}" name="intensity" id="intensity" min="0" max="1" step="0.1" value="0.5">
-                </fluent-slider>
-              </div>
-            </div>` : null
-          }
 
           <main id="canvasMain">
 
@@ -872,31 +863,31 @@ export class AppHome extends LitElement {
                   <span id="filters-label">Filters</span>
                 </div>
 
-                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
-                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
-                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
-                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
-                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
-                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
-                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
-                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
+                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
+                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
+                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
+                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
+                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
+                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
+                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
+                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
 
                 <div id="otherControls">
                   <div class="menu-label">
                     <span id="order-label">Order</span>
                   </div>
 
-                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
-                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
-                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
-                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
+                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
+                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
+                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
 
 
                     <div class="menu-label">
                       <span>Add</span>
                     </div>
 
-                    <fluent-button @click="${() => this.addText()}">Add Text</fluent-button>
+                    <sl-button @click="${() => this.addText()}">Add Text</sl-button>
                 </div>
               </div>
 
@@ -909,26 +900,26 @@ export class AppHome extends LitElement {
           </div>
 
           <div id="controls">
-              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
-              <fluent-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fluent-button>
-              <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
+              <sl-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
-              ${this.removeShow ? html`<fluent-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></fluent-button>` : null}
+              <sl-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              ${this.removeShow ? html`<sl-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>` : null}
 
-              <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
+              <sl-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
 
               <div id="filters">
-                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
-                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
-                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
-                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
-                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
-                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
-                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
-                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
+                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
+                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
+                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
+                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
+                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
+                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
+                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
+                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
               </div>
 
                 <div id="otherControls">
@@ -936,10 +927,10 @@ export class AppHome extends LitElement {
                     <span id="order-label">Order</span>
                   </div>
 
-                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
-                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
-                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
-                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
+                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
+                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
+                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
                 </div>
     </div>
         </div>
@@ -952,9 +943,9 @@ export class AppHome extends LitElement {
           <div id="settings-header">
             <h3>Settings</h3>
 
-            <fluent-button @click="${() => this.doSettings()}">
+            <sl-button @click="${() => this.doSettings()}">
               Close
-            </fluent-button>
+            </sl-button>
           </div>
 
           <div class="setting">

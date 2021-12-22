@@ -48,11 +48,11 @@ export class SaveModal extends LitElement {
           background: var(--accent-fill-hover);
       }
 
-      fluent-button ion-icon {
+      sl-button ion-icon {
         margin-left: 6px;
       }
 
-      fluent-button::part(content) {
+      sl-button::part(content) {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -95,8 +95,8 @@ export class SaveModal extends LitElement {
         </div>
 
         <div id="actions">
-          <fluent-button @click="${() => this.closeModal()}">Cancel</fluent-button>
-          <fluent-button id="save-button" @click="${() => this.save()}">Save  <ion-icon name="save-outline"></ion-icon></fluent-button>
+          <sl-button @click="${() => this.closeModal()}">Cancel</sl-button>
+          <sl-button id="save-button" @click="${() => this.save()}">Save  <ion-icon name="save-outline"></ion-icon></sl-button>
         </div>
        </fluent-dialog>
       </div>

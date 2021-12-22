@@ -22,7 +22,7 @@ export class AppAbout extends LitElement {
         margin-left: 16px;
       }
 
-      fluent-button {
+      sl-button {
         color: white;
       }
 
@@ -205,16 +205,16 @@ export class AppAbout extends LitElement {
                         <h3>${saved.name}</h3>
 
                         <div id="actions">
-                          <fluent-button @click="${() => this.continue(saved)}" id="edit-button">
+                          <sl-button @click="${() => this.continue(saved)}" id="edit-button">
                             Edit
 
                             <ion-icon name="brush-outline"></ion-icon>
-                          </fluent-button>
-                          <fluent-button  id="removeButton" appearance="danger" @click="${() => this.removeFile(saved)}">
+                          </sl-button>
+                          <sl-button  id="removeButton" appearance="danger" @click="${() => this.removeFile(saved)}">
                             Remove
 
                             <ion-icon name="trash-outline"></ion-icon>
-                          </fluent-button>
+                          </sl-button>
                         </div>
                       </div>
                     </fluent-card>

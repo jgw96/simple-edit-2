@@ -125,7 +125,7 @@ export class AppIntro extends LitElement {
                 filters, text controls, and more! SimpleEdit works on any device, your phone, tablet and laptop.
               </p>
 
-              <!-- <fluent-button @click="${() => this.scrollRight()}">Next</fluent-button>-->
+              <!-- <sl-button @click="${() => this.scrollRight()}">Next</sl-button>-->
             </div>
 
             <div class="getting-started-item" id="lastItem">
