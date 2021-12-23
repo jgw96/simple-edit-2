@@ -50,14 +50,16 @@ export class AppHome extends LitElement {
 
     pwa-install {
       position: fixed;
-      right: 12.2em;
+      right: 13.2em;
       z-index: 2;
+      top: 3.11em;
     }
 
     pwa-install::part(openButton) {
       border-radius: 2px;
-      height: 2.45em;
       background: var(--accent-fill-hover);
+
+      height: 2.9em;
     }
 
     #canvasMain {
@@ -141,7 +143,14 @@ export class AppHome extends LitElement {
         font-size: 13px;
 
         position: fixed;
-        right: 9.4em;
+
+        right: 10.8em;
+        top: 4em;
+
+        height: 2.9em;
+        top: 3.75em;
+        border-radius: 4px;
+        border: solid 1px #43434a;
       }
 
       #filters {
@@ -183,10 +192,8 @@ export class AppHome extends LitElement {
       }
 
       #controls #advanced {
-        margin-left: 1em;
-
         position: fixed;
-        right: 16px;
+        right: 20px;
       }
 
       #mobile-toolbar #advanced {
@@ -962,10 +969,8 @@ export class AppHome extends LitElement {
               <p>Draw on your collage with your pen, mouse or touch!</p>
             </div>
 
-            <fluent-switch value="${this.pen_mode || false}" @change="${(ev: any) => this.penMode(ev.target.checked)}">
-              <span slot="checked-message">on</span>
-              <span slot="unchecked-message">off</span>
-            </fluent-switch>
+            <sl-switch value="${this.pen_mode || false}" @change="${(ev: any) => this.penMode(ev.target.checked)}">
+            </sl-switch>
           </div>
         </div>
       </div>

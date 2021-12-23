@@ -14,8 +14,9 @@ export class AppAbout extends LitElement {
         padding: 0px;
         margin: 1em;
         display: grid;
-        grid-template-columns: 24.2% 24.2% 24.2% 24.2%;
-        gap: 10px;
+        grid-template-columns: auto auto auto auto;
+        gap: 8px;
+        gap: 18px;
       }
 
       h2 {
@@ -102,7 +103,13 @@ export class AppAbout extends LitElement {
       }
 
       #removeButton {
-        background: #d02929;
+        margin-left: 8px;
+      }
+
+      sl-card [slot="footer"] {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
       }
 
       @media(max-width: 800px) {
@@ -195,7 +202,7 @@ export class AppAbout extends LitElement {
               ${
                 this.saved.map((saved) => {
                   return html`
-                    <fluent-card>
+                   <!-- <fluent-card>
                       <div id="header-info">
                         <img src="${URL.createObjectURL(saved.preview)}">
                       </div>
@@ -205,19 +212,29 @@ export class AppAbout extends LitElement {
                         <h3>${saved.name}</h3>
 
                         <div id="actions">
-                          <sl-button @click="${() => this.continue(saved)}" id="edit-button">
+
+                        </div>
+                      </div>
+                    </fluent-card>-->
+
+                    <sl-card>
+                      <img slot="image" src="${URL.createObjectURL(saved.preview)}">
+
+                      <strong>${saved.name}</strong><br>
+
+                      <div slot="footer">
+                          <sl-button variant="primary" pill @click="${() => this.continue(saved)}">
                             Edit
 
                             <ion-icon name="brush-outline"></ion-icon>
                           </sl-button>
-                          <sl-button  id="removeButton" appearance="danger" @click="${() => this.removeFile(saved)}">
+                          <sl-button id="removeButton" pill variant="danger" @click="${() => this.removeFile(saved)}">
                             Remove
 
                             <ion-icon name="trash-outline"></ion-icon>
                           </sl-button>
-                        </div>
                       </div>
-                    </fluent-card>
+                    </sl-card>
                   `
                 })
               }
