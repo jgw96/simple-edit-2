@@ -121,7 +121,7 @@ export function drawImageFunc(blob: Blob | File, canvas: any, image: any, imgIns
 
           imgInstance.bringToFront();
 
-          await set("current_file", this.canvas?.writeToJSON());
+          await set("current_file", canvas?.writeToJSON());
         }
 
         if (e.target?.result) {

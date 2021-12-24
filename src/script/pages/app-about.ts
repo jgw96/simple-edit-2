@@ -34,8 +34,8 @@ export class AppAbout extends LitElement {
       }
 
       #gallery-header a {
-        background: var(--accent-fill-rest);
-        color: white;
+        background: var(--sl-color-primary-600);
+        color: black;
         border-radius: 4px;
         text-decoration: none;
         padding: 8px;
@@ -43,22 +43,26 @@ export class AppAbout extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
+        font-weight: var(--sl-font-weight-semibold);
       }
 
-      ul fluent-card {
-        width: 100%;
-        height: 18em;
-        display: flex;
-        flex-direction: column;
+      #no-saved-block a {
+        text-decoration: none;
+                color: black;
+                font-weight: var(--sl-font-weight-semibold);
+                background: var(--sl-color-primary-600);
+                padding: 6px;
+                padding-left: 10px;
+                padding-right: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 500;
+                border-radius: 4px;
 
-        background-color: var(--neutral-foreground-rest);
-        color: white;
-      }
-
-      ul fluent-card img {
-        width: 100%;
-        height: 10em;
-        object-fit: cover;
+                width: 8em;
+                height: 2em;
+                font-size: 18px;
       }
 
       #content {
@@ -104,6 +108,10 @@ export class AppAbout extends LitElement {
 
       #removeButton {
         margin-left: 8px;
+      }
+
+      sl-card img {
+        height: 280px;
       }
 
       sl-card [slot="footer"] {
@@ -202,21 +210,6 @@ export class AppAbout extends LitElement {
               ${
                 this.saved.map((saved) => {
                   return html`
-                   <!-- <fluent-card>
-                      <div id="header-info">
-                        <img src="${URL.createObjectURL(saved.preview)}">
-                      </div>
-
-                      <div id="content">
-
-                        <h3>${saved.name}</h3>
-
-                        <div id="actions">
-
-                        </div>
-                      </div>
-                    </fluent-card>-->
-
                     <sl-card>
                       <img slot="image" src="${URL.createObjectURL(saved.preview)}">
 
@@ -228,6 +221,7 @@ export class AppAbout extends LitElement {
 
                             <ion-icon name="brush-outline"></ion-icon>
                           </sl-button>
+
                           <sl-button id="removeButton" pill variant="danger" @click="${() => this.removeFile(saved)}">
                             Remove
 
@@ -244,7 +238,7 @@ export class AppAbout extends LitElement {
         <div id="no-saved-block">
           <h3>No previous edits</h3>
 
-          <fluent-anchor id="started" href="/">Get Started</fluent-anchor>
+          <a id="started" href="/">Get Started</a>
         </div>`}
       </div>
     `;

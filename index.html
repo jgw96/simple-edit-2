@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="sl-theme-dark">
   <head>
     <meta charset="utf-8" />
     <title>SimpleEdit</title>
@@ -25,13 +25,9 @@
     <!-- Imports the manifest to represent the web application. A web app must have a manifest to be a PWA. -->
     <link rel="manifest" href="manifest.json" />
 
-    <!-- Microsoft Fast Components https://www.fast.design/docs/components/getting-started-->
-    <!--<script type="module" src="https://unpkg.com/@fluentui/web-components"></script>-->
-
-    <link rel="stylesheet" media="(prefers-color-scheme:light)" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.62/dist/themes/light.css">
 <link rel="stylesheet" media="(prefers-color-scheme:dark)"
       href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.62/dist/themes/dark.css"
-      onload="document.documentElement.classList.add('sl-theme-dark');">
+      >
 
     <!-- A stylesheet to design the pages. -->
     <link href="styles/global.css" rel="stylesheet" />
@@ -45,9 +41,7 @@
 
   <body>
     <!-- Our app-index web component. This component is defined in src/pages/app-index.ts-->
-    <fluent-design-system-provider use-defaults>
-      <app-index></app-index>
-    </fluent-design-system-provider>
+    <app-index></app-index>
 
     <script type="module" src="/pwabuilder-sw.ts"></script>
 
@@ -55,9 +49,7 @@
       navigator.serviceWorker.register("/pwabuilder-sw.js");
     </script>
 
-    <script type="module" async defer src="/assets/fluent-web-components.js"></script>
-
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.62/dist/shoelace.js"></script>
+    <script async defer type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.62/dist/shoelace.js"></script>
 
     <script async defer type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
     <script async defer nomodule="" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>

@@ -83,6 +83,10 @@ export class AppHome extends LitElement {
       width: 97%;
     }
 
+    .add-header {
+      margin-top: 1em;
+    }
+
     sl-button::part(content) {
       display: flex;
       align-items: center;
@@ -130,32 +134,56 @@ export class AppHome extends LitElement {
       #controls a {
         width: 5em;
         text-decoration: none;
-        color: white;
+        color: black;
         display: flex;
         align-items: center;
         justify-content: center;
 
-        background: var(--accent-fill-rest);
-        height: 2.5em;
+        background: var(--sl-color-primary-600);
+        font-weight: var(--sl-font-weight-semibold);
         margin-bottom: 0px;
         margin-top: 0px;
-        border-radius: 2px;
-        font-size: 13px;
-
         position: fixed;
 
         right: 10.8em;
-        top: 4em;
 
-        height: 2.9em;
+        height: 2.5rem;
         top: 3.75em;
         border-radius: 4px;
         border: solid 1px #43434a;
+
+        font-size: var(--sl-button-font-size-medium);
+        height: var(--sl-input-height-medium);
+        line-height: calc(var(--sl-input-height-medium) - var(--sl-input-border-width) * 2);
+        border-radius: var(--sl-input-border-radius-medium);
+        top: 3.5em;
       }
 
       #filters {
         flex-direction: row;
         justify-content: flex-end;
+        height: 86vh;
+        overflow-y: auto;
+      }
+
+      /* width */
+      ::-webkit-scrollbar {
+        width: 2px;
+      }
+
+      /* Track */
+      ::-webkit-scrollbar-track {
+        background: black;
+      }
+
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+        background: #43434a;
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+        background: #rgb(30, 30, 30);
       }
 
       #controls sl-button, #filters sl-button {
@@ -169,12 +197,6 @@ export class AppHome extends LitElement {
 
       #shareButton {
         margin-bottom: 1em;
-      }
-
-      fluent-progress-ring {
-        position: fixed;
-        bottom: -26px;
-        right: 16px;
       }
 
       #mobile-toolbar {
@@ -271,9 +293,6 @@ export class AppHome extends LitElement {
 
       #remove-image {
         background: #d02929;
-
-        animation-name: slideup;
-        animation-duration: 300ms;
       }
 
       #extra-controls {
@@ -297,11 +316,6 @@ export class AppHome extends LitElement {
         font-weight: bold;
         display: flex;
         align-items: center;
-      }
-
-      #extra-controls fluent-slider {
-        width: 12em;
-        margin-left: 6px;
       }
 
       #pill-box {
@@ -713,12 +727,11 @@ export class AppHome extends LitElement {
   }
 
   async save() {
-    this.saving = !this.saving;
+    (this.shadowRoot?.querySelector("save-modal") as any)?.openModal();
   }
 
   saveCanvas() {
     this.canvas?.save();
-    this.saving = !this.saving;
   }
 
   async share() {
@@ -805,7 +818,7 @@ export class AppHome extends LitElement {
 
   render() {
     return html`
-      <save-modal @saved="${() => this.saveCanvas()}" ?hiddenModal="${this.saving ? false : true}"></save-modal>
+      <save-modal @saved="${() => this.saveCanvas()}"></save-modal>
 
         <div id="layout">
         <aside>
@@ -816,7 +829,11 @@ export class AppHome extends LitElement {
               <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
               <sl-button type="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
-              ${this.removeShow ? html`<sl-button type="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>` : null}
+              ${this.removeShow ? html`
+              <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
+                <sl-button type="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
+              </sl-animation>
+              ` : null}
 
               <pwa-install>Install SimpleEdit</pwa-install>
 
@@ -852,7 +869,7 @@ export class AppHome extends LitElement {
                   <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
 
 
-                    <div class="menu-label">
+                    <div class="menu-label add-header">
                       <span>Add</span>
                     </div>
 
@@ -890,7 +907,7 @@ export class AppHome extends LitElement {
                   <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
 
 
-                    <div class="menu-label">
+                    <div class="menu-label add-header">
                       <span>Add</span>
                     </div>
 
@@ -912,7 +929,11 @@ export class AppHome extends LitElement {
               <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
               <sl-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
-              ${this.removeShow ? html`<sl-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>` : null}
+              ${this.removeShow ? html`
+              <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
+                <sl-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
+              </sl-animation>
+              ` : null}
 
               <sl-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>

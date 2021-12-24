@@ -41,8 +41,8 @@ export class AppIntro extends LitElement {
 
             .getting-started-item a {
                 text-decoration: none;
-                color: white;
-                background: var(--accent-fill-hover);
+                color: black;
+                background: var(--sl-color-primary-600);
                 padding: 6px;
                 padding-left: 10px;
                 padding-right: 10px;
