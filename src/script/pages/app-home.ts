@@ -50,14 +50,14 @@ export class AppHome extends LitElement {
 
     pwa-install {
       position: fixed;
-      right: 13.2em;
+      right: 14.4em;
       z-index: 2;
       top: 3.11em;
     }
 
     pwa-install::part(openButton) {
       border-radius: 2px;
-      background: var(--accent-fill-hover);
+      background-color: var(--sl-color-primary-600);
 
       height: 2.9em;
     }
@@ -133,8 +133,9 @@ export class AppHome extends LitElement {
 
       #controls a {
         width: 5em;
+        text-align: center;
         text-decoration: none;
-        color: black;
+        color: black
         display: flex;
         align-items: center;
         justify-content: center;
@@ -145,18 +146,23 @@ export class AppHome extends LitElement {
         margin-top: 0px;
         position: fixed;
 
-        right: 10.8em;
+        right: 10.5em;
 
-        height: 2.5rem;
+        height: 38px;
         top: 3.75em;
         border-radius: 4px;
         border: solid 1px #43434a;
 
         font-size: var(--sl-button-font-size-medium);
-        height: var(--sl-input-height-medium);
         line-height: calc(var(--sl-input-height-medium) - var(--sl-input-border-width) * 2);
         border-radius: var(--sl-input-border-radius-medium);
         top: 3.5em;
+      }
+
+      @media(prefers-color-scheme: light) {
+        #controls a {
+          color: white;
+        }
       }
 
       #filters {
@@ -262,6 +268,12 @@ export class AppHome extends LitElement {
         padding: 10px;
         border-radius: 6px;
         margin-bottom: 10px;
+      }
+
+      @media(prefers-color-scheme: light) {
+        .setting {
+          background: #f3f3f3;
+        }
       }
 
       .colorCard {
@@ -745,7 +757,7 @@ export class AppHome extends LitElement {
   }
 
   async doSettings() {
-    if (this.settingsAni) {
+    /*if (this.settingsAni) {
       this.settingsAni.reverse();
 
       await this.settingsAni.finished;
@@ -771,6 +783,15 @@ export class AppHome extends LitElement {
         easing: "ease-in-out",
         duration: 280
       })
+    }*/
+
+    if (!this.handleSettings) {
+      (this.shadowRoot?.querySelector(".drawer") as any)?.show();
+      this.handleSettings = true;
+    }
+    else {
+      (this.shadowRoot?.querySelector(".drawer") as any)?.hide();
+      this.handleSettings = false;
     }
   }
 
@@ -913,6 +934,8 @@ export class AppHome extends LitElement {
 
                     <sl-button @click="${() => this.addText()}">Add Text</sl-button>
                 </div>
+
+
               </div>
 
             <drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas @object-selected="${() => this.handleObjectSelected()}" @object-cleared="${() => this.handleObjectCleared()}"></app-canvas></drag-drop>
@@ -960,40 +983,20 @@ export class AppHome extends LitElement {
                   <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
                   <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
                 </div>
-    </div>
+            </div>
         </div>
 
-        <div
-        style=${styleMap({
-            display: this.handleSettings ? "initial" : "none"
-          })}
-          id="settings-pane">
-          <div id="settings-header">
-            <h3>Settings</h3>
-
-            <sl-button @click="${() => this.doSettings()}">
-              Close
-            </sl-button>
-          </div>
+        <!--settings-drawer-->
+        <sl-drawer label="Settings" class="drawer">
 
           <div class="setting">
             <div class="setting-header">
               <label id="color-label" for="color">Canvas Background Color</label>
               <p>Change the background color of your canvas</p>
             </div>
-            <input @change="${(ev: any) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
+            <sl-color-picker @sl-change="${(ev: any) => this.handleColor(ev.target.value)}"></sl-color-picker>
           </div>
-
-          <div class="setting colorCard">
-            <div class="setting-header">
-              <label id="color-label" for="color">Drawing Mode</label>
-              <p>Draw on your collage with your pen, mouse or touch!</p>
-            </div>
-
-            <sl-switch value="${this.pen_mode || false}" @change="${(ev: any) => this.penMode(ev.target.checked)}">
-            </sl-switch>
-          </div>
-        </div>
+        </sl-drawer>
       </div>
     `;
   }

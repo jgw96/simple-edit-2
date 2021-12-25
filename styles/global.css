@@ -37,7 +37,13 @@ html, body {
   margin: 0;
   background: #181818;
   overflow: hidden;
-
   color: white;
 }
 
+@media(prefers-color-scheme: light) {
+  html, body {
+    --app-color-primary: #f3f3f3;
+    background: #f3f3f3;
+    color: black;
+  }
+}

@@ -24,7 +24,7 @@ export class AppAbout extends LitElement {
       }
 
       sl-button {
-        color: white;
+        color: white
       }
 
       #gallery-header {
@@ -48,7 +48,7 @@ export class AppAbout extends LitElement {
 
       #no-saved-block a {
         text-decoration: none;
-                color: black;
+        color: black;
                 font-weight: var(--sl-font-weight-semibold);
                 background: var(--sl-color-primary-600);
                 padding: 6px;

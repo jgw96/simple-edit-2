@@ -11,7 +11,7 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
     window.fabric.textureSize = 8000;
     const fabricCanvas = new window.fabric.Canvas(canvas, {
       preserveObjectStacking: true,
-      backgroundColor: "#1e1e1e"
+      backgroundColor: window.matchMedia("(prefers-color-scheme: light)").matches ? "white" : "#1e1e1e"
     });
 
     // fabricCanvas.isDrawingMode = true;
