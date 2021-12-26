@@ -46,6 +46,12 @@ export class AppAbout extends LitElement {
         font-weight: var(--sl-font-weight-semibold);
       }
 
+      @media(prefers-color-scheme: light) {
+        #gallery-header a {
+          color: white;
+        }
+      }
+
       #no-saved-block a {
         text-decoration: none;
         color: black;
@@ -112,6 +118,7 @@ export class AppAbout extends LitElement {
 
       sl-card img {
         height: 280px;
+        object-fit: cover;
       }
 
       sl-card [slot="footer"] {

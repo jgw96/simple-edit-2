@@ -57,6 +57,12 @@ export class AppIntro extends LitElement {
                 font-size: 18px;
             }
 
+            @media(prefers-color-scheme: light) {
+              .getting-started-item a {
+                color: white;
+              }
+            }
+
             @media(max-width: 800px) {
               .getting-started-item {
                 flex-direction: column;

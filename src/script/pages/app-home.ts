@@ -53,6 +53,7 @@ export class AppHome extends LitElement {
       right: 14.4em;
       z-index: 2;
       top: 3.11em;
+      display: none;
     }
 
     pwa-install::part(openButton) {
@@ -60,6 +61,10 @@ export class AppHome extends LitElement {
       background-color: var(--sl-color-primary-600);
 
       height: 2.9em;
+    }
+
+    @media(prefers-color-scheme: dark) {
+      color: initial;
     }
 
     #canvasMain {
@@ -215,8 +220,10 @@ export class AppHome extends LitElement {
         right: 0;
         left: 0;
 
+        overflow-y: auto;
+
         height: 94vh;
-        transform: translateY(30em);
+        transform: translateY(60%);
       }
 
       #controls #advanced {
@@ -392,6 +399,11 @@ export class AppHome extends LitElement {
           margin-bottom: 2em;
         }
 
+
+        #filters {
+          height: initial;
+        }
+
         #canvasMain .tabletFilters {
           display: none;
         }
@@ -446,6 +458,9 @@ export class AppHome extends LitElement {
 
         #controls, #filters {
           flex-direction: column;
+          justify-content: initial;
+          height: initial;
+          overflow-y: initial;
         }
 
         #controls sl-button, #filters sl-button {
@@ -565,8 +580,6 @@ export class AppHome extends LitElement {
   swipeHandler() {
     const el = this.shadowRoot?.querySelector("#mobile-toolbar");
 
-    console.log('el', el);
-
     if (el) {
       // @ts-ignore
       const swiper = new Swipe(el);
@@ -590,7 +603,7 @@ export class AppHome extends LitElement {
       swiper.onDown((ev: any) => {
         el.animate([
           {
-            transform: "translateY(30em)"
+            transform: "translateY(60%)"
           }
         ], {
           duration: 200,
