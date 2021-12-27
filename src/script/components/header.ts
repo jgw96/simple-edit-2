@@ -77,7 +77,6 @@ export class AppHeader extends LitElement {
         font-size: 14px;
         margin-left: 10px;
         font-weight: bold;
-        color: white;
       }
 
       #gallery-button::part(content) {

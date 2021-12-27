@@ -5,6 +5,30 @@
 */
 :root {
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --sl-color-primary-50: rgb(249 249 255);
+  --sl-color-primary-100: rgb(236 234 255);
+  --sl-color-primary-200: rgb(221 219 255);
+  --sl-color-primary-300: rgb(204 201 255);
+  --sl-color-primary-400: rgb(182 178 255);
+  --sl-color-primary-500: rgb(154 147 255);
+  --sl-color-primary-600: rgb(121 113 255);
+  --sl-color-primary-700: rgb(96 88 227);
+  --sl-color-primary-800: rgb(79 73 187);
+  --sl-color-primary-900: rgb(57 52 133);
+  --sl-color-primary-950: rgb(35 32 82);
+
+  --sl-color-success-50: rgb(228 255 252);
+  --sl-color-success-100: rgb(146 255 242);
+  --sl-color-success-200: rgb(84 246 226);
+  --sl-color-success-300: rgb(78 228 210);
+  --sl-color-success-400: rgb(70 206 190);
+  --sl-color-success-500: rgb(60 177 163);
+  --sl-color-success-600: rgb(50 146 135);
+  --sl-color-success-700: rgb(41 120 110);
+  --sl-color-success-800: rgb(34 99 91);
+  --sl-color-success-900: rgb(24 70 65);
+  --sl-color-success-950: rgb(15 43 40);
 }
 
 html, body {
@@ -13,13 +37,13 @@ html, body {
   margin: 0;
   background: #181818;
   overflow: hidden;
+  color: white;
 }
 
-fluent-design-system-provider {
-  --accent-fill-rest: #6c63ff;
-  --background-color: #181818;
-  --accent-fill-hover: #DA1A5F;
-  --neutral-foreground-rest: white;
-  --neutral-fill-rest: #2d2d2d;
-  --neutral-fill-hover: #2d2d2dda;
+@media(prefers-color-scheme: light) {
+  html, body {
+    --app-color-primary: #f3f3f3;
+    background: #f3f3f3;
+    color: black;
+  }
 }

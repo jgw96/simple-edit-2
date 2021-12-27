@@ -19,21 +19,6 @@ export class SaveModal extends LitElement {
         top: 0;
       }
 
-      fluent-dialog {
-        z-index: 2;
-
-        --dialog-width: 30vw;
-        --dialog-height: 24vh;
-      }
-
-      fluent-dialog::part(control) {
-        padding: 10px;
-
-        display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-      }
-
       h2 {
           margin-top: 0;
       }
@@ -45,23 +30,16 @@ export class SaveModal extends LitElement {
 
       #save-button {
           margin-left: 8px;
-          background: var(--accent-fill-hover);
       }
 
-      fluent-button ion-icon {
+      sl-button ion-icon {
         margin-left: 6px;
       }
 
-      fluent-button::part(content) {
+      sl-button::part(content) {
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
-
-    @media(max-width: 1000px) {
-        fluent-dialog {
-          --dialog-width: 80vw;
-        }
     }
 
     `;
@@ -71,11 +49,21 @@ export class SaveModal extends LitElement {
     super();
   }
 
-  closeModal() {
-    this.hiddenModal = true;
+  public openModal() {
+    const dialog: any = this.shadowRoot?.querySelector('.save-dialog');
+    if (dialog) {
+      dialog.show();
+    }
   }
 
-  save() {
+  public closeModal() {
+    const dialog: any = this.shadowRoot?.querySelector('.save-dialog');
+    if (dialog) {
+      dialog.hide();
+    }
+  }
+
+  public save() {
     const event = new CustomEvent('saved', {});
     this.dispatchEvent(event);
 
@@ -84,22 +72,13 @@ export class SaveModal extends LitElement {
 
   render() {
     return html`
-    <div id="background" ?hidden="${this.hiddenModal}">
-      <fluent-dialog id="example1" class="example-dialog" ?hidden="${this.hiddenModal}" aria-label="Image saving dialog" modal="true">
-        <div id="dialog-header">
-          <h2>Save</h2>
+      <sl-dialog label="Save" class="save-dialog">
+        Ready to save your work?
 
-          <div id="content">
-            <p>Are you sure you would like to save your work?</p>
-          </div>
-        </div>
-
-        <div id="actions">
-          <fluent-button @click="${() => this.closeModal()}">Cancel</fluent-button>
-          <fluent-button id="save-button" @click="${() => this.save()}">Save  <ion-icon name="save-outline"></ion-icon></fluent-button>
-        </div>
-       </fluent-dialog>
-      </div>
+        <sl-button slot="footer" @click="${() => this.closeModal()}">Cancel</sl-button>
+        <sl-button slot="footer" id="save-button" @click="${() => this.save()}">Save <ion-icon name="save-outline"></ion-icon>
+        </sl-button>
+      </sl-dialog>
     `;
   }
 }

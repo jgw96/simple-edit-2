@@ -32,7 +32,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }) => url.href.includes("@fluentui"),
+  ({ url }) => url.href.includes("shoelace"),
   new CacheFirst()
 );
 

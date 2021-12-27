@@ -11,7 +11,8 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
     window.fabric.textureSize = 8000;
     const fabricCanvas = new window.fabric.Canvas(canvas, {
       preserveObjectStacking: true,
-      backgroundColor: "#1e1e1e"
+      allowTouchScrolling: true,
+      backgroundColor: window.matchMedia("(prefers-color-scheme: light)").matches ? "white" : "#1e1e1e"
     });
 
     // fabricCanvas.isDrawingMode = true;
@@ -44,9 +45,9 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
       opt.e.stopPropagation();
     });
 
-    return fabricCanvas;
+    drag(fabricCanvas);
 
-    // drag();
+    return fabricCanvas;
   }
   else return undefined;
 }
@@ -121,7 +122,7 @@ export function drawImageFunc(blob: Blob | File, canvas: any, image: any, imgIns
 
           imgInstance.bringToFront();
 
-          await set("current_file", this.canvas?.writeToJSON());
+          await set("current_file", canvas?.writeToJSON());
         }
 
         if (e.target?.result) {

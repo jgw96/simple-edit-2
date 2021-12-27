@@ -1,6 +1,7 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map';
+//@ts-ignore
+import fabricPureBrowser from 'https://cdn.skypack.dev/fabric-pure-browser';
 
 import '../components/app-canvas';
 import '../components/drag-drop';
@@ -10,7 +11,6 @@ import '../components/save-modal';
 import '@pwabuilder/pwainstall';
 import { directoryOpen, fileOpen } from 'browser-fs-access';
 import { AppCanvas } from '../components/app-canvas';
-import { Swipe } from '../utils/swipe';
 import { get, set } from 'idb-keyval';
 
 
@@ -31,12 +31,21 @@ export class AppHome extends LitElement {
   @state() saving = false;
   @state() removeShow = false;
 
-  settingsAni: Animation | undefined;
+  @state() menuOpen = false;
+
+  fabric: any;
+
+  menuAnimation: Animation | undefined;
 
   currentFilter: string | undefined;
 
   static get styles() {
     return css`
+
+    #menu-close {
+      margin-left: 6px;
+      margin-bottom: 1em;
+    }
 
     .menu-label {
       font-weight: bold;
@@ -46,14 +55,21 @@ export class AppHome extends LitElement {
 
     pwa-install {
       position: fixed;
-      right: 12.2em;
+      right: 14.4em;
       z-index: 2;
+      top: 3.11em;
+      display: none;
     }
 
     pwa-install::part(openButton) {
       border-radius: 2px;
-      height: 2.45em;
-      background: var(--accent-fill-hover);
+      background-color: var(--sl-color-primary-600);
+
+      height: 2.9em;
+    }
+
+    @media(prefers-color-scheme: dark) {
+      color: initial;
     }
 
     #canvasMain {
@@ -73,17 +89,21 @@ export class AppHome extends LitElement {
       margin-top: 1em;
     }
 
-    #otherControls fluent-button {
+    #otherControls sl-button {
       width: 97%;
     }
 
-    fluent-button::part(content) {
+    .add-header {
+      margin-top: 1em;
+    }
+
+    sl-button::part(content) {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    fluent-button ion-icon {
+    sl-button ion-icon {
       margin-left: 6px;
     }
 
@@ -111,7 +131,13 @@ export class AppHome extends LitElement {
         animation-timing-function: "ease-in-out";
       }
 
-      aside fluent-button {
+      #menuToggler {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+      }
+
+      aside sl-button {
         margin-bottom: 6px;
       }
 
@@ -123,71 +149,96 @@ export class AppHome extends LitElement {
 
       #controls a {
         width: 5em;
+        text-align: center;
         text-decoration: none;
-        color: white;
+        color: black
         display: flex;
         align-items: center;
         justify-content: center;
 
-        background: var(--accent-fill-rest);
-        height: 2.5em;
+        background: var(--sl-color-primary-600);
+        font-weight: var(--sl-font-weight-semibold);
         margin-bottom: 0px;
         margin-top: 0px;
-        border-radius: 2px;
-        font-size: 13px;
-
         position: fixed;
-        right: 9.4em;
+
+        right: 10.5em;
+
+        height: 38px;
+        top: 3.75em;
+        border-radius: 4px;
+        border: solid 1px #43434a;
+
+        font-size: var(--sl-button-font-size-medium);
+        line-height: calc(var(--sl-input-height-medium) - var(--sl-input-border-width) * 2);
+        border-radius: var(--sl-input-border-radius-medium);
+        top: 3.5em;
+      }
+
+      @media(prefers-color-scheme: light) {
+        #controls a {
+          color: white;
+        }
       }
 
       #filters {
         flex-direction: row;
         justify-content: flex-end;
+        height: 86vh;
+        overflow-y: auto;
       }
 
-      #controls fluent-button, #filters fluent-button {
+      /* width */
+      ::-webkit-scrollbar {
+        width: 2px;
+      }
+
+      /* Track */
+      ::-webkit-scrollbar-track {
+        background: black;
+      }
+
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+        background: #43434a;
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+        background: #rgb(30, 30, 30);
+      }
+
+      #controls sl-button, #filters sl-button {
         margin-bottom: 10px;
         margin-right: 6px;
       }
 
       #choosePhoto {
         margin-bottom: 1em;
-        background: var(--accent-fill-hover);
-      }
-
-      #chooseFolder {
-        background: var(--accent-fill-rest);
       }
 
       #shareButton {
         margin-bottom: 1em;
       }
 
-      fluent-progress-ring {
-        position: fixed;
-        bottom: -26px;
-        right: 16px;
-      }
-
       #mobile-toolbar {
-        display: none;
-
+        display: block;
+        border-radius: 12px 12px 0px 0px;
         position: fixed;
-        bottom: 0;
         background: rgb(19, 19, 19);
         padding: 10px;
-        right: 0;
-        left: 0;
-
-        height: 94vh;
-        transform: translateY(30em);
+        overflow-y: auto;
+        top: 0px;
+        height: initial;
+        transform: translateX(-100%);
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
       }
 
       #controls #advanced {
-        margin-left: 1em;
-
         position: fixed;
-        right: 16px;
+        right: 20px;
       }
 
       #mobile-toolbar #advanced {
@@ -196,7 +247,7 @@ export class AppHome extends LitElement {
         margin-left: 0;
       }
 
-      #mobile-toolbar #otherControls fluent-button {
+      #mobile-toolbar #otherControls sl-button {
         margin-bottom: 8px;
       }
 
@@ -236,6 +287,12 @@ export class AppHome extends LitElement {
         margin-bottom: 10px;
       }
 
+      @media(prefers-color-scheme: light) {
+        .setting {
+          background: #f3f3f3;
+        }
+      }
+
       .colorCard {
         display: none;
       }
@@ -263,13 +320,6 @@ export class AppHome extends LitElement {
         height: 2em;
       }
 
-      #remove-image {
-        background: #d02929;
-
-        animation-name: slideup;
-        animation-duration: 300ms;
-      }
-
       #extra-controls {
         position: fixed;
         bottom: 0;
@@ -293,11 +343,6 @@ export class AppHome extends LitElement {
         align-items: center;
       }
 
-      #extra-controls fluent-slider {
-        width: 12em;
-        margin-left: 6px;
-      }
-
       #pill-box {
         display: flex;
         justify-content: center;
@@ -319,7 +364,7 @@ export class AppHome extends LitElement {
           bottom: 12px;
         }
 
-        #controls fluent-button, #filters fluent-button, #otherControls fluent-button {
+        #controls sl-button, #filters sl-button, #otherControls sl-button {
           border-radius: 6px;
           padding: 6px;
           font-size: 1em;
@@ -346,11 +391,6 @@ export class AppHome extends LitElement {
           display: none;
         }
 
-        #mobile-toolbar {
-          display: block;
-          border-radius: 12px 12px 0px 0px;
-        }
-
         #controls, #filters {
           display: grid;
           grid-template-columns: auto auto;
@@ -360,7 +400,22 @@ export class AppHome extends LitElement {
           margin-bottom: 2em;
         }
 
+
+        #filters {
+          height: initial;
+        }
+
         #canvasMain .tabletFilters {
+          display: none;
+        }
+      }
+
+      @media(min-width: 800px) {
+        #mobile-toolbar {
+          display: none;
+        }
+
+        #menuToggler {
           display: none;
         }
       }
@@ -414,9 +469,12 @@ export class AppHome extends LitElement {
 
         #controls, #filters {
           flex-direction: column;
+          justify-content: initial;
+          height: initial;
+          overflow-y: initial;
         }
 
-        #controls fluent-button, #filters fluent-button {
+        #controls sl-button, #filters sl-button {
           border-radius: 6px;
           padding: 6px;
           font-size: 1em;
@@ -477,6 +535,8 @@ export class AppHome extends LitElement {
   }
 
   async firstUpdated() {
+    window.fabric = fabricPureBrowser.fabric;
+
     const working = await get("current_file");
 
     if (working) {
@@ -524,48 +584,32 @@ export class AppHome extends LitElement {
         })
       }
     }
-
-    this.swipeHandler();
   }
 
-  swipeHandler() {
+  toggleMobileMenu() {
     const el = this.shadowRoot?.querySelector("#mobile-toolbar");
 
-    console.log('el', el);
-
     if (el) {
-      // @ts-ignore
-      const swiper = new Swipe(el);
-
-      swiper.onUp((ev: any) => {
-        //Your code goes here
-
-        console.log('here', ev);
-
-        el.animate([
+      if (this.menuOpen === false) {
+        this.menuAnimation = el.animate([
           {
-            transform: "translateY(0em)"
+            transform: "translateX(0px)",
           }
         ], {
           duration: 200,
           easing: "ease-out",
           fill: "forwards"
-        })
-      });
+        });
 
-      swiper.onDown((ev: any) => {
-        el.animate([
-          {
-            transform: "translateY(30em)"
-          }
-        ], {
-          duration: 200,
-          easing: "ease-out",
-          fill: "forwards"
-        })
-      })
+        this.menuOpen = true;
+      }
+      else {
+        if (this.menuAnimation) {
+          (this.menuAnimation as Animation).reverse();
 
-      swiper.run()
+          this.menuOpen = false;
+        }
+      }
     }
   }
 
@@ -607,9 +651,9 @@ export class AppHome extends LitElement {
 
     await this.updateComplete;
 
-    this.swipeHandler();
-
     localStorage.setItem("done-with-tut", "true");
+
+    this.toggleMobileMenu();
   }
 
   async openFolder() {
@@ -638,8 +682,6 @@ export class AppHome extends LitElement {
 
     await this.updateComplete;
 
-    this.swipeHandler();
-
     localStorage.setItem("done-with-tut", "true");
 
   }
@@ -657,8 +699,6 @@ export class AppHome extends LitElement {
       await this.updateComplete;
 
       await set("current_file", this.canvas?.writeToJSON());
-
-      this.swipeHandler();
     }
   }
 
@@ -672,6 +712,8 @@ export class AppHome extends LitElement {
     }
 
     await set("current_file", this.canvas?.writeToJSON());
+
+    this.toggleMobileMenu();
   }
 
   async handleBringForward() {
@@ -705,26 +747,31 @@ export class AppHome extends LitElement {
   }
 
   async save() {
-    this.saving = !this.saving;
+    (this.shadowRoot?.querySelector("save-modal") as any)?.openModal();
+
+    this.toggleMobileMenu();
   }
 
   saveCanvas() {
     this.canvas?.save();
-    this.saving = !this.saving;
   }
 
   async share() {
     this.canvas?.shareImage();
+
+    this.toggleMobileMenu();
   }
 
   async remove() {
     this.canvas?.removeObject();
 
     await set("current_file", this.canvas?.writeToJSON());
+
+    this.toggleMobileMenu();
   }
 
   async doSettings() {
-    if (this.settingsAni) {
+    /*if (this.settingsAni) {
       this.settingsAni.reverse();
 
       await this.settingsAni.finished;
@@ -750,6 +797,15 @@ export class AppHome extends LitElement {
         easing: "ease-in-out",
         duration: 280
       })
+    }*/
+
+    if (!this.handleSettings) {
+      (this.shadowRoot?.querySelector(".drawer") as any)?.show();
+      this.handleSettings = true;
+    }
+    else {
+      (this.shadowRoot?.querySelector(".drawer") as any)?.hide();
+      this.handleSettings = false;
     }
   }
 
@@ -797,18 +853,22 @@ export class AppHome extends LitElement {
 
   render() {
     return html`
-      <save-modal @saved="${() => this.saveCanvas()}" ?hiddenModal="${this.saving ? false : true}"></save-modal>
+      <save-modal @saved="${() => this.saveCanvas()}"></save-modal>
 
         <div id="layout">
         <aside>
             <div id="controls">
-              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
-              <fluent-button id="chooseFolder" @click="${() => this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></fluent-button>
-              <fluent-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fluent-button>
-              <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
+              <sl-button type="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button id="chooseFolder" @click="${() => this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></sl-button>
+              <sl-button type="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
-              ${this.removeShow ? html`<fluent-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></fluent-button>` : null}
+              <sl-button type="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              ${this.removeShow ? html`
+              <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
+                <sl-button type="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
+              </sl-animation>
+              ` : null}
 
               <pwa-install>Install SimpleEdit</pwa-install>
 
@@ -816,7 +876,7 @@ export class AppHome extends LitElement {
                 Gallery
               </a>
 
-              <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
+              <sl-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
             <div id="filters" class="duoFilters">
@@ -824,46 +884,38 @@ export class AppHome extends LitElement {
                   <span id="filters-label">Filters</span>
                 </div>
 
-                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
-                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
-                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
-                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
-                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
-                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
-                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
-                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
+                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
+                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
+                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
+                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
+                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
+                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
+                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
+                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
+                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
+                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
 
                 <div id="otherControls">
                   <div class="menu-label">
                     <span id="order-label">Order</span>
                   </div>
 
-                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
-                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
-                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
-                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
+                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
+                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
+                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
 
 
-                    <div class="menu-label">
+                    <div class="menu-label add-header">
                       <span>Add</span>
                     </div>
 
-                    <fluent-button @click="${() => this.addText()}">Add Text</fluent-button>
+                    <sl-button @click="${() => this.addText()}">Add Text</sl-button>
                 </div>
               </div>
 
 
           </aside>
-
-          ${
-            this.intensity ? html`<div id="extra-controls">
-              <div>
-                <label for="intensity">Intensity</label>
-                <fluent-slider @change="${(ev: any) => this.handleIntensity(ev.target.value)}" name="intensity" id="intensity" min="0" max="1" step="0.1" value="0.5">
-                </fluent-slider>
-              </div>
-            </div>` : null
-          }
 
           <main id="canvasMain">
 
@@ -872,63 +924,74 @@ export class AppHome extends LitElement {
                   <span id="filters-label">Filters</span>
                 </div>
 
-                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
-                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
-                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
-                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
-                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
-                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
-                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
-                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
+                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
+                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
+                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
+                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
+                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
+                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
+                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
+                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
+                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
+                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
 
                 <div id="otherControls">
                   <div class="menu-label">
                     <span id="order-label">Order</span>
                   </div>
 
-                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
-                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
-                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
-                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
+                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
+                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
+                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
 
 
-                    <div class="menu-label">
+                    <div class="menu-label add-header">
                       <span>Add</span>
                     </div>
 
-                    <fluent-button @click="${() => this.addText()}">Add Text</fluent-button>
+                    <sl-button @click="${() => this.addText()}">Add Text</sl-button>
                 </div>
+
+
               </div>
 
             <drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas @object-selected="${() => this.handleObjectSelected()}" @object-cleared="${() => this.handleObjectCleared()}"></app-canvas></drag-drop>
           </main>
 
+          <!-- mobile menu toggler -->
+          <sl-button id="menuToggler" @click="${() => this.toggleMobileMenu()}">Menu</sl-button>
+
           <div id="mobile-toolbar">
-          <div id="pill-box">
-            <div id="pill"></div>
-          </div>
+           <sl-button id="menu-close" @click="${() => this.toggleMobileMenu()}">Close</sl-button>
 
           <div id="controls">
-              <fluent-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></fluent-button>
-              <fluent-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></fluent-button>
-              <fluent-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></fluent-button>
+              <sl-button type="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button type="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <fluent-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></fluent-button>
-              ${this.removeShow ? html`<fluent-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></fluent-button>` : null}
+              <sl-button type="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              ${this.removeShow ? html`
+              <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
+                <sl-button type="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
+              </sl-animation>
+              ` : null}
 
-              <fluent-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></fluent-button>
+              <sl-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
 
               <div id="filters">
-                <fluent-button @click="${() => this.filter("grayscale")}">desaturate</fluent-button>
-                <fluent-button @click="${() => this.filter("pixelate")}">pixelate</fluent-button>
-                <fluent-button @click="${() => this.filter("invert")}">invert</fluent-button>
-                <fluent-button @click="${() => this.filter("blur")}">blur</fluent-button>
-                <fluent-button @click="${() => this.filter("sepia")}">sepia</fluent-button>
-                <fluent-button @click="${() => this.filter("saturation")}">saturate</fluent-button>
-                <fluent-button @click="${() => this.filter("brightness")}">brighten</fluent-button>
-                <fluent-button @click="${() => this.filter("contrast")}">contrast</fluent-button>
+                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
+                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
+                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
+                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
+                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
+                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
+                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
+                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
+                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
+                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
               </div>
 
                 <div id="otherControls">
@@ -936,47 +999,25 @@ export class AppHome extends LitElement {
                     <span id="order-label">Order</span>
                   </div>
 
-                  <fluent-button @click="${() => this.handleBringFront()}">Bring to Front</fluent-button>
-                  <fluent-button @click="${() => this.handleBringForward()}">Bring Forward</fluent-button>
-                  <fluent-button @click="${() => this.handleSendToBack()}">Send to Back</fluent-button>
-                  <fluent-button @click="${() => this.handleSendBackward()}">Send Backward</fluent-button>
+                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
+                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
+                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
+                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
                 </div>
-    </div>
+            </div>
         </div>
 
-        <div
-        style=${styleMap({
-            display: this.handleSettings ? "initial" : "none"
-          })}
-          id="settings-pane">
-          <div id="settings-header">
-            <h3>Settings</h3>
-
-            <fluent-button @click="${() => this.doSettings()}">
-              Close
-            </fluent-button>
-          </div>
+        <!--settings-drawer-->
+        <sl-drawer label="Settings" class="drawer">
 
           <div class="setting">
             <div class="setting-header">
               <label id="color-label" for="color">Canvas Background Color</label>
               <p>Change the background color of your canvas</p>
             </div>
-            <input @change="${(ev: any) => this.handleColor(ev.target.value)}" id="color" name="color" type="color"></input>
+            <sl-color-picker @sl-change="${(ev: any) => this.handleColor(ev.target.value)}"></sl-color-picker>
           </div>
-
-          <div class="setting colorCard">
-            <div class="setting-header">
-              <label id="color-label" for="color">Drawing Mode</label>
-              <p>Draw on your collage with your pen, mouse or touch!</p>
-            </div>
-
-            <fluent-switch value="${this.pen_mode || false}" @change="${(ev: any) => this.penMode(ev.target.checked)}">
-              <span slot="checked-message">on</span>
-              <span slot="unchecked-message">off</span>
-            </fluent-switch>
-          </div>
-        </div>
+        </sl-drawer>
       </div>
     `;
   }

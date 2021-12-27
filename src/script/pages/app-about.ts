@@ -14,16 +14,17 @@ export class AppAbout extends LitElement {
         padding: 0px;
         margin: 1em;
         display: grid;
-        grid-template-columns: 24.2% 24.2% 24.2% 24.2%;
-        gap: 10px;
+        grid-template-columns: auto auto auto auto;
+        gap: 8px;
+        gap: 18px;
       }
 
       h2 {
         margin-left: 16px;
       }
 
-      fluent-button {
-        color: white;
+      sl-button {
+        color: white
       }
 
       #gallery-header {
@@ -33,8 +34,8 @@ export class AppAbout extends LitElement {
       }
 
       #gallery-header a {
-        background: var(--accent-fill-rest);
-        color: white;
+        background: var(--sl-color-primary-600);
+        color: black;
         border-radius: 4px;
         text-decoration: none;
         padding: 8px;
@@ -42,22 +43,32 @@ export class AppAbout extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
+        font-weight: var(--sl-font-weight-semibold);
       }
 
-      ul fluent-card {
-        width: 100%;
-        height: 18em;
-        display: flex;
-        flex-direction: column;
-
-        background-color: var(--neutral-foreground-rest);
-        color: white;
+      @media(prefers-color-scheme: light) {
+        #gallery-header a {
+          color: white;
+        }
       }
 
-      ul fluent-card img {
-        width: 100%;
-        height: 10em;
-        object-fit: cover;
+      #no-saved-block a {
+        text-decoration: none;
+        color: black;
+                font-weight: var(--sl-font-weight-semibold);
+                background: var(--sl-color-primary-600);
+                padding: 6px;
+                padding-left: 10px;
+                padding-right: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 500;
+                border-radius: 4px;
+
+                width: 8em;
+                height: 2em;
+                font-size: 18px;
       }
 
       #content {
@@ -102,7 +113,18 @@ export class AppAbout extends LitElement {
       }
 
       #removeButton {
-        background: #d02929;
+        margin-left: 8px;
+      }
+
+      sl-card img {
+        height: 280px;
+        object-fit: cover;
+      }
+
+      sl-card [slot="footer"] {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
       }
 
       @media(max-width: 800px) {
@@ -195,29 +217,25 @@ export class AppAbout extends LitElement {
               ${
                 this.saved.map((saved) => {
                   return html`
-                    <fluent-card>
-                      <div id="header-info">
-                        <img src="${URL.createObjectURL(saved.preview)}">
-                      </div>
+                    <sl-card>
+                      <img slot="image" src="${URL.createObjectURL(saved.preview)}">
 
-                      <div id="content">
+                      <strong>${saved.name}</strong><br>
 
-                        <h3>${saved.name}</h3>
-
-                        <div id="actions">
-                          <fluent-button @click="${() => this.continue(saved)}" id="edit-button">
+                      <div slot="footer">
+                          <sl-button variant="primary" pill @click="${() => this.continue(saved)}">
                             Edit
 
                             <ion-icon name="brush-outline"></ion-icon>
-                          </fluent-button>
-                          <fluent-button  id="removeButton" appearance="danger" @click="${() => this.removeFile(saved)}">
+                          </sl-button>
+
+                          <sl-button id="removeButton" pill variant="danger" @click="${() => this.removeFile(saved)}">
                             Remove
 
                             <ion-icon name="trash-outline"></ion-icon>
-                          </fluent-button>
-                        </div>
+                          </sl-button>
                       </div>
-                    </fluent-card>
+                    </sl-card>
                   `
                 })
               }
@@ -227,7 +245,7 @@ export class AppAbout extends LitElement {
         <div id="no-saved-block">
           <h3>No previous edits</h3>
 
-          <fluent-anchor id="started" href="/">Get Started</fluent-anchor>
+          <a id="started" href="/">Get Started</a>
         </div>`}
       </div>
     `;
