@@ -150,6 +150,8 @@ export class AppCanvas extends LitElement {
       { name: "saturation", filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }) },
       { name: "blur", filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }) },
       { name: "invert", filter: new window.fabric.Image.filters.Invert() },
+      { name: "polaroid", filter: new (window.fabric.Image.filters as any).Polaroid() },
+      { name: "vintage", filter: new (window.fabric.Image.filters as any).Vintage() },
       { name: "pixelate", filter: new window.fabric.Image.filters.Pixelate({ blocksize: 50 })},
       { name: "contrast", filter: new window.fabric.Image.filters.Contrast({ contrast: 0.25 }) },
     ];

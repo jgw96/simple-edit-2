@@ -1,6 +1,5 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map';
 //@ts-ignore
 import fabricPureBrowser from 'https://cdn.skypack.dev/fabric-pure-browser';
 
@@ -12,7 +11,6 @@ import '../components/save-modal';
 import '@pwabuilder/pwainstall';
 import { directoryOpen, fileOpen } from 'browser-fs-access';
 import { AppCanvas } from '../components/app-canvas';
-import { Swipe } from '../utils/swipe';
 import { get, set } from 'idb-keyval';
 
 
@@ -33,14 +31,21 @@ export class AppHome extends LitElement {
   @state() saving = false;
   @state() removeShow = false;
 
+  @state() menuOpen = false;
+
   fabric: any;
 
-  settingsAni: Animation | undefined;
+  menuAnimation: Animation | undefined;
 
   currentFilter: string | undefined;
 
   static get styles() {
     return css`
+
+    #menu-close {
+      margin-left: 6px;
+      margin-bottom: 1em;
+    }
 
     .menu-label {
       font-weight: bold;
@@ -124,6 +129,12 @@ export class AppHome extends LitElement {
         animation-name: slideup;
         animation-duration: 280ms;
         animation-timing-function: "ease-in-out";
+      }
+
+      #menuToggler {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
       }
 
       aside sl-button {
@@ -211,19 +222,18 @@ export class AppHome extends LitElement {
       }
 
       #mobile-toolbar {
-        display: none;
-
+        display: block;
+        border-radius: 12px 12px 0px 0px;
         position: fixed;
-        bottom: 0;
         background: rgb(19, 19, 19);
         padding: 10px;
-        right: 0;
-        left: 0;
-
         overflow-y: auto;
-
-        height: 94vh;
-        transform: translateY(60%);
+        top: 0px;
+        height: initial;
+        transform: translateX(-100%);
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
       }
 
       #controls #advanced {
@@ -310,10 +320,6 @@ export class AppHome extends LitElement {
         height: 2em;
       }
 
-      #remove-image {
-        background: #d02929;
-      }
-
       #extra-controls {
         position: fixed;
         bottom: 0;
@@ -385,11 +391,6 @@ export class AppHome extends LitElement {
           display: none;
         }
 
-        #mobile-toolbar {
-          display: block;
-          border-radius: 12px 12px 0px 0px;
-        }
-
         #controls, #filters {
           display: grid;
           grid-template-columns: auto auto;
@@ -405,6 +406,16 @@ export class AppHome extends LitElement {
         }
 
         #canvasMain .tabletFilters {
+          display: none;
+        }
+      }
+
+      @media(min-width: 800px) {
+        #mobile-toolbar {
+          display: none;
+        }
+
+        #menuToggler {
           display: none;
         }
       }
@@ -573,46 +584,32 @@ export class AppHome extends LitElement {
         })
       }
     }
-
-    this.swipeHandler();
   }
 
-  swipeHandler() {
+  toggleMobileMenu() {
     const el = this.shadowRoot?.querySelector("#mobile-toolbar");
 
     if (el) {
-      // @ts-ignore
-      const swiper = new Swipe(el);
-
-      swiper.onUp((ev: any) => {
-        //Your code goes here
-
-        console.log('here', ev);
-
-        el.animate([
+      if (this.menuOpen === false) {
+        this.menuAnimation = el.animate([
           {
-            transform: "translateY(0em)"
+            transform: "translateX(0px)",
           }
         ], {
           duration: 200,
           easing: "ease-out",
           fill: "forwards"
-        })
-      });
+        });
 
-      swiper.onDown((ev: any) => {
-        el.animate([
-          {
-            transform: "translateY(60%)"
-          }
-        ], {
-          duration: 200,
-          easing: "ease-out",
-          fill: "forwards"
-        })
-      })
+        this.menuOpen = true;
+      }
+      else {
+        if (this.menuAnimation) {
+          (this.menuAnimation as Animation).reverse();
 
-      swiper.run()
+          this.menuOpen = false;
+        }
+      }
     }
   }
 
@@ -654,9 +651,9 @@ export class AppHome extends LitElement {
 
     await this.updateComplete;
 
-    this.swipeHandler();
-
     localStorage.setItem("done-with-tut", "true");
+
+    this.toggleMobileMenu();
   }
 
   async openFolder() {
@@ -685,8 +682,6 @@ export class AppHome extends LitElement {
 
     await this.updateComplete;
 
-    this.swipeHandler();
-
     localStorage.setItem("done-with-tut", "true");
 
   }
@@ -704,8 +699,6 @@ export class AppHome extends LitElement {
       await this.updateComplete;
 
       await set("current_file", this.canvas?.writeToJSON());
-
-      this.swipeHandler();
     }
   }
 
@@ -719,6 +712,8 @@ export class AppHome extends LitElement {
     }
 
     await set("current_file", this.canvas?.writeToJSON());
+
+    this.toggleMobileMenu();
   }
 
   async handleBringForward() {
@@ -753,6 +748,8 @@ export class AppHome extends LitElement {
 
   async save() {
     (this.shadowRoot?.querySelector("save-modal") as any)?.openModal();
+
+    this.toggleMobileMenu();
   }
 
   saveCanvas() {
@@ -761,12 +758,16 @@ export class AppHome extends LitElement {
 
   async share() {
     this.canvas?.shareImage();
+
+    this.toggleMobileMenu();
   }
 
   async remove() {
     this.canvas?.removeObject();
 
     await set("current_file", this.canvas?.writeToJSON());
+
+    this.toggleMobileMenu();
   }
 
   async doSettings() {
@@ -891,6 +892,8 @@ export class AppHome extends LitElement {
                 <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
                 <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
                 <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
+                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
+                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
 
                 <div id="otherControls">
                   <div class="menu-label">
@@ -929,6 +932,8 @@ export class AppHome extends LitElement {
                 <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
                 <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
                 <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
+                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
+                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
 
                 <div id="otherControls">
                   <div class="menu-label">
@@ -954,20 +959,21 @@ export class AppHome extends LitElement {
             <drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas @object-selected="${() => this.handleObjectSelected()}" @object-cleared="${() => this.handleObjectCleared()}"></app-canvas></drag-drop>
           </main>
 
+          <!-- mobile menu toggler -->
+          <sl-button id="menuToggler" @click="${() => this.toggleMobileMenu()}">Menu</sl-button>
+
           <div id="mobile-toolbar">
-          <div id="pill-box">
-            <div id="pill"></div>
-          </div>
+           <sl-button id="menu-close" @click="${() => this.toggleMobileMenu()}">Close</sl-button>
 
           <div id="controls">
-              <sl-button id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
-              <sl-button @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button type="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button type="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
               <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <sl-button @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              <sl-button type="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
               ${this.removeShow ? html`
               <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
-                <sl-button id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
+                <sl-button type="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
               </sl-animation>
               ` : null}
 
@@ -984,6 +990,8 @@ export class AppHome extends LitElement {
                 <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
                 <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
                 <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
+                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
+                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
               </div>
 
                 <div id="otherControls">

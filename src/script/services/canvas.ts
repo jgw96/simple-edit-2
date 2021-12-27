@@ -11,6 +11,7 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
     window.fabric.textureSize = 8000;
     const fabricCanvas = new window.fabric.Canvas(canvas, {
       preserveObjectStacking: true,
+      allowTouchScrolling: true,
       backgroundColor: window.matchMedia("(prefers-color-scheme: light)").matches ? "white" : "#1e1e1e"
     });
 
@@ -44,9 +45,9 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
       opt.e.stopPropagation();
     });
 
-    return fabricCanvas;
+    drag(fabricCanvas);
 
-    // drag();
+    return fabricCanvas;
   }
   else return undefined;
 }
