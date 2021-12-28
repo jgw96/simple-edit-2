@@ -507,11 +507,11 @@ export class AppCanvas extends LitElement {
             </div>
 
             <label>Text Color
-              <input type="color" @input=${(e: any) => this.changeTextColor(e.target.value)} />
+              <input variant="color" @input=${(e: any) => this.changeTextColor(e.target.value)} />
             </label>
 
             <label>Font Size
-              <input type="number" @input=${(e: any) => this.currentText.set("fontSize", e.target.value)} />
+              <input variant="number" @input=${(e: any) => this.currentText.set("fontSize", e.target.value)} />
             </label>
           </div>
         ` : null
