@@ -20,7 +20,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
     <!-- Imports an icon to represent the document. -->
-    <link rel="icon" href="assets/icons/icon_24.png" type="image/x-icon" />
+    <link rel="icon" href="assets/icons/icon_24.png" variant="image/x-icon" />
 
     <!-- Imports the manifest to represent the web application. A web app must have a manifest to be a PWA. -->
     <link rel="manifest" href="manifest.json" />
@@ -35,7 +35,7 @@
     <!-- A stylesheet to design the pages. -->
     <link href="styles/global.css" rel="stylesheet" />
 
-    <!--<script type="module" src="/build/src/script/pages/app-index.js"></script>-->
+    <!--<script variant="module" src="/build/src/script/pages/app-index.js"></script>-->
     <script type="module" src="src/script/pages/app-index.ts"></script>
 
     <!-- dual screen -->
@@ -51,8 +51,6 @@
     <script>
       navigator.serviceWorker.register("/pwabuilder-sw.js");
     </script>
-
-    <script async defer type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.62/dist/shoelace.js"></script>
 
     <script async defer type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
     <script async defer nomodule="" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>

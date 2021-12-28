@@ -3,6 +3,11 @@ import { customElement, state } from 'lit/decorators.js';
 //@ts-ignore
 import fabricPureBrowser from 'https://cdn.skypack.dev/fabric-pure-browser';
 
+import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js';
+import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/animation/animation.js';
+import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/drawer/drawer.js';
+import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/color-picker/color-picker.js';
+
 import '../components/app-canvas';
 import '../components/drag-drop';
 import '../components/save-modal';
@@ -66,10 +71,6 @@ export class AppHome extends LitElement {
       background-color: var(--sl-color-primary-600);
 
       height: 2.9em;
-    }
-
-    @media(prefers-color-scheme: dark) {
-      color: initial;
     }
 
     #canvasMain {
@@ -151,7 +152,7 @@ export class AppHome extends LitElement {
         width: 5em;
         text-align: center;
         text-decoration: none;
-        color: black
+        color: black;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -205,7 +206,7 @@ export class AppHome extends LitElement {
 
       /* Handle on hover */
       ::-webkit-scrollbar-thumb:hover {
-        background: #rgb(30, 30, 30);
+        background: rgb(30, 30, 30);
       }
 
       #controls sl-button, #filters sl-button {
@@ -858,15 +859,15 @@ export class AppHome extends LitElement {
         <div id="layout">
         <aside>
             <div id="controls">
-              <sl-button type="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button variant="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
               <sl-button id="chooseFolder" @click="${() => this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></sl-button>
-              <sl-button type="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button variant="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
               <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <sl-button type="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              <sl-button variant="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
               ${this.removeShow ? html`
               <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
-                <sl-button type="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
+                <sl-button variant="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
               </sl-animation>
               ` : null}
 
@@ -966,14 +967,14 @@ export class AppHome extends LitElement {
            <sl-button id="menu-close" @click="${() => this.toggleMobileMenu()}">Close</sl-button>
 
           <div id="controls">
-              <sl-button type="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
-              <sl-button type="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button variant="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button variant="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
               <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <sl-button type="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              <sl-button variant="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
               ${this.removeShow ? html`
               <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
-                <sl-button type="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
+                <sl-button variant="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
               </sl-animation>
               ` : null}
 

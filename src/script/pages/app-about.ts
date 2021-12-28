@@ -4,6 +4,9 @@ import { get, set } from 'idb-keyval';
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
+import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js';
+import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/card/card.js';
+
 @customElement('app-about')
 export class AppAbout extends LitElement {
   @state() saved: Array<any> = [];
