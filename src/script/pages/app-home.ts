@@ -11,12 +11,16 @@ import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist
 import "../components/app-canvas";
 import "../components/drag-drop";
 import "../components/save-modal";
+import "../components/common-controls";
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import "@pwabuilder/pwainstall";
 import { directoryOpen, fileOpen } from "browser-fs-access";
 import { AppCanvas } from "../components/app-canvas";
 import { get, set } from "idb-keyval";
+
+import { IdleQueue } from "idlize/IdleQueue.mjs";
+import { IdleValue } from "idlize/IdleValue.mjs";
 
 @customElement("app-home")
 export class AppHome extends LitElement {
@@ -415,7 +419,7 @@ export class AppHome extends LitElement {
           height: initial;
         }
 
-        #canvasMain .tabletFilters {
+        .tabletFilters {
           display: none;
         }
       }
@@ -440,12 +444,12 @@ export class AppHome extends LitElement {
         }
       }
 
-      #filters.duoFilters {
+      .duoFilters {
         display: none;
       }
 
       @media (horizontal-viewport-segments: 2) {
-        #filters.duoFilters {
+        .duoFilters {
           display: flex;
         }
 
@@ -453,7 +457,7 @@ export class AppHome extends LitElement {
           display: initial;
         }
 
-        #canvasMain .tabletFilters {
+        .tabletFilters {
           display: none;
         }
 
@@ -526,6 +530,7 @@ export class AppHome extends LitElement {
         #controls {
           margin-top: 1em;
         }
+
       }
 
       @keyframes slideup {
@@ -547,31 +552,47 @@ export class AppHome extends LitElement {
   }
 
   async firstUpdated() {
-    window.fabric = fabricPureBrowser.fabric;
+    const queue = new IdleQueue({
+      ensureTasksRun: true,
+      defaultMinTaskTime: 500,
+    });
 
-    const working = await get("current_file");
+    queue.pushTask(() => {
+      console.log("initializing Fabric");
+      window.fabric = fabricPureBrowser.fabric;
+    });
 
-    if (working) {
-      this.org = working;
-
-      await this.updateComplete;
-
-      this.canvas = this.shadowRoot?.querySelector("app-canvas");
+    queue.pushTask(async () => {
+      console.log("initializing current_file work");
+      const working = await get("current_file");
 
       if (working) {
-        this.canvas?.openFromJSON(working);
-      }
-    }
+        this.org = working;
 
-    navigator.serviceWorker.addEventListener("message", (event) => {
-      const imageBlob = event.data.file;
+        await this.updateComplete;
 
-      if (imageBlob) {
-        this.handleSharedImage(imageBlob);
+        this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+        if (working) {
+          this.canvas?.openFromJSON(working);
+        }
       }
     });
 
-    this.fileHandler();
+    navigator.serviceWorker.addEventListener("message", (event) => {
+      const imageBlob = new IdleValue(() => {
+        return event.data.file;
+      });
+
+      if (imageBlob.getValue()) {
+        this.handleSharedImage(imageBlob.getValue());
+      }
+    });
+
+    queue.pushTask(() => {
+      console.log("initilalizing fileHandling");
+      this.fileHandler();
+    });
 
     const search = new URLSearchParams(location.search);
     const file_name = search.get("file");
@@ -714,44 +735,6 @@ export class AppHome extends LitElement {
     }
   }
 
-  async filter(type: string, value?: number) {
-    await this.canvas?.applyWebglFilter(type, value);
-
-    this.currentFilter = type;
-
-    if (type === "blur" || type === "brightness") {
-      this.intensity = true;
-    }
-
-    await set("current_file", this.canvas?.writeToJSON());
-
-    this.toggleMobileMenu();
-  }
-
-  async handleBringForward() {
-    await this.canvas?.bringForwardObject();
-
-    await set("current_file", this.canvas?.writeToJSON());
-  }
-
-  async handleBringFront() {
-    await this.canvas?.bringToFront();
-
-    await set("current_file", this.canvas?.writeToJSON());
-  }
-
-  async handleSendBackward() {
-    await this.canvas?.sendBackward();
-
-    await set("current_file", this.canvas?.writeToJSON());
-  }
-
-  async handleSendToBack() {
-    await this.canvas?.sendToBack();
-
-    await set("current_file", this.canvas?.writeToJSON());
-  }
-
   async revert() {
     this.canvas?.revert();
 
@@ -783,34 +766,6 @@ export class AppHome extends LitElement {
   }
 
   async doSettings() {
-    /*if (this.settingsAni) {
-      this.settingsAni.reverse();
-
-      await this.settingsAni.finished;
-
-      this.settingsAni = undefined;
-
-      this.handleSettings = !this.handleSettings;
-    }
-    else {
-      this.handleSettings = !this.handleSettings;
-
-      await this.updateComplete;
-
-      this.settingsAni = this.shadowRoot?.querySelector("#settings-pane")?.animate([
-        {
-          transform: "translateX(260px)"
-        },
-        {
-          transform: "translateY(0)"
-        }
-      ], {
-        fill: "both",
-        easing: "ease-in-out",
-        duration: 280
-      })
-    }*/
-
     if (!this.handleSettings) {
       (this.shadowRoot?.querySelector(".drawer") as any)?.show();
       this.handleSettings = true;
@@ -833,23 +788,6 @@ export class AppHome extends LitElement {
     this.pen_mode = ev;
 
     this.canvas?.handlePenMode(this.pen_mode);
-  }
-
-  async handleIntensity(value: number) {
-    console.log(value);
-    if (this.currentFilter) {
-      if (this.currentFilter === "brightness") {
-        await this.filter(this.currentFilter, value * 10);
-      } else {
-        await this.filter(this.currentFilter, value);
-      }
-    }
-  }
-
-  async addText() {
-    this.canvas?.handleText();
-
-    await set("current_file", this.canvas?.writeToJSON());
   }
 
   handleObjectSelected() {
@@ -910,112 +848,16 @@ export class AppHome extends LitElement {
                 this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
-            <div id="filters" class="duoFilters">
-                <div class="menu-label">
-                  <span id="filters-label">Filters</span>
-                </div>
-
-                <sl-button @click="${() =>
-                  this.filter("grayscale")}">desaturate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("pixelate")}">pixelate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("invert")}">invert</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("blur")}">blur</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("sepia")}">sepia</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("saturation")}">saturate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("brightness")}">brighten</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("contrast")}">contrast</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("vintage")}">vintage</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("polaroid")}">polaroid</sl-button>
-
-                <div id="otherControls">
-                  <div class="menu-label">
-                    <span id="order-label">Order</span>
-                  </div>
-
-                  <sl-button @click="${() =>
-                    this.handleBringFront()}">Bring to Front</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleBringForward()}">Bring Forward</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleSendToBack()}">Send to Back</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleSendBackward()}">Send Backward</sl-button>
-
-
-                    <div class="menu-label add-header">
-                      <span>Add</span>
-                    </div>
-
-                    <sl-button @click="${() =>
-                      this.addText()}">Add Text</sl-button>
-                </div>
-              </div>
+            <!--extracting -->
+            <common-controls class="duoFilters"></common-controls>
 
 
           </aside>
 
           <main id="canvasMain">
 
-          <div id="filters" class="tabletFilters">
-                <div class="menu-label">
-                  <span id="filters-label">Filters</span>
-                </div>
-
-                <sl-button @click="${() =>
-                  this.filter("grayscale")}">desaturate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("pixelate")}">pixelate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("invert")}">invert</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("blur")}">blur</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("sepia")}">sepia</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("saturation")}">saturate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("brightness")}">brighten</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("contrast")}">contrast</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("vintage")}">vintage</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("polaroid")}">polaroid</sl-button>
-
-                <div id="otherControls">
-                  <div class="menu-label">
-                    <span id="order-label">Order</span>
-                  </div>
-
-                  <sl-button @click="${() =>
-                    this.handleBringFront()}">Bring to Front</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleBringForward()}">Bring Forward</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleSendToBack()}">Send to Back</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleSendBackward()}">Send Backward</sl-button>
-
-
-                    <div class="menu-label add-header">
-                      <span>Add</span>
-                    </div>
-
-                    <sl-button @click="${() =>
-                      this.addText()}">Add Text</sl-button>
-                </div>
-
-
-              </div>
+          <!-- extracting -->
+          <common-controls class="tabletFilters" .canvas="${this.canvas}"></common-controls>
 
             <drag-drop @got-file="${(event: any) =>
               this.handleSharedImage(
@@ -1068,44 +910,8 @@ export class AppHome extends LitElement {
                 this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
+            <common-controls class="mobileControls"></common-controls>
 
-              <div id="filters">
-                <sl-button @click="${() =>
-                  this.filter("grayscale")}">desaturate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("pixelate")}">pixelate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("invert")}">invert</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("blur")}">blur</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("sepia")}">sepia</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("saturation")}">saturate</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("brightness")}">brighten</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("contrast")}">contrast</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("vintage")}">vintage</sl-button>
-                <sl-button @click="${() =>
-                  this.filter("polaroid")}">polaroid</sl-button>
-              </div>
-
-                <div id="otherControls">
-                  <div class="menu-label">
-                    <span id="order-label">Order</span>
-                  </div>
-
-                  <sl-button @click="${() =>
-                    this.handleBringFront()}">Bring to Front</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleBringForward()}">Bring Forward</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleSendToBack()}">Send to Back</sl-button>
-                  <sl-button @click="${() =>
-                    this.handleSendBackward()}">Send Backward</sl-button>
-                </div>
             </div>
         </div>
 

@@ -4,6 +4,8 @@ import { get, set } from "idb-keyval";
 import { LitElement, css, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 
+import { IdleQueue } from "idlize/IdleQueue.mjs";
+
 import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js";
 import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/card/card.js";
 
@@ -146,7 +148,14 @@ export class AppAbout extends LitElement {
     const saved = await this.getSavedFiles();
     this.saved = saved;
 
-    sessionStorage.setItem("visited-gallery", "true");
+    const queue = new IdleQueue({
+      ensureTasksRun: true,
+      defaultMinTaskTime: 500,
+    });
+
+    queue.pushTask(() => {
+      sessionStorage.setItem("visited-gallery", "true");
+    });
   }
 
   async getSavedFiles() {

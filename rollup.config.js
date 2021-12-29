@@ -5,6 +5,7 @@ import replace from "@rollup/plugin-replace";
 import strip from "@rollup/plugin-strip";
 import copy from "rollup-plugin-copy";
 import typescript from "@rollup/plugin-typescript";
+import filesize from 'rollup-plugin-filesize';
 
 export default {
   input: "build/index.html",
@@ -14,6 +15,12 @@ export default {
   },
   plugins: [
     resolve(),
+    filesize(
+      {
+        showMinifiedSize: false,
+        showBrotliSize: true
+      }
+    ),
     replace({
       "process.env.NODE_ENV": JSON.stringify(
         process.env.NODE_ENV || "production"
@@ -34,6 +41,6 @@ export default {
         { src: "manifest.json", dest: "dist/" },
         { src: ".well-known/**/*", dest: "dist/.well-known/"}
       ],
-    })
+    }),
   ],
 };
