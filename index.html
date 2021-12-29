@@ -49,7 +49,9 @@
     <script type="module" src="/pwabuilder-sw.ts"></script>
 
     <script>
-      navigator.serviceWorker.register("/pwabuilder-sw.js");
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/pwabuilder-sw.js");
+      })
     </script>
 
     <script async defer type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>

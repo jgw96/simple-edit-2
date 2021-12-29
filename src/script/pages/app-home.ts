@@ -1,31 +1,40 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { LitElement, css, html } from "lit";
+import { customElement, state } from "lit/decorators.js";
 //@ts-ignore
-import fabricPureBrowser from 'https://cdn.skypack.dev/fabric-pure-browser';
+import fabricPureBrowser from "https://cdn.skypack.dev/fabric-pure-browser";
 
-import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js';
-import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/animation/animation.js';
-import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/drawer/drawer.js';
-import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/color-picker/color-picker.js';
+import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js";
+import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/animation/animation.js";
+import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/drawer/drawer.js";
+import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/color-picker/color-picker.js";
 
-import '../components/app-canvas';
-import '../components/drag-drop';
-import '../components/save-modal';
+import "../components/app-canvas";
+import "../components/drag-drop";
+import "../components/save-modal";
+import "../components/common-controls";
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
-import '@pwabuilder/pwainstall';
-import { directoryOpen, fileOpen } from 'browser-fs-access';
-import { AppCanvas } from '../components/app-canvas';
-import { get, set } from 'idb-keyval';
+import "@pwabuilder/pwainstall";
+import { directoryOpen, fileOpen } from "browser-fs-access";
+import { AppCanvas } from "../components/app-canvas";
+import { get, set } from "idb-keyval";
 
+import { IdleQueue } from "idlize/IdleQueue.mjs";
+import { IdleValue } from "idlize/IdleValue.mjs";
 
-@customElement('app-home')
+@customElement("app-home")
 export class AppHome extends LitElement {
   // For more information on using properties in lit-element
   // check out this link https://lit-element.polymer-project.org/guide/properties#declare-with-decorators
 
   @state() canvas: AppCanvas | undefined | null;
-  @state() org: File | Array<File> | Array<Blob> | Blob | undefined | null = undefined;
+  @state() org:
+    | File
+    | Array<File>
+    | Array<Blob>
+    | Blob
+    | undefined
+    | null = undefined;
 
   @state() handleSettings = false;
 
@@ -46,67 +55,66 @@ export class AppHome extends LitElement {
 
   static get styles() {
     return css`
+      #menu-close {
+        margin-left: 6px;
+        margin-bottom: 1em;
+      }
 
-    #menu-close {
-      margin-left: 6px;
-      margin-bottom: 1em;
-    }
+      .menu-label {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
 
-    .menu-label {
-      font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
+      pwa-install {
+        position: fixed;
+        right: 14.4em;
+        z-index: 2;
+        top: 3.11em;
+        display: none;
+      }
 
-    pwa-install {
-      position: fixed;
-      right: 14.4em;
-      z-index: 2;
-      top: 3.11em;
-      display: none;
-    }
+      pwa-install::part(openButton) {
+        border-radius: 2px;
+        background-color: var(--sl-color-primary-600);
 
-    pwa-install::part(openButton) {
-      border-radius: 2px;
-      background-color: var(--sl-color-primary-600);
+        height: 2.9em;
+      }
 
-      height: 2.9em;
-    }
+      #canvasMain {
+        display: grid;
+        grid-template-columns: 16% 84%;
+      }
 
-    #canvasMain {
-      display: grid;
-      grid-template-columns: 16% 84%;
-    }
+      #canvasMain .tabletFilters {
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-left: 10px;
+        padding-right: 6px;
+        padding-top: 8px;
+      }
 
-    #canvasMain .tabletFilters {
-      flex-direction: column;
-      justify-content: flex-start;
-      padding-left: 10px;
-      padding-right: 6px;
-      padding-top: 8px;
-    }
+      #otherControls {
+        margin-top: 1em;
+      }
 
-    #otherControls {
-      margin-top: 1em;
-    }
+      #otherControls sl-button {
+        width: 97%;
+      }
 
-    #otherControls sl-button {
-      width: 97%;
-    }
+      .add-header {
+        margin-top: 1em;
+      }
 
-    .add-header {
-      margin-top: 1em;
-    }
+      sl-button::part(content) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-    sl-button::part(content) {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    sl-button ion-icon {
-      margin-left: 6px;
-    }
+      sl-button ion-icon {
+        margin-left: 6px;
+      }
 
       #layout {
         height: 96vh;
@@ -142,7 +150,8 @@ export class AppHome extends LitElement {
         margin-bottom: 6px;
       }
 
-      #controls, #filters {
+      #controls,
+      #filters {
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
@@ -171,12 +180,14 @@ export class AppHome extends LitElement {
         border: solid 1px #43434a;
 
         font-size: var(--sl-button-font-size-medium);
-        line-height: calc(var(--sl-input-height-medium) - var(--sl-input-border-width) * 2);
+        line-height: calc(
+          var(--sl-input-height-medium) - var(--sl-input-border-width) * 2
+        );
         border-radius: var(--sl-input-border-radius-medium);
         top: 3.5em;
       }
 
-      @media(prefers-color-scheme: light) {
+      @media (prefers-color-scheme: light) {
         #controls a {
           color: white;
         }
@@ -189,27 +200,8 @@ export class AppHome extends LitElement {
         overflow-y: auto;
       }
 
-      /* width */
-      ::-webkit-scrollbar {
-        width: 2px;
-      }
-
-      /* Track */
-      ::-webkit-scrollbar-track {
-        background: black;
-      }
-
-      /* Handle */
-      ::-webkit-scrollbar-thumb {
-        background: #43434a;
-      }
-
-      /* Handle on hover */
-      ::-webkit-scrollbar-thumb:hover {
-        background: rgb(30, 30, 30);
-      }
-
-      #controls sl-button, #filters sl-button {
+      #controls sl-button,
+      #filters sl-button {
         margin-bottom: 10px;
         margin-right: 6px;
       }
@@ -288,7 +280,7 @@ export class AppHome extends LitElement {
         margin-bottom: 10px;
       }
 
-      @media(prefers-color-scheme: light) {
+      @media (prefers-color-scheme: light) {
         .setting {
           background: #f3f3f3;
         }
@@ -298,7 +290,7 @@ export class AppHome extends LitElement {
         display: none;
       }
 
-      .setting .setting-header  {
+      .setting .setting-header {
         margin-top: 8px;
         font-size: 12px;
       }
@@ -349,7 +341,7 @@ export class AppHome extends LitElement {
         justify-content: center;
         align-items: center;
         margin-bottom: 14px;
-          }
+      }
 
       #pill {
         background: var(--neutral-outline-rest);
@@ -358,14 +350,15 @@ export class AppHome extends LitElement {
         border-radius: 12px;
       }
 
-      @media(max-width: 800px) {
-
+      @media (max-width: 800px) {
         pwa-install {
           left: 12px;
           bottom: 12px;
         }
 
-        #controls sl-button, #filters sl-button, #otherControls sl-button {
+        #controls sl-button,
+        #filters sl-button,
+        #otherControls sl-button {
           border-radius: 6px;
           padding: 6px;
           font-size: 1em;
@@ -392,7 +385,8 @@ export class AppHome extends LitElement {
           display: none;
         }
 
-        #controls, #filters {
+        #controls,
+        #filters {
           display: grid;
           grid-template-columns: auto auto;
           justify-content: unset;
@@ -401,17 +395,16 @@ export class AppHome extends LitElement {
           margin-bottom: 2em;
         }
 
-
         #filters {
           height: initial;
         }
 
-        #canvasMain .tabletFilters {
+        .tabletFilters {
           display: none;
         }
       }
 
-      @media(min-width: 800px) {
+      @media (min-width: 800px) {
         #mobile-toolbar {
           display: none;
         }
@@ -421,7 +414,7 @@ export class AppHome extends LitElement {
         }
       }
 
-      @media(max-width: 1200px) and (min-width: 800px) {
+      @media (max-width: 1200px) and (min-width: 800px) {
         #remove-image {
           position: fixed;
           bottom: 0px;
@@ -431,12 +424,12 @@ export class AppHome extends LitElement {
         }
       }
 
-      #filters.duoFilters {
+      .duoFilters {
         display: none;
       }
 
-      @media(horizontal-viewport-segments: 2) {
-        #filters.duoFilters {
+      @media (horizontal-viewport-segments: 2) {
+        .duoFilters {
           display: flex;
         }
 
@@ -444,7 +437,7 @@ export class AppHome extends LitElement {
           display: initial;
         }
 
-        #canvasMain .tabletFilters {
+        .tabletFilters {
           display: none;
         }
 
@@ -468,14 +461,16 @@ export class AppHome extends LitElement {
           overflow-y: scroll;
         }
 
-        #controls, #filters {
+        #controls,
+        #filters {
           flex-direction: column;
           justify-content: initial;
           height: initial;
           overflow-y: initial;
         }
 
-        #controls sl-button, #filters sl-button {
+        #controls sl-button,
+        #filters sl-button {
           border-radius: 6px;
           padding: 6px;
           font-size: 1em;
@@ -493,7 +488,7 @@ export class AppHome extends LitElement {
         }
       }
 
-      @media(vertical-viewport-segments: 2) {
+      @media (vertical-viewport-segments: 2) {
         #mobile-toolbar {
           height: 60vh;
           border-radius: 0;
@@ -515,6 +510,7 @@ export class AppHome extends LitElement {
         #controls {
           margin-top: 1em;
         }
+
       }
 
       @keyframes slideup {
@@ -536,31 +532,47 @@ export class AppHome extends LitElement {
   }
 
   async firstUpdated() {
-    window.fabric = fabricPureBrowser.fabric;
+    const queue = new IdleQueue({
+      ensureTasksRun: true,
+      defaultMinTaskTime: 500,
+    });
 
-    const working = await get("current_file");
+    queue.pushTask(() => {
+      console.log("initializing Fabric");
+      window.fabric = fabricPureBrowser.fabric;
+    });
 
-    if (working) {
-      this.org = working;
-
-      await this.updateComplete;
-
-      this.canvas = this.shadowRoot?.querySelector("app-canvas");
+    queue.pushTask(async () => {
+      console.log("initializing current_file work");
+      const working = await get("current_file");
 
       if (working) {
-        this.canvas?.openFromJSON(working);
-      }
-    }
+        this.org = working;
 
-    navigator.serviceWorker.addEventListener('message', (event) => {
-      const imageBlob = event.data.file;
+        await this.updateComplete;
 
-      if (imageBlob) {
-        this.handleSharedImage(imageBlob);
+        this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+        if (working) {
+          this.canvas?.openFromJSON(working);
+        }
       }
     });
 
-    this.fileHandler();
+    navigator.serviceWorker.addEventListener("message", (event) => {
+      const imageBlob = new IdleValue(() => {
+        return event.data.file;
+      });
+
+      if (imageBlob.getValue()) {
+        this.handleSharedImage(imageBlob.getValue());
+      }
+    });
+
+    queue.pushTask(() => {
+      console.log("initilalizing fileHandling");
+      this.fileHandler();
+    });
 
     const search = new URLSearchParams(location.search);
     const file_name = search.get("file");
@@ -582,7 +594,7 @@ export class AppHome extends LitElement {
 
             await set("current_file", file.canvas);
           }
-        })
+        });
       }
     }
   }
@@ -592,19 +604,21 @@ export class AppHome extends LitElement {
 
     if (el) {
       if (this.menuOpen === false) {
-        this.menuAnimation = el.animate([
+        this.menuAnimation = el.animate(
+          [
+            {
+              transform: "translateX(0px)",
+            },
+          ],
           {
-            transform: "translateX(0px)",
+            duration: 200,
+            easing: "ease-out",
+            fill: "forwards",
           }
-        ], {
-          duration: 200,
-          easing: "ease-out",
-          fill: "forwards"
-        });
+        );
 
         this.menuOpen = true;
-      }
-      else {
+      } else {
         if (this.menuAnimation) {
           (this.menuAnimation as Animation).reverse();
 
@@ -615,15 +629,14 @@ export class AppHome extends LitElement {
   }
 
   async fileHandler() {
-    if ('launchQueue' in window) {
+    if ("launchQueue" in window) {
       (window as any).launchQueue.setConsumer(async (launchParams: any) => {
         if (!launchParams.files.length) {
           return;
         }
 
-
         const fileHandle = launchParams.files[0];
-        console.log('fileHandle', fileHandle);
+        console.log("fileHandle", fileHandle);
 
         await this.handleSharedImage(fileHandle);
       });
@@ -632,8 +645,8 @@ export class AppHome extends LitElement {
 
   async openPhoto() {
     const blobs = await fileOpen({
-      mimeTypes: ['image/*'],
-      multiple: true
+      mimeTypes: ["image/*"],
+      multiple: true,
     });
 
     if (blobs) {
@@ -647,7 +660,7 @@ export class AppHome extends LitElement {
         this.canvas?.drawImage(blob);
 
         await set("current_file", this.canvas?.writeToJSON());
-      })
+      });
     }
 
     await this.updateComplete;
@@ -669,7 +682,7 @@ export class AppHome extends LitElement {
     // await this.updateComplete;
 
     if (blobs) {
-      console.log('blobs', blobs);
+      console.log("blobs", blobs);
       this.org = blobs;
 
       blobs.forEach(async (blob) => {
@@ -684,7 +697,6 @@ export class AppHome extends LitElement {
     await this.updateComplete;
 
     localStorage.setItem("done-with-tut", "true");
-
   }
 
   async handleSharedImage(blob: Blob | File) {
@@ -701,44 +713,6 @@ export class AppHome extends LitElement {
 
       await set("current_file", this.canvas?.writeToJSON());
     }
-  }
-
-  async filter(type: string, value?: number) {
-    await this.canvas?.applyWebglFilter(type, value);
-
-    this.currentFilter = type;
-
-    if (type === "blur" || type === "brightness") {
-      this.intensity = true;
-    }
-
-    await set("current_file", this.canvas?.writeToJSON());
-
-    this.toggleMobileMenu();
-  }
-
-  async handleBringForward() {
-    await this.canvas?.bringForwardObject();
-
-    await set("current_file", this.canvas?.writeToJSON());
-  }
-
-  async handleBringFront() {
-    await this.canvas?.bringToFront();
-
-    await set("current_file", this.canvas?.writeToJSON());
-  }
-
-  async handleSendBackward() {
-    await this.canvas?.sendBackward();
-
-    await set("current_file", this.canvas?.writeToJSON());
-  }
-
-  async handleSendToBack() {
-    await this.canvas?.sendToBack();
-
-    await set("current_file", this.canvas?.writeToJSON());
   }
 
   async revert() {
@@ -772,39 +746,10 @@ export class AppHome extends LitElement {
   }
 
   async doSettings() {
-    /*if (this.settingsAni) {
-      this.settingsAni.reverse();
-
-      await this.settingsAni.finished;
-
-      this.settingsAni = undefined;
-
-      this.handleSettings = !this.handleSettings;
-    }
-    else {
-      this.handleSettings = !this.handleSettings;
-
-      await this.updateComplete;
-
-      this.settingsAni = this.shadowRoot?.querySelector("#settings-pane")?.animate([
-        {
-          transform: "translateX(260px)"
-        },
-        {
-          transform: "translateY(0)"
-        }
-      ], {
-        fill: "both",
-        easing: "ease-in-out",
-        duration: 280
-      })
-    }*/
-
     if (!this.handleSettings) {
       (this.shadowRoot?.querySelector(".drawer") as any)?.show();
       this.handleSettings = true;
-    }
-    else {
+    } else {
       (this.shadowRoot?.querySelector(".drawer") as any)?.hide();
       this.handleSettings = false;
     }
@@ -825,26 +770,8 @@ export class AppHome extends LitElement {
     this.canvas?.handlePenMode(this.pen_mode);
   }
 
-  async handleIntensity(value: number) {
-    console.log(value);
-    if (this.currentFilter) {
-      if (this.currentFilter === "brightness") {
-        await this.filter(this.currentFilter, value * 10);
-      }
-      else {
-        await this.filter(this.currentFilter, value);
-      }
-    }
-  }
-
-  async addText() {
-    this.canvas?.handleText();
-
-    await set("current_file", this.canvas?.writeToJSON());
-  }
-
   handleObjectSelected() {
-    console.log('object selected');
+    console.log("object selected");
     this.removeShow = true;
   }
 
@@ -859,17 +786,37 @@ export class AppHome extends LitElement {
         <div id="layout">
         <aside>
             <div id="controls">
-              <sl-button variant="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
-              <sl-button id="chooseFolder" @click="${() => this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></sl-button>
-              <sl-button variant="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
-              <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
+              <sl-button variant="primary" id="choosePhoto" @click="${() =>
+                this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button id="chooseFolder" @click="${() =>
+                this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></sl-button>
+              <sl-button variant="success" @click="${() =>
+                this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button @click="${() =>
+                this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <sl-button variant="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
-              ${this.removeShow ? html`
-              <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
-                <sl-button variant="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
-              </sl-animation>
-              ` : null}
+              <sl-button variant="danger" @click="${() =>
+                this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              ${
+                this.removeShow
+                  ? html`
+                      <sl-animation
+                        name="bounce"
+                        easing="ease-in-out"
+                        duration="400"
+                        iterations="1"
+                        play
+                      >
+                        <sl-button
+                          variant="danger"
+                          id="remove-image"
+                          @click="${() => this.remove()}"
+                          >Remove <ion-icon name="trash-outline"></ion-icon
+                        ></sl-button>
+                      </sl-animation>
+                    `
+                  : null
+              }
 
               <pwa-install>Install SimpleEdit</pwa-install>
 
@@ -877,134 +824,74 @@ export class AppHome extends LitElement {
                 Gallery
               </a>
 
-              <sl-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
+              <sl-button id="advanced" @click="${() =>
+                this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
-            <div id="filters" class="duoFilters">
-                <div class="menu-label">
-                  <span id="filters-label">Filters</span>
-                </div>
-
-                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
-                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
-                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
-                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
-                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
-                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
-                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
-                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
-                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
-                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
-
-                <div id="otherControls">
-                  <div class="menu-label">
-                    <span id="order-label">Order</span>
-                  </div>
-
-                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
-                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
-                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
-                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
-
-
-                    <div class="menu-label add-header">
-                      <span>Add</span>
-                    </div>
-
-                    <sl-button @click="${() => this.addText()}">Add Text</sl-button>
-                </div>
-              </div>
+            <!--extracting -->
+            <common-controls class="duoFilters"></common-controls>
 
 
           </aside>
 
           <main id="canvasMain">
 
-          <div id="filters" class="tabletFilters">
-                <div class="menu-label">
-                  <span id="filters-label">Filters</span>
-                </div>
+          <!-- extracting -->
+          <common-controls class="tabletFilters" .canvas="${this.canvas}"></common-controls>
 
-                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
-                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
-                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
-                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
-                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
-                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
-                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
-                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
-                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
-                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
-
-                <div id="otherControls">
-                  <div class="menu-label">
-                    <span id="order-label">Order</span>
-                  </div>
-
-                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
-                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
-                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
-                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
-
-
-                    <div class="menu-label add-header">
-                      <span>Add</span>
-                    </div>
-
-                    <sl-button @click="${() => this.addText()}">Add Text</sl-button>
-                </div>
-
-
-              </div>
-
-            <drag-drop @got-file="${(event: any) => this.handleSharedImage(event.detail.file)}"><app-canvas @object-selected="${() => this.handleObjectSelected()}" @object-cleared="${() => this.handleObjectCleared()}"></app-canvas></drag-drop>
+            <drag-drop @got-file="${(event: any) =>
+              this.handleSharedImage(
+                event.detail.file
+              )}"><app-canvas @object-selected="${() =>
+      this.handleObjectSelected()}" @object-cleared="${() =>
+      this.handleObjectCleared()}"></app-canvas></drag-drop>
           </main>
 
           <!-- mobile menu toggler -->
-          <sl-button id="menuToggler" @click="${() => this.toggleMobileMenu()}">Menu</sl-button>
+          <sl-button id="menuToggler" @click="${() =>
+            this.toggleMobileMenu()}">Menu</sl-button>
 
           <div id="mobile-toolbar">
-           <sl-button id="menu-close" @click="${() => this.toggleMobileMenu()}">Close</sl-button>
+           <sl-button id="menu-close" @click="${() =>
+             this.toggleMobileMenu()}">Close</sl-button>
 
           <div id="controls">
-              <sl-button variant="primary" id="choosePhoto" @click="${() => this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
-              <sl-button variant="success" @click="${() => this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
-              <sl-button @click="${() => this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
+              <sl-button variant="primary" id="choosePhoto" @click="${() =>
+                this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
+              <sl-button variant="success" @click="${() =>
+                this.save()}">Save Copy <ion-icon name="save-outline"></ion-icon></sl-button>
+              <sl-button @click="${() =>
+                this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <sl-button variant="danger" @click="${() => this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
-              ${this.removeShow ? html`
-              <sl-animation name="bounce" easing="ease-in-out" duration="400" iterations="1" play>
-                <sl-button variant="danger" id="remove-image" @click="${() => this.remove()}">Remove <ion-icon name="trash-outline"></ion-icon></sl-button>
-              </sl-animation>
-              ` : null}
+              <sl-button variant="danger" @click="${() =>
+                this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
+              ${
+                this.removeShow
+                  ? html`
+                      <sl-animation
+                        name="bounce"
+                        easing="ease-in-out"
+                        duration="400"
+                        iterations="1"
+                        play
+                      >
+                        <sl-button
+                          variant="danger"
+                          id="remove-image"
+                          @click="${() => this.remove()}"
+                          >Remove <ion-icon name="trash-outline"></ion-icon
+                        ></sl-button>
+                      </sl-animation>
+                    `
+                  : null
+              }
 
-              <sl-button id="advanced" @click="${() => this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
+              <sl-button id="advanced" @click="${() =>
+                this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
+            <common-controls class="mobileControls"></common-controls>
 
-              <div id="filters">
-                <sl-button @click="${() => this.filter("grayscale")}">desaturate</sl-button>
-                <sl-button @click="${() => this.filter("pixelate")}">pixelate</sl-button>
-                <sl-button @click="${() => this.filter("invert")}">invert</sl-button>
-                <sl-button @click="${() => this.filter("blur")}">blur</sl-button>
-                <sl-button @click="${() => this.filter("sepia")}">sepia</sl-button>
-                <sl-button @click="${() => this.filter("saturation")}">saturate</sl-button>
-                <sl-button @click="${() => this.filter("brightness")}">brighten</sl-button>
-                <sl-button @click="${() => this.filter("contrast")}">contrast</sl-button>
-                <sl-button @click="${() => this.filter("vintage")}">vintage</sl-button>
-                <sl-button @click="${() => this.filter("polaroid")}">polaroid</sl-button>
-              </div>
-
-                <div id="otherControls">
-                  <div class="menu-label">
-                    <span id="order-label">Order</span>
-                  </div>
-
-                  <sl-button @click="${() => this.handleBringFront()}">Bring to Front</sl-button>
-                  <sl-button @click="${() => this.handleBringForward()}">Bring Forward</sl-button>
-                  <sl-button @click="${() => this.handleSendToBack()}">Send to Back</sl-button>
-                  <sl-button @click="${() => this.handleSendBackward()}">Send Backward</sl-button>
-                </div>
             </div>
         </div>
 
@@ -1016,7 +903,8 @@ export class AppHome extends LitElement {
               <label id="color-label" for="color">Canvas Background Color</label>
               <p>Change the background color of your canvas</p>
             </div>
-            <sl-color-picker @sl-change="${(ev: any) => this.handleColor(ev.target.value)}"></sl-color-picker>
+            <sl-color-picker @sl-change="${(ev: any) =>
+              this.handleColor(ev.target.value)}"></sl-color-picker>
           </div>
         </sl-drawer>
       </div>

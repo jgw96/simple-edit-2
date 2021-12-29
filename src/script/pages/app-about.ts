@@ -1,13 +1,15 @@
-import { Router } from '@vaadin/router';
-import { FileSystemHandle } from 'browser-fs-access';
-import { get, set } from 'idb-keyval';
-import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { Router } from "@vaadin/router";
+import { FileSystemHandle } from "browser-fs-access";
+import { get, set } from "idb-keyval";
+import { LitElement, css, html } from "lit";
+import { customElement, state } from "lit/decorators.js";
 
-import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js';
-import 'https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/card/card.js';
+import { IdleQueue } from "idlize/IdleQueue.mjs";
 
-@customElement('app-about')
+import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js";
+import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/card/card.js";
+
+@customElement("app-about")
 export class AppAbout extends LitElement {
   @state() saved: Array<any> = [];
 
@@ -27,7 +29,7 @@ export class AppAbout extends LitElement {
       }
 
       sl-button {
-        color: white
+        color: white;
       }
 
       #gallery-header {
@@ -49,7 +51,7 @@ export class AppAbout extends LitElement {
         font-weight: var(--sl-font-weight-semibold);
       }
 
-      @media(prefers-color-scheme: light) {
+      @media (prefers-color-scheme: light) {
         #gallery-header a {
           color: white;
         }
@@ -58,20 +60,20 @@ export class AppAbout extends LitElement {
       #no-saved-block a {
         text-decoration: none;
         color: black;
-                font-weight: var(--sl-font-weight-semibold);
-                background: var(--sl-color-primary-600);
-                padding: 6px;
-                padding-left: 10px;
-                padding-right: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 500;
-                border-radius: 4px;
+        font-weight: var(--sl-font-weight-semibold);
+        background: var(--sl-color-primary-600);
+        padding: 6px;
+        padding-left: 10px;
+        padding-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        border-radius: 4px;
 
-                width: 8em;
-                height: 2em;
-                font-size: 18px;
+        width: 8em;
+        height: 2em;
+        font-size: 18px;
       }
 
       #content {
@@ -130,7 +132,7 @@ export class AppAbout extends LitElement {
         align-items: center;
       }
 
-      @media(max-width: 800px) {
+      @media (max-width: 800px) {
         ul {
           grid-template-columns: 50% 50%;
         }
@@ -146,7 +148,14 @@ export class AppAbout extends LitElement {
     const saved = await this.getSavedFiles();
     this.saved = saved;
 
-    sessionStorage.setItem("visited-gallery", "true");
+    const queue = new IdleQueue({
+      ensureTasksRun: true,
+      defaultMinTaskTime: 500,
+    });
+
+    queue.pushTask(() => {
+      sessionStorage.setItem("visited-gallery", "true");
+    });
   }
 
   async getSavedFiles() {
@@ -164,29 +173,28 @@ export class AppAbout extends LitElement {
   }
 
   async verifyPermission(fileHandle: FileSystemHandle, readWrite: boolean) {
-    console.log('trying perm');
+    console.log("trying perm");
     const options: any = {};
     if (readWrite) {
-      options.mode = 'readwrite';
+      options.mode = "readwrite";
     }
 
     const perm = await fileHandle.queryPermission(options);
 
     // Check if permission was already granted. If so, return true.
-    if (perm === 'granted') {
+    if (perm === "granted") {
       return true;
-    }
-    else {
+    } else {
       const check = await fileHandle.requestPermission(options);
 
-      console.log('check', check);
+      console.log("check", check);
 
-      if (check === 'granted') {
+      if (check === "granted") {
         return true;
       }
     }
     // Request permission. If the user grants permission, return true.
-    if ((await fileHandle.requestPermission(options)) === 'granted') {
+    if ((await fileHandle.requestPermission(options)) === "granted") {
       return true;
     }
     // The user didn't grant permission, so return false.
@@ -194,9 +202,9 @@ export class AppAbout extends LitElement {
   }
 
   async removeFile(saved: any) {
-    const savedFiles:Array<any> = await this.getSavedFiles();
+    const savedFiles: Array<any> = await this.getSavedFiles();
 
-    const arr = savedFiles.filter(file => file.name !== saved.name);
+    const arr = savedFiles.filter((file) => file.name !== saved.name);
 
     await set("saved_files", arr);
 
@@ -207,49 +215,58 @@ export class AppAbout extends LitElement {
     return html`
       <div id="gallery-wrapper">
         <div id="gallery-header">
-          <a href="/home">
-            Back
-          </a>
+          <a href="/home"> Back </a>
 
           <h2>Saved Projects</h2>
         </div>
 
-        ${this.saved ? html`<ul>
-          ${
-            this.saved.length > 0 ? html`
-              ${
-                this.saved.map((saved) => {
-                  return html`
-                    <sl-card>
-                      <img slot="image" src="${URL.createObjectURL(saved.preview)}">
+        ${this.saved
+          ? html`<ul>
+              ${this.saved.length > 0
+                ? html`
+                    ${this.saved.map((saved) => {
+                      return html`
+                        <sl-card>
+                          <img
+                            slot="image"
+                            src="${URL.createObjectURL(saved.preview)}"
+                          />
 
-                      <strong>${saved.name}</strong><br>
+                          <strong>${saved.name}</strong><br />
 
-                      <div slot="footer">
-                          <sl-button variant="primary" pill @click="${() => this.continue(saved)}">
-                            Edit
+                          <div slot="footer">
+                            <sl-button
+                              variant="primary"
+                              pill
+                              @click="${() => this.continue(saved)}"
+                            >
+                              Edit
 
-                            <ion-icon name="brush-outline"></ion-icon>
-                          </sl-button>
+                              <ion-icon name="brush-outline"></ion-icon>
+                            </sl-button>
 
-                          <sl-button id="removeButton" pill variant="danger" @click="${() => this.removeFile(saved)}">
-                            Remove
+                            <sl-button
+                              id="removeButton"
+                              pill
+                              variant="danger"
+                              @click="${() => this.removeFile(saved)}"
+                            >
+                              Remove
 
-                            <ion-icon name="trash-outline"></ion-icon>
-                          </sl-button>
-                      </div>
-                    </sl-card>
+                              <ion-icon name="trash-outline"></ion-icon>
+                            </sl-button>
+                          </div>
+                        </sl-card>
+                      `;
+                    })}
                   `
-                })
-              }
-            ` : null
-          }
-        </ul>` : html`
-        <div id="no-saved-block">
-          <h3>No previous edits</h3>
+                : null}
+            </ul>`
+          : html` <div id="no-saved-block">
+              <h3>No previous edits</h3>
 
-          <a id="started" href="/">Get Started</a>
-        </div>`}
+              <a id="started" href="/">Get Started</a>
+            </div>`}
       </div>
     `;
   }
