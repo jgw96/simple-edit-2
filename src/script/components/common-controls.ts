@@ -24,11 +24,32 @@ export class CommonControls extends LitElement {
           }
       }
 
+      /* width */
+      ::-webkit-scrollbar {
+        width: 2px;
+      }
+
+      /* Track */
+      ::-webkit-scrollbar-track {
+        background: black;
+      }
+
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+        background: #43434a;
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgb(30, 30, 30);
+      }
+
       #filters {
         flex-direction: row;
         justify-content: flex-end;
         height: 86vh;
         overflow-y: auto;
+        overflow-x: hidden;
       }
 
       #otherControls {

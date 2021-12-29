@@ -200,26 +200,6 @@ export class AppHome extends LitElement {
         overflow-y: auto;
       }
 
-      /* width */
-      ::-webkit-scrollbar {
-        width: 2px;
-      }
-
-      /* Track */
-      ::-webkit-scrollbar-track {
-        background: black;
-      }
-
-      /* Handle */
-      ::-webkit-scrollbar-thumb {
-        background: #43434a;
-      }
-
-      /* Handle on hover */
-      ::-webkit-scrollbar-thumb:hover {
-        background: rgb(30, 30, 30);
-      }
-
       #controls sl-button,
       #filters sl-button {
         margin-bottom: 10px;
