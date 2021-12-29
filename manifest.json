@@ -12,12 +12,12 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "assets/icons/maskable_icon.png",
+      "src": "assets/icons/maskable_icon.webp",
       "sizes": "512x512",
       "purpose": "maskable"
     },
     {
-      "src": "assets/icons/icon_256.png",
+      "src": "assets/icons/icon_256.webp",
       "sizes": "256x256"
     },
     {
@@ -44,10 +44,10 @@
       "src": "assets/screenshots/screen_3.png"
     },
     {
-      "src": "assets/screenshots/mobile_1.png"
+      "src": "assets/screenshots/mobile_1.webp"
     },
     {
-      "src": "assets/screenshots/mobile_2.png"
+      "src": "assets/screenshots/mobile_2.webp"
     }
   ],
   "features": [
