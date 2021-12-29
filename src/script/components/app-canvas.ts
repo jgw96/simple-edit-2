@@ -1,12 +1,11 @@
-import { fileSave } from 'browser-fs-access';
-import { get, set } from 'idb-keyval';
-import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { drag, drawImageFunc, setupCanvas } from '../services/canvas';
+import { fileSave } from "browser-fs-access";
+import { get, set } from "idb-keyval";
+import { LitElement, css, html } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { drag, drawImageFunc, setupCanvas } from "../services/canvas";
 
-@customElement('app-canvas')
+@customElement("app-canvas")
 export class AppCanvas extends LitElement {
-
   @state() canvas: fabric.Canvas | undefined = undefined;
   @state() image: HTMLImageElement | undefined | null = undefined;
   @state() imgInstance: any | undefined = undefined;
@@ -132,7 +131,6 @@ export class AppCanvas extends LitElement {
           transform: translateY(0);
         }
       }
-
     `;
   }
 
@@ -144,39 +142,70 @@ export class AppCanvas extends LitElement {
     const canvas = this.shadowRoot?.querySelector("canvas");
 
     this.typeMap = [
-      { name: "grayscale", filter: new window.fabric.Image.filters.Grayscale() },
+      {
+        name: "grayscale",
+        filter: new window.fabric.Image.filters.Grayscale(),
+      },
       { name: "sepia", filter: new window.fabric.Image.filters.Sepia() },
-      { name: "brightness", filter: new window.fabric.Image.filters.Brightness({ brightness: 0.3 }) },
-      { name: "saturation", filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }) },
-      { name: "blur", filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }) },
+      {
+        name: "brightness",
+        filter: new window.fabric.Image.filters.Brightness({ brightness: 0.3 }),
+      },
+      {
+        name: "saturation",
+        filter: new window.fabric.Image.filters.Saturation({ saturation: 50 }),
+      },
+      {
+        name: "blur",
+        filter: new (window.fabric.Image.filters as any).Blur({ blur: 0.5 }),
+      },
       { name: "invert", filter: new window.fabric.Image.filters.Invert() },
-      { name: "polaroid", filter: new (window.fabric.Image.filters as any).Polaroid() },
-      { name: "vintage", filter: new (window.fabric.Image.filters as any).Vintage() },
-      { name: "pixelate", filter: new window.fabric.Image.filters.Pixelate({ blocksize: 50 })},
-      { name: "contrast", filter: new window.fabric.Image.filters.Contrast({ contrast: 0.25 }) },
+      {
+        name: "polaroid",
+        filter: new (window.fabric.Image.filters as any).Polaroid(),
+      },
+      {
+        name: "vintage",
+        filter: new (window.fabric.Image.filters as any).Vintage(),
+      },
+      {
+        name: "pixelate",
+        filter: new window.fabric.Image.filters.Pixelate({ blocksize: 50 }),
+      },
+      {
+        name: "contrast",
+        filter: new window.fabric.Image.filters.Contrast({ contrast: 0.25 }),
+      },
     ];
 
     if (canvas) {
       this.canvas = setupCanvas(canvas);
       drag(this.canvas);
 
-      this.canvas?.on('mouse:down', (options) => {
+      this.canvas?.on("mouse:down", (options) => {
         if (options.target) {
-          console.log('an object was clicked! ', options.target.type);
+          console.log("an object was clicked! ", options.target.type);
 
           if (options.target.type?.includes("text")) {
             this.text = true;
             this.currentText = options.target;
           }
 
-          this.dispatchEvent(new CustomEvent("object-selected", {bubbles: true, composed: true}));
+          this.dispatchEvent(
+            new CustomEvent("object-selected", {
+              bubbles: true,
+              composed: true,
+            })
+          );
         }
       });
 
-      this.canvas?.on('selection:cleared', () => {
+      this.canvas?.on("selection:cleared", () => {
         this.text = false;
-        this.dispatchEvent(new CustomEvent("object-cleared", {bubbles: true, composed: true}));
-      })
+        this.dispatchEvent(
+          new CustomEvent("object-cleared", { bubbles: true, composed: true })
+        );
+      });
     }
   }
 
@@ -195,15 +224,14 @@ export class AppCanvas extends LitElement {
       if (mode === true) {
         this.pen = true;
         this.canvas.isDrawingMode = true;
-      }
-      else {
+      } else {
         this.pen = false;
         this.canvas.isDrawingMode = false;
       }
     }
   }
 
- public async drawImage(blob: Blob | File) {
+  public async drawImage(blob: Blob | File) {
     drawImageFunc(blob, this.canvas, this.image, this.imgInstance);
 
     await set("current_file", this.canvas?.toJSON());
@@ -236,7 +264,7 @@ export class AppCanvas extends LitElement {
   public async applyWebglFilter(type: string, value?: number) {
     try {
       const active = this.canvas?.getActiveObject();
-      console.log('active', active);
+      console.log("active", active);
 
       if (active) {
         const filter = this.typeMap.find((filter: any) => {
@@ -249,16 +277,15 @@ export class AppCanvas extends LitElement {
           (active as any)._objects.forEach((object: any) => {
             if (value && type === "blur") {
               filter.filter.setOptions({
-                blur: value
-              })
-            }
-            else if (value && type === "brightness") {
+                blur: value,
+              });
+            } else if (value && type === "brightness") {
               filter.filter.setOptions({
-                brightness: value
-              })
+                brightness: value,
+              });
             }
 
-            console.log('filter', filter);
+            console.log("filter", filter);
 
             (object as any).filters.push(filter?.filter);
 
@@ -266,26 +293,23 @@ export class AppCanvas extends LitElement {
             (object as any).applyFilters();
 
             // this.canvas?.add(active);
-
-          })
+          });
 
           this.canvas?.renderAll();
-        }
-        else {
-          console.log('type', type);
+        } else {
+          console.log("type", type);
 
           if (value && type === "blur") {
             filter.filter.setOptions({
-              blur: value
-            })
-          }
-          else if (value && type === "brightness") {
+              blur: value,
+            });
+          } else if (value && type === "brightness") {
             filter.filter.setOptions({
-              brightness: value
-            })
+              brightness: value,
+            });
           }
 
-          console.log('filter', filter);
+          console.log("filter", filter);
 
           (active as any).filters.push(filter?.filter);
 
@@ -296,14 +320,12 @@ export class AppCanvas extends LitElement {
 
           // this.canvas?.add(active);
         }
-      }
-      else {
+      } else {
         // add filter
         const filter = this.typeMap.find((filter: any) => {
           if (filter.name === type) {
             return filter;
-          }
-          else {
+          } else {
             return null;
           }
         });
@@ -317,8 +339,7 @@ export class AppCanvas extends LitElement {
       }
 
       // this.applying = false;
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
     }
   }
@@ -355,8 +376,7 @@ export class AppCanvas extends LitElement {
 
     if (active) {
       dataurl = active.toDataURL({});
-    }
-    else {
+    } else {
       dataurl = this.canvas?.toDataURL();
     }
 
@@ -364,7 +384,7 @@ export class AppCanvas extends LitElement {
       const blob = this.dataURLtoBlob(dataurl);
       const handle = await fileSave(blob, {
         fileName: "untitled.png",
-        extensions: [".png"]
+        extensions: [".png"],
       });
 
       const savedCanvas = this.canvas?.toJSON();
@@ -372,30 +392,28 @@ export class AppCanvas extends LitElement {
       if (savedCanvas) {
         const savedCanvasData = {
           canvas: savedCanvas,
-          name: handle && handle.name || "untitled",
+          name: (handle && handle.name) || "untitled",
           handle: handle,
-          preview: blob
-        }
+          preview: blob,
+        };
 
         const files = await get("saved_files");
         if (files) {
           await set("saved_files", [...files, savedCanvasData]);
-        }
-        else {
+        } else {
           await set("saved_files", [savedCanvasData]);
         }
       }
     }
-
   }
 
   dataURLtoBlob(dataurl: string) {
-    const arr = dataurl.split(',');
+    const arr = dataurl.split(",");
 
     //@ts-expect-error weird typescript issues
     const mime = arr[0].match(/:(.*?);/)[1];
 
-    const bstr = atob(arr[1])
+    const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
 
@@ -409,17 +427,14 @@ export class AppCanvas extends LitElement {
     const active = this.canvas?.getActiveObject();
 
     if (active) {
-
       if ((active as any)._objects) {
         (active as any)._objects.forEach((object: any) => {
           this.canvas?.remove(object);
-        })
-      }
-      else {
+        });
+      } else {
         this.canvas?.remove(active);
       }
-    }
-    else {
+    } else {
       this.canvas?.remove(this.imgInstance);
     }
   }
@@ -431,8 +446,7 @@ export class AppCanvas extends LitElement {
 
     if (active) {
       dataurl = active.toDataURL({});
-    }
-    else {
+    } else {
       dataurl = this.canvas?.toDataURL();
     }
 
@@ -444,15 +458,18 @@ export class AppCanvas extends LitElement {
 
       if (blob) {
         const file = new File([blob], "untitled.png", {
-          type: "image/png"
+          type: "image/png",
         });
 
-        if ((navigator as any).canShare && (navigator as any).canShare({ files: [file] })) {
+        if (
+          (navigator as any).canShare &&
+          (navigator as any).canShare({ files: [file] })
+        ) {
           await (navigator as any).share({
             files: [file],
-            title: 'Edited image',
-            text: 'edited image',
-          })
+            title: "Edited image",
+            text: "edited image",
+          });
         } else {
           console.log(`Your system doesn't support sharing files.`);
         }
@@ -471,11 +488,11 @@ export class AppCanvas extends LitElement {
 
   public async changeBackgroundColor(color: string) {
     this.canvas?.setBackgroundColor(color, () => {
-      console.log('color changed');
+      console.log("color changed");
 
       this.canvas?.renderAll();
       return;
-    })
+    });
   }
 
   changePenColor(color: string) {
@@ -491,7 +508,12 @@ export class AppCanvas extends LitElement {
   }
 
   handleText() {
-    this.currentText = new window.fabric.IText('New Text', { left: 100, top: 100, fill: "white", fontFamily: "sans-serif" });
+    this.currentText = new window.fabric.IText("New Text", {
+      left: 100,
+      top: 100,
+      fill: "white",
+      fontFamily: "sans-serif",
+    });
     this.canvas?.add(this.currentText);
   }
 
@@ -499,31 +521,61 @@ export class AppCanvas extends LitElement {
     return html`
       <canvas></canvas>
 
-      ${
-        this.text ? html`
-          <div id="textControls">
-            <div>
-              <span id="textControlsHeader">Text Settings</span>
+      ${this.text
+        ? html`
+            <div id="textControls">
+              <div>
+                <span id="textControlsHeader">Text Settings</span>
+              </div>
+
+              <label
+                >Text Color
+                <input
+                  variant="color"
+                  @input=${(e: any) => this.changeTextColor(e.target.value)}
+                />
+              </label>
+
+              <label
+                >Font Size
+                <input
+                  variant="number"
+                  @input=${(e: any) =>
+                    this.currentText.set("fontSize", e.target.value)}
+                />
+              </label>
             </div>
-
-            <label>Text Color
-              <input variant="color" @input=${(e: any) => this.changeTextColor(e.target.value)} />
-            </label>
-
-            <label>Font Size
-              <input variant="number" @input=${(e: any) => this.currentText.set("fontSize", e.target.value)} />
-            </label>
-          </div>
-        ` : null
-      }
-
-      ${this.pen ? html`<div id="colors">
-        <button @click="${() => this.changePenColor("red")}" class="color" id="red"></button>
-        <button @click="${() => this.changePenColor("green")}" class="color" id="green"></button>
-        <button @click="${() => this.changePenColor("blue")}" class="color" id="blue"></button>
-        <button @click="${() => this.changePenColor("yellow")}" class="color" id="yellow"></button>
-        <button @click="${() => this.changePenColor("black")}" class="color" id="black"></button>
-      </div>` : null}
+          `
+        : null}
+      ${this.pen
+        ? html`<div id="colors">
+            <button
+              @click="${() => this.changePenColor("red")}"
+              class="color"
+              id="red"
+            ></button>
+            <button
+              @click="${() => this.changePenColor("green")}"
+              class="color"
+              id="green"
+            ></button>
+            <button
+              @click="${() => this.changePenColor("blue")}"
+              class="color"
+              id="blue"
+            ></button>
+            <button
+              @click="${() => this.changePenColor("yellow")}"
+              class="color"
+              id="yellow"
+            ></button>
+            <button
+              @click="${() => this.changePenColor("black")}"
+              class="color"
+              id="black"
+            ></button>
+          </div>`
+        : null}
     `;
   }
 }

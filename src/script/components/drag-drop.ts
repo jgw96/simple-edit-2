@@ -1,46 +1,44 @@
-import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { LitElement, css, html } from "lit";
+import { customElement } from "lit/decorators.js";
 
-
-@customElement('drag-drop')
+@customElement("drag-drop")
 export class DragDrop extends LitElement {
-
   static get styles() {
     return css`
+      #dragdrop {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        display: block;
+        height: 100%;
+      }
+
+      @media (max-width: 1000px) {
         #dragdrop {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            display: block;
-            height: 100%;
+          height: 69vh;
         }
+      }
 
-        @media(max-width: 1000px) {
-            #dragdrop {
-                height: 69vh;
-            }
+      @media (min-width: 1000px) {
+        #dragdrop {
+          height: 80vh;
         }
+      }
 
-        @media(min-width: 1000px) {
-          #dragdrop {
-            height: 80vh;
-          }
+      @media (horizontal-viewport-segments: 2) {
+        #dragdrop {
+          width: 48.8%;
+          height: 90vh;
         }
+      }
 
-        @media(horizontal-viewport-segments: 2) {
-            #dragdrop {
-                width: 48.8%;
-                height: 90vh;
-            }
+      @media (vertical-viewport-segments: 2) {
+        #dragdrop {
+          height: 50%;
         }
-
-        @media(vertical-viewport-segments: 2) {
-            #dragdrop {
-                height: 50%;
-            }
-        }
-        `
+      }
+    `;
   }
 
   constructor() {
@@ -56,14 +54,14 @@ export class DragDrop extends LitElement {
       // Use DataTransferItemList interface to access the file(s)
       for (let i = 0; i < ev.dataTransfer.items.length; i++) {
         // If dropped items aren't files, reject them
-        if (ev.dataTransfer.items[i].kind === 'file') {
+        if (ev.dataTransfer.items[i].kind === "file") {
           const file = ev.dataTransfer.items[i].getAsFile();
-          console.log('... file[' + i + '].name = ' + file.name);
+          console.log("... file[" + i + "].name = " + file.name);
 
-          const event = new CustomEvent('got-file', {
+          const event = new CustomEvent("got-file", {
             detail: {
-              file: file
-            }
+              file: file,
+            },
           });
           this.dispatchEvent(event);
         }
@@ -71,12 +69,14 @@ export class DragDrop extends LitElement {
     } else {
       // Use DataTransfer interface to access the file(s)
       for (let i = 0; i < ev.dataTransfer.files.length; i++) {
-        console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
+        console.log(
+          "... file[" + i + "].name = " + ev.dataTransfer.files[i].name
+        );
 
-        const event = new CustomEvent('got-file', {
+        const event = new CustomEvent("got-file", {
           detail: {
-            file: ev.dataTransfer.files[i]
-          }
+            file: ev.dataTransfer.files[i],
+          },
         });
         this.dispatchEvent(event);
 
@@ -86,18 +86,19 @@ export class DragDrop extends LitElement {
   }
 
   dragOverHandler(ev: any) {
-
     // Prevent default behavior (Prevent file from being opened)
     ev.preventDefault();
-
   }
 
   render() {
     return html`
-        <div @drop="${(event: any) => this.dropHandler(event)}" @dragover="${(event: any) => this.dragOverHandler(event)}"
-            id="dragdrop">
-            <slot></slot>
-        </div>
-        `;
+      <div
+        @drop="${(event: any) => this.dropHandler(event)}"
+        @dragover="${(event: any) => this.dragOverHandler(event)}"
+        id="dragdrop"
+      >
+        <slot></slot>
+      </div>
+    `;
   }
 }

@@ -1,13 +1,11 @@
-import { Router } from '@vaadin/router';
-import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { Router } from "@vaadin/router";
+import { LitElement, css, html } from "lit";
+import { customElement } from "lit/decorators.js";
 
-@customElement('app-header')
+@customElement("app-header")
 export class AppHeader extends LitElement {
-
   static get styles() {
     return css`
-
       :host {
         position: fixed;
         left: calc(env(titlebar-area-x, 0) - 6px);
@@ -88,8 +86,9 @@ export class AppHeader extends LitElement {
         margin-left: 6px;
       }
 
-      @media(max-width: 800px) {
-        :host, header {
+      @media (max-width: 800px) {
+        :host,
+        header {
           height: 3.6em;
         }
 
@@ -98,8 +97,7 @@ export class AppHeader extends LitElement {
         }
       }
 
-
-      @media(prefers-color-scheme: light) {
+      @media (prefers-color-scheme: light) {
         header {
           color: black;
         }
@@ -118,8 +116,8 @@ export class AppHeader extends LitElement {
   render() {
     return html`
       <header>
-        <div @click="${() => this.goBack()}" id ="info">
-          <img src="/assets/icons/icon_64.png" alt="Simple Edit app icon">
+        <div @click="${() => this.goBack()}" id="info">
+          <img src="/assets/icons/icon_64.png" alt="Simple Edit app icon" />
 
           <h1>SimpleEdit</h1>
         </div>

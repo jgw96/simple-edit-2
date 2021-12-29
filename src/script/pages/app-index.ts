@@ -1,13 +1,13 @@
-import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { LitElement, css, html } from "lit";
+import { customElement } from "lit/decorators.js";
 
-import './app-intro';
+import "./app-intro";
 
-import { Router } from '@vaadin/router';
+import { Router } from "@vaadin/router";
 
-import '../components/header';
+import "../components/header";
 
-@customElement('app-index')
+@customElement("app-index")
 export class AppIndex extends LitElement {
   static get styles() {
     return css`
@@ -32,7 +32,7 @@ export class AppIndex extends LitElement {
         margin-top: env(titlebar-area-height, 33px);
       }
 
-      @media(max-width: 800px) {
+      @media (max-width: 800px) {
         main {
           margin-top: 3.6em;
         }
@@ -69,33 +69,33 @@ export class AppIndex extends LitElement {
     // for more info check out the lit-element docs https://lit-element.polymer-project.org/guide/lifecycle
 
     // For more info on using the @vaadin/router check here https://vaadin.com/router
-    const router = new Router(this.shadowRoot?.querySelector('#routerOutlet'));
+    const router = new Router(this.shadowRoot?.querySelector("#routerOutlet"));
     router.setRoutes([
       // temporarily cast to any because of a Type bug with the router
       {
-        path: '',
+        path: "",
         animate: true,
         children: [
-          { path: '/', component: 'app-intro' },
+          { path: "/", component: "app-intro" },
           {
-            path: '/home',
-            component: 'app-home',
+            path: "/home",
+            component: "app-home",
             action: async () => {
-              await import('./app-home');
-            }
-          },
-          {
-            path: '/about',
-            component: 'app-about',
-            action: async () => {
-              await import('./app-about.js');
+              await import("./app-home");
             },
           },
           {
-            path: '/gallery',
-            component: 'app-about',
+            path: "/about",
+            component: "app-about",
             action: async () => {
-              await import('./app-about.js');
+              await import("./app-about.js");
+            },
+          },
+          {
+            path: "/gallery",
+            component: "app-about",
+            action: async () => {
+              await import("./app-about.js");
             },
           },
         ],
