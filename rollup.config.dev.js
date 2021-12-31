@@ -24,7 +24,7 @@ export default {
     copy({
       targets: [
         { src: "assets/**/*", dest: "build/assets/" },
-        { src: "styles/global.css", dest: "build/styles/" },
+        { src: "styles/**/*", dest: "build/styles/" },
         { src: "manifest.json", dest: "build/" },
       ],
     }),
