@@ -375,7 +375,19 @@ export class AppCanvas extends LitElement {
     const active = this.canvas?.getActiveObject();
 
     if (active) {
-      dataurl = active.toDataURL({});
+      active.cloneAsImage((cloned) => {
+        if (active.height && active.width) {
+          active.scaleToHeight(active.height);
+          active.scaleToWidth(active.width);
+
+          dataurl = active.toDataURL({});
+
+          active.scaleToHeight(cloned.height);
+          active.scaleToWidth(cloned.width);
+
+          cloned.dispose();
+        }
+      })
     } else {
       dataurl = this.canvas?.toDataURL();
     }

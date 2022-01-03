@@ -6,14 +6,17 @@ import strip from "@rollup/plugin-strip";
 import copy from "rollup-plugin-copy";
 import typescript from "@rollup/plugin-typescript";
 import filesize from 'rollup-plugin-filesize';
+import minifyHTML from 'rollup-plugin-minify-html-literals';
 
 export default {
   input: "build/index.html",
+  preserveEntrySignatures: 'strict',
   output: {
     dir: "dist",
     format: "es",
   },
   plugins: [
+    html(),
     resolve(),
     filesize(
       {
@@ -21,16 +24,20 @@ export default {
         showBrotliSize: true
       }
     ),
+    minifyHTML(),
     replace({
       "process.env.NODE_ENV": JSON.stringify(
         process.env.NODE_ENV || "production"
       ),
     }),
-    html(),
     typescript({
       tsconfig: "tsconfig.json"
     }),
-    terser(),
+    terser({
+      ecma: 2020,
+      module: true,
+      warnings: true,
+    }),
     strip({
       functions: ["console.log"],
     }),
