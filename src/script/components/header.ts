@@ -118,8 +118,6 @@ export class AppHeader extends LitElement {
       <header>
         <div @click="${() => this.goBack()}" id="info">
           <img src="/assets/icons/icon_64.png" alt="Simple Edit app icon" />
-
-          <h1>SimpleEdit</h1>
         </div>
       </header>
     `;
