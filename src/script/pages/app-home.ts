@@ -137,9 +137,15 @@ export class AppHome extends LitElement {
 
         position: absolute;
         top: 0;
-        right: 6em;
         height: env(titlebar-area-height, 33px);
         margin-top: 0;
+        z-index: 999999;
+
+        app-region: no-drag;
+
+        margin-right: 0;
+        right: 0;
+        width: calc(env(titlebar-area-x, -266px) + 725px);
 
         animation-name: slideup;
         animation-duration: 280ms;
@@ -191,6 +197,8 @@ export class AppHome extends LitElement {
         );
         border-radius: var(--sl-input-border-radius-medium);
         top: 3.5em;
+
+        display: none;
       }
 
       @media (prefers-color-scheme: light) {
@@ -237,7 +245,7 @@ export class AppHome extends LitElement {
 
       #controls #advanced {
         position: fixed;
-        right: 0px;
+        right: calc(env(titlebar-area-width, 53vw) - 37.7em);
       }
 
       #mobile-toolbar #advanced {
@@ -418,6 +426,10 @@ export class AppHome extends LitElement {
         #menuToggler {
           display: none;
         }
+
+        #controls {
+          z-index: 9999;
+        }
       }
 
       @media (max-width: 1200px) and (min-width: 800px) {
@@ -431,6 +443,10 @@ export class AppHome extends LitElement {
       }
 
       .duoFilters {
+        display: none;
+      }
+
+      #advanced {
         display: none;
       }
 
