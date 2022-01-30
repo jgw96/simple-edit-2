@@ -135,6 +135,12 @@ export class AppHome extends LitElement {
         height: initial;
         flex-direction: row;
 
+        position: absolute;
+        top: 0;
+        right: 6em;
+        height: env(titlebar-area-height, 33px);
+        margin-top: 0;
+
         animation-name: slideup;
         animation-duration: 280ms;
         animation-timing-function: "ease-in-out";
@@ -231,7 +237,7 @@ export class AppHome extends LitElement {
 
       #controls #advanced {
         position: fixed;
-        right: 20px;
+        right: 0px;
       }
 
       #mobile-toolbar #advanced {
@@ -459,6 +465,9 @@ export class AppHome extends LitElement {
         aside {
           flex-direction: column;
           overflow-y: scroll;
+          height: initial;
+          position: unset;
+          padding-top: 12px;
         }
 
         #controls,
@@ -779,6 +788,10 @@ export class AppHome extends LitElement {
     this.removeShow = false;
   }
 
+  handleDone() {
+    this.toggleMobileMenu();
+  }
+
   render() {
     return html`
       <save-modal @saved="${() => this.saveCanvas()}"></save-modal>
@@ -786,16 +799,16 @@ export class AppHome extends LitElement {
         <div id="layout">
         <aside>
             <div id="controls">
-              <sl-button variant="primary" id="choosePhoto" @click="${() =>
+              <sl-button size="small" variant="primary" id="choosePhoto" @click="${() =>
                 this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
-              <sl-button id="chooseFolder" @click="${() =>
+              <sl-button size="small" id="chooseFolder" @click="${() =>
                 this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></sl-button>
-              <sl-button variant="success" @click="${() =>
+              <sl-button size="small" @click="${() =>
                 this.save()}">Save <ion-icon name="save-outline"></ion-icon></sl-button>
-              <sl-button @click="${() =>
+              <sl-button size="small" @click="${() =>
                 this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
-              <sl-button variant="danger" @click="${() =>
+              <sl-button size="small" @click="${() =>
                 this.revert()}">undo <ion-icon name="arrow-undo-outline"></ion-icon></sl-button>
               ${
                 this.removeShow
@@ -809,6 +822,7 @@ export class AppHome extends LitElement {
                       >
                         <sl-button
                           variant="danger"
+                          size="small"
                           id="remove-image"
                           @click="${() => this.remove()}"
                           >Remove <ion-icon name="trash-outline"></ion-icon
@@ -824,12 +838,12 @@ export class AppHome extends LitElement {
                 Gallery
               </a>
 
-              <sl-button id="advanced" @click="${() =>
+              <sl-button size="small" id="advanced" @click="${() =>
                 this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
             <!--extracting -->
-            <common-controls class="duoFilters"></common-controls>
+            <common-controls class="duoFilters" .canvas="${this.canvas}" @filter-done="${() => this.handleDone()}"></common-controls>
 
 
           </aside>
@@ -837,7 +851,7 @@ export class AppHome extends LitElement {
           <main id="canvasMain">
 
           <!-- extracting -->
-          <common-controls class="tabletFilters" .canvas="${this.canvas}"></common-controls>
+          <common-controls class="tabletFilters" .canvas="${this.canvas}" @filter-done="${() => this.handleDone()}"></common-controls>
 
             <drag-drop @got-file="${(event: any) =>
               this.handleSharedImage(
@@ -890,7 +904,7 @@ export class AppHome extends LitElement {
                 this.doSettings()}">Settings <ion-icon name="settings-outline"></ion-icon></sl-button>
             </div>
 
-            <common-controls class="mobileControls"></common-controls>
+            <common-controls class="mobileControls" .canvas="${this.canvas}" @filter-done="${() => this.handleDone()}"></common-controls>
 
             </div>
         </div>
