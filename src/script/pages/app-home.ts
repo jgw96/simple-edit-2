@@ -144,9 +144,8 @@ export class AppHome extends LitElement {
         app-region: no-drag;
 
         margin-right: 0;
-        right: 0;
 
-        width: calc(env(titlebar-area-x, -307px) + 775px);
+        left: calc(env(titlebar-area-x, 0px) + 111px);
 
         animation-name: slideup;
         animation-duration: 280ms;
