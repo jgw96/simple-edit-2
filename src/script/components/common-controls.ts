@@ -47,7 +47,7 @@ export class CommonControls extends LitElement {
       #filters {
         flex-direction: row;
         justify-content: flex-end;
-        height: 86vh;
+        height: 93vh;
         overflow-y: auto;
         overflow-x: hidden;
       }
