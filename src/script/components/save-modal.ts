@@ -74,13 +74,13 @@ export class SaveModal extends LitElement {
   render() {
     return html`
       <sl-dialog label="Save" class="save-dialog">
-        Ready to save your work?
+        Ready to export your work?
 
         <sl-button slot="footer" @click="${() => this.closeModal()}"
           >Cancel</sl-button
         >
         <sl-button slot="footer" id="save-button" @click="${() => this.save()}"
-          >Save <ion-icon name="save-outline"></ion-icon>
+          >Export <ion-icon name="save-outline"></ion-icon>
         </sl-button>
       </sl-dialog>
     `;

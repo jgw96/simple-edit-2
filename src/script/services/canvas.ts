@@ -118,6 +118,8 @@ export function drawImageFunc(
             left: 0 + window.innerWidth / 8,
             top: 0 + window.innerHeight / 8,
             angle: 0,
+            width: image.naturalWidth,
+            height: image.naturalHeight,
           });
 
           canvas?.add(imgInstance);

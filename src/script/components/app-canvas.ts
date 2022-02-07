@@ -345,55 +345,23 @@ export class AppCanvas extends LitElement {
   }
 
   public async save() {
-    /*let dataurl: string | undefined = undefined;
-
-    const active = this.canvas?.getActiveObject();
-
-    if (active) {
-      dataurl = active.toDataURL({});
-    }
-    else {
-      dataurl = this.canvas?.toDataURL();
-    }
-
-    if (dataurl) {
-      const blob = this.dataURLtoBlob(dataurl);
-      console.log(blob);
-
-      if (blob) {
-        const handle = await fileSave(blob, {
-          fileName: "untitled.png",
-          extensions: [".png"]
-        });
-
-        await this.saveFileHandles(handle, blob);
-      }
-    }*/
-
     let dataurl: string | undefined = undefined;
 
     const active = this.canvas?.getActiveObject();
 
     if (active) {
-      active.cloneAsImage((cloned) => {
-        if (active.height && active.width) {
-          active.scaleToHeight(active.height);
-          active.scaleToWidth(active.width);
+      if (((active as any)._filteredEl as HTMLCanvasElement)) {
+        dataurl = (active as any)._filteredEl.toDataURL({});
+      }
 
-          dataurl = active.toDataURL({});
-
-          active.scaleToHeight(cloned.height);
-          active.scaleToWidth(cloned.width);
-
-          cloned.dispose();
-        }
-      })
     } else {
       dataurl = this.canvas?.toDataURL();
     }
 
     if (dataurl) {
+      console.log('dataurl', dataurl);
       const blob = this.dataURLtoBlob(dataurl);
+      console.log(blob);
       const handle = await fileSave(blob, {
         fileName: "untitled.png",
         extensions: [".png"],

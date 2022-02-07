@@ -820,7 +820,7 @@ export class AppHome extends LitElement {
               <sl-button size="small" id="chooseFolder" @click="${() =>
                 this.openFolder()}">Add Folder <ion-icon name="folder-outline"></ion-icon></sl-button>
               <sl-button size="small" @click="${() =>
-                this.save()}">Save <ion-icon name="save-outline"></ion-icon></sl-button>
+                this.save()}">Export <ion-icon name="save-outline"></ion-icon></sl-button>
               <sl-button size="small" @click="${() =>
                 this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
@@ -889,7 +889,7 @@ export class AppHome extends LitElement {
               <sl-button variant="primary" id="choosePhoto" @click="${() =>
                 this.openPhoto()}">Add Photos <ion-icon name="add-outline"></ion-icon></sl-button>
               <sl-button variant="success" @click="${() =>
-                this.save()}">Save <ion-icon name="save-outline"></ion-icon></sl-button>
+                this.save()}">Export <ion-icon name="save-outline"></ion-icon></sl-button>
               <sl-button @click="${() =>
                 this.share()}" id="shareButton">Share <ion-icon name="share-outline"></ion-icon></sl-button>
 
