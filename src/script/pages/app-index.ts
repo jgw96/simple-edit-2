@@ -34,7 +34,7 @@ export class AppIndex extends LitElement {
 
       @media (max-width: 800px) {
         main {
-          margin-top: 3.6em;
+          margin-top: 2.6em;
         }
       }
 

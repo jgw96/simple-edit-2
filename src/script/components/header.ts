@@ -89,7 +89,7 @@ export class AppHeader extends LitElement {
       @media (max-width: 800px) {
         :host,
         header {
-          height: 3.6em;
+          height: 2.6em;
         }
 
         #info h1 {

@@ -184,8 +184,6 @@ export class AppCanvas extends LitElement {
 
       this.canvas?.on("mouse:down", (options) => {
         if (options.target) {
-          console.log("an object was clicked! ", options.target.type);
-
           if (options.target.type?.includes("text")) {
             this.text = true;
             this.currentText = options.target;

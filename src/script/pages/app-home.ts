@@ -1,7 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 //@ts-ignore
-import fabricPureBrowser from "https://cdn.skypack.dev/fabric-pure-browser";
+// import fabricPureBrowser from "https://cdn.skypack.dev/fabric-pure-browser";
 
 import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js";
 import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/animation/animation.js";
@@ -429,6 +429,7 @@ export class AppHome extends LitElement {
 
         #controls {
           z-index: 9999;
+          margin-left: 12px;
         }
       }
 
@@ -563,8 +564,9 @@ export class AppHome extends LitElement {
     });
 
     queue.pushTask(() => {
-      console.log("initializing Fabric");
-      window.fabric = fabricPureBrowser.fabric;
+      console.log("initializing Fabric", window.fabric);
+      // import("../fabric.min.js");
+      // window.fabric = fabricPureBrowser.fabric;
     });
 
     queue.pushTask(async () => {
@@ -878,11 +880,11 @@ export class AppHome extends LitElement {
           </main>
 
           <!-- mobile menu toggler -->
-          <sl-button id="menuToggler" @click="${() =>
+          <sl-button id="menuToggler" variant="primary" @click="${() =>
             this.toggleMobileMenu()}">Menu</sl-button>
 
           <div id="mobile-toolbar">
-           <sl-button id="menu-close" @click="${() =>
+           <sl-button variant="primary" id="menu-close" @click="${() =>
              this.toggleMobileMenu()}">Close</sl-button>
 
           <div id="controls">
