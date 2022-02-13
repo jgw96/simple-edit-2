@@ -1,7 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 //@ts-ignore
-import fabricPureBrowser from "https://cdn.skypack.dev/fabric-pure-browser";
+// import fabricPureBrowser from "https://cdn.skypack.dev/fabric-pure-browser";
 
 import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/button/button.js";
 import "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/components/animation/animation.js";
@@ -563,8 +563,9 @@ export class AppHome extends LitElement {
     });
 
     queue.pushTask(() => {
-      console.log("initializing Fabric");
-      window.fabric = fabricPureBrowser.fabric;
+      console.log("initializing Fabric", window.fabric);
+      // import("../fabric.min.js");
+      // window.fabric = fabricPureBrowser.fabric;
     });
 
     queue.pushTask(async () => {

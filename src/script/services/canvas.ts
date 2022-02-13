@@ -122,6 +122,12 @@ export function drawImageFunc(
             height: image.naturalHeight,
           });
 
+          if (window.matchMedia("(max-width: 800px)").matches) {
+            imgInstance.scaleToWidth(400);
+          } else {
+            imgInstance.scaleToWidth(800);
+          }
+
           canvas?.add(imgInstance);
 
           imgInstance.bringToFront();
