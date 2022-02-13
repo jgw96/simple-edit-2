@@ -429,6 +429,7 @@ export class AppHome extends LitElement {
 
         #controls {
           z-index: 9999;
+          margin-left: 12px;
         }
       }
 
@@ -879,11 +880,11 @@ export class AppHome extends LitElement {
           </main>
 
           <!-- mobile menu toggler -->
-          <sl-button id="menuToggler" @click="${() =>
+          <sl-button id="menuToggler" variant="primary" @click="${() =>
             this.toggleMobileMenu()}">Menu</sl-button>
 
           <div id="mobile-toolbar">
-           <sl-button id="menu-close" @click="${() =>
+           <sl-button variant="primary" id="menu-close" @click="${() =>
              this.toggleMobileMenu()}">Close</sl-button>
 
           <div id="controls">
