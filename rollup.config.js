@@ -46,6 +46,7 @@ export default {
         { src: "assets/**/*", dest: "dist/assets/" },
         { src: "styles/**/*", dest: "dist/styles/" },
         { src: "manifest.json", dest: "dist/" },
+        { src: "fabric.min.js", dest: "dist/" },
         { src: ".well-known/**/*", dest: "dist/.well-known/"}
       ],
     }),
