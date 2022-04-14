@@ -596,10 +596,10 @@ export class AppHome extends LitElement {
       }
     });
 
-    queue.pushTask(() => {
+    // queue.pushTask(() => {
       console.log("initilalizing fileHandling");
       this.fileHandler();
-    });
+    // });
 
     const search = new URLSearchParams(location.search);
     const file_name = search.get("file");
@@ -657,7 +657,9 @@ export class AppHome extends LitElement {
 
   async fileHandler() {
     if ("launchQueue" in window) {
+      console.log("launchQueue is defined");
       (window as any).launchQueue.setConsumer(async (launchParams: any) => {
+        console.log("launchParams", launchParams);
         if (!launchParams.files.length) {
           return;
         }
@@ -665,7 +667,7 @@ export class AppHome extends LitElement {
         const fileHandle = launchParams.files[0];
         console.log("fileHandle", fileHandle);
 
-        await this.handleSharedImage(fileHandle);
+        await this.handleSharedImage(await fileHandle.getFile());
       });
     }
   }
