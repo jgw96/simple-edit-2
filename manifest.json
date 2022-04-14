@@ -700,7 +700,7 @@
   "protocol_handlers": [
     {
       "protocol": "web+simpleedit",
-      "url": "/share/image/?url=%s"
+      "url": "/?url=%s"
     }
   ],
   "share_target": {

@@ -591,8 +591,9 @@ export class AppHome extends LitElement {
         return event.data.file;
       });
 
-      if (imageBlob.getValue()) {
-        this.handleSharedImage(imageBlob.getValue());
+      console.log("received service worker message");
+      if (event.data.file) {
+        this.handleSharedImage(event.data.file);
       }
     });
 
@@ -622,6 +623,31 @@ export class AppHome extends LitElement {
             await set("current_file", file.canvas);
           }
         });
+      }
+    }
+
+    let url = search.get("url");
+    if (url) {
+      url = url.substring(15); //remove web+simpleedit:
+
+      try {
+        let blob = await fetch(url).then((res) => res.blob());
+
+        if (blob) {
+          this.org = blob;
+
+          await this.updateComplete;
+
+          this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+          this.canvas?.drawImage(blob);
+
+          await this.updateComplete;
+
+          await set("current_file", this.canvas?.writeToJSON());
+        }
+      } catch(nop) {
+
       }
     }
   }

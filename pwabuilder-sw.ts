@@ -9,7 +9,8 @@ self.addEventListener("message", (event: any) => {
   }
 });
 
-async function shareTargetHandler(event: any) {
+async function shareTargetHandler(e: any) {
+  const {event} = e;
   event.respondWith(Response.redirect("/"));
 
   return event.waitUntil(async function () {
@@ -21,8 +22,14 @@ async function shareTargetHandler(event: any) {
     const file = data.get('file');
 
     console.log('file', file);
+    await delay(1000);
     client.postMessage({ file, action: 'load-image' });
   }());
+};
+
+// function to delay in milliseconds
+async function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 };
 
 registerRoute(
