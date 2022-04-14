@@ -668,10 +668,6 @@
       "type": "image/png"
     },
     {
-      "src": "assets/screenshots/screen_2.png",
-      "type": "image/png"
-    },
-    {
       "src": "assets/screenshots/screen_3.png",
       "type": "image/png"
     },
@@ -704,7 +700,7 @@
   "protocol_handlers": [
     {
       "protocol": "web+simpleedit",
-      "url": "/share/image/?url=%s"
+      "url": "/?url=%s"
     }
   ],
   "share_target": {

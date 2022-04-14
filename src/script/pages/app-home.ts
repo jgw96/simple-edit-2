@@ -591,15 +591,16 @@ export class AppHome extends LitElement {
         return event.data.file;
       });
 
-      if (imageBlob.getValue()) {
-        this.handleSharedImage(imageBlob.getValue());
+      console.log("received service worker message");
+      if (event.data.file) {
+        this.handleSharedImage(event.data.file);
       }
     });
 
-    queue.pushTask(() => {
+    // queue.pushTask(() => {
       console.log("initilalizing fileHandling");
       this.fileHandler();
-    });
+    // });
 
     const search = new URLSearchParams(location.search);
     const file_name = search.get("file");
@@ -622,6 +623,31 @@ export class AppHome extends LitElement {
             await set("current_file", file.canvas);
           }
         });
+      }
+    }
+
+    let url = search.get("url");
+    if (url) {
+      url = url.substring(15); //remove web+simpleedit:
+
+      try {
+        let blob = await fetch(url).then((res) => res.blob());
+
+        if (blob) {
+          this.org = blob;
+
+          await this.updateComplete;
+
+          this.canvas = this.shadowRoot?.querySelector("app-canvas");
+
+          this.canvas?.drawImage(blob);
+
+          await this.updateComplete;
+
+          await set("current_file", this.canvas?.writeToJSON());
+        }
+      } catch(nop) {
+
       }
     }
   }
@@ -657,7 +683,9 @@ export class AppHome extends LitElement {
 
   async fileHandler() {
     if ("launchQueue" in window) {
+      console.log("launchQueue is defined");
       (window as any).launchQueue.setConsumer(async (launchParams: any) => {
+        console.log("launchParams", launchParams);
         if (!launchParams.files.length) {
           return;
         }
@@ -665,7 +693,7 @@ export class AppHome extends LitElement {
         const fileHandle = launchParams.files[0];
         console.log("fileHandle", fileHandle);
 
-        await this.handleSharedImage(fileHandle);
+        await this.handleSharedImage(await fileHandle.getFile());
       });
     }
   }
