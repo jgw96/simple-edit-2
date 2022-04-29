@@ -597,10 +597,8 @@ export class AppHome extends LitElement {
       }
     });
 
-    // queue.pushTask(() => {
-      console.log("initilalizing fileHandling");
-      this.fileHandler();
-    // });
+    console.log("initilalizing fileHandling");
+    this.fileHandler();
 
     const search = new URLSearchParams(location.search);
     const file_name = search.get("file");
